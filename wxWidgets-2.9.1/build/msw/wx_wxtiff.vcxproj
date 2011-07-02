@@ -124,8 +124,8 @@
     <TargetName>wxtiffd</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Release|Win32'">
-    <OutDir>.\..\..\lib\vc_dll\</OutDir>
-    <IntDir>.\vc_mswudll\wxtiff\</IntDir>
+    <OutDir>.\..\..\..\lib\Release\wx\</OutDir>
+    <IntDir>.\..\..\..\temp\wx\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>wxtiff</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Universal Release|Win32'">
@@ -196,10 +196,10 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>..\..\src\zlib;..\..\src\jpeg;..\..\src\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\vc_mswudll\wxtiff\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\vc_mswudll\wxtiff\wx_wxtiff.pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>.\vc_mswudll\wxtiff\</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\lib\vc_dll\wxtiff.pdb</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)$(ProjectName)\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <AdditionalOptions> /EHsc /opt:ref /opt:icf </AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
@@ -211,7 +211,7 @@
     </Bscmake>
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>..\..\lib\vc_dll\wxtiff.lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DLL Universal Release|Win32'">

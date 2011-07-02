@@ -119,8 +119,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Release|Win32'">
-    <OutDir>.\..\..\lib\vc_dll\</OutDir>
-    <IntDir>.\vc_mswudll\wxjpeg\</IntDir>
+    <OutDir>.\..\..\..\lib\Release\wx\</OutDir>
+    <IntDir>.\..\..\..\temp\wx\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>wxjpeg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -164,10 +164,10 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>..\..\lib\vc_dll\mswu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\vc_mswudll\wxjpeg\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\vc_mswudll\wxjpeg\wx_wxjpeg.pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>.\vc_mswudll\wxjpeg\</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\lib\vc_dll\wxjpeg.pdb</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)$(ProjectName)\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <AdditionalOptions> /EHsc /opt:ref /opt:icf </AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
@@ -179,7 +179,7 @@
     </Bscmake>
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>..\..\lib\vc_dll\wxjpeg.lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

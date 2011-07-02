@@ -145,8 +145,8 @@
     <IntDir>.\vc_mswunivud\wxscintilla\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Release|Win32'">
-    <OutDir>.\..\..\lib\vc_dll\</OutDir>
-    <IntDir>.\vc_mswudll\wxscintilla\</IntDir>
+    <OutDir>.\..\..\..\lib\Release\wx\</OutDir>
+    <IntDir>.\..\..\..\temp\wx\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>wxscintilla</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Universal Debug|Win32'">
@@ -341,10 +341,10 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>..\..\src\stc\scintilla\include;..\..\src\stc\scintilla\src;..\..\lib\vc_dll\mswu;..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;WXUSINGDLL;__WX__;__WXMSW__;SCI_LEXER;LINK_LEXERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\vc_mswudll\wxscintilla\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\vc_mswudll\wxscintilla\wx_wxscintilla.pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>.\vc_mswudll\wxscintilla\</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\lib\vc_dll\wxscintilla.pdb</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)$(ProjectName)\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <AdditionalOptions> /EHsc /opt:ref /opt:icf </AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
@@ -356,7 +356,7 @@
     </Bscmake>
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>..\..\lib\vc_dll\wxscintilla.lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DLL Universal Debug|Win32'">

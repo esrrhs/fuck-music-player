@@ -121,8 +121,8 @@
     <IntDir>.\vc_mswunivud\wxregex\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Release|Win32'">
-    <OutDir>.\..\..\lib\vc_dll\</OutDir>
-    <IntDir>.\vc_mswudll\wxregex\</IntDir>
+    <OutDir>.\..\..\..\lib\Release\wx\</OutDir>
+    <IntDir>.\..\..\..\temp\wx\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>wxregexu</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Universal Release|Win32'">
@@ -191,10 +191,10 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>..\..\include;..\..\lib\vc_dll\mswu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_LIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;__WXMSW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\vc_mswudll\wxregex\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\vc_mswudll\wxregex\wx_wxregex.pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>.\vc_mswudll\wxregex\</ObjectFileName>
-      <ProgramDataBaseFileName>..\..\lib\vc_dll\wxregexu.pdb</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)$(ProjectName)\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <AdditionalOptions> /EHsc /opt:ref /opt:icf </AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
@@ -206,7 +206,7 @@
     </Bscmake>
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>..\..\lib\vc_dll\wxregexu.lib</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DLL Universal Release|Win32'">
