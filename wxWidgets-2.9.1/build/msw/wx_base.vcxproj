@@ -132,8 +132,8 @@
     <TargetName>wxbase29ud</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Debug|Win32'">
-    <OutDir>.\..\..\..\lib\wx\</OutDir>
-    <IntDir>.\..\..\..\temp\wx\</IntDir>
+    <OutDir>.\..\..\..\lib\Debug\wx\</OutDir>
+    <IntDir>.\..\..\..\temp\wx\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>wxbase291ud_vc_custom</TargetName>
   </PropertyGroup>
@@ -238,10 +238,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
-      <ImportLibrary>..\..\lib\vc_dll\wxbase29ud.lib</ImportLibrary>
-      <AdditionalLibraryDirectories>..\..\lib\vc_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)wxbase29ud.lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>wxzlibd.lib;wxregexud.lib;wxexpatd.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <BuildLog>
+      <Path>$(IntDir)\$(MSBuildProjectName).log</Path>
+    </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

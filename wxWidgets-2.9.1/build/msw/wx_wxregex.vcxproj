@@ -134,8 +134,8 @@
     <IntDir>.\vc_mswunivu\wxregex\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Debug|Win32'">
-    <OutDir>.\..\..\..\lib\wx\</OutDir>
-    <IntDir>.\..\..\..\temp\wx\</IntDir>
+    <OutDir>.\..\..\..\lib\Debug\wx\</OutDir>
+    <IntDir>.\..\..\..\temp\wx\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>wxregexud</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -295,6 +295,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
     </Lib>
+    <BuildLog>
+      <Path>$(IntDir)\$(MSBuildProjectName).log</Path>
+    </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

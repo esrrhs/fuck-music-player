@@ -119,8 +119,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Debug|Win32'">
-    <OutDir>.\..\..\..\lib\wx\</OutDir>
-    <IntDir>.\..\..\..\temp\wx\</IntDir>
+    <OutDir>.\..\..\..\lib\Debug\wx\</OutDir>
+    <IntDir>.\..\..\..\temp\wx\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>wxtiffd</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DLL Release|Win32'">
@@ -181,6 +181,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName).lib</OutputFile>
     </Lib>
+    <BuildLog>
+      <Path>$(IntDir)\$(MSBuildProjectName).log</Path>
+    </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DLL Release|Win32'">
     <ClCompile>
