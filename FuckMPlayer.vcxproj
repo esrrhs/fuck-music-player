@@ -37,13 +37,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>temp\$(Configuration)\</IntDir>
+    <IntDir>temp\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>bin\$(Configuration)\</OutDir>
     <IncludePath>$(ProjectDir)wxWidgets-2.9.1\include;$(ProjectDir)wxWidgets-2.9.1\lib\vc_dll\mswud;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>bin\$(Configuration)\</OutDir>
-    <IntDir>temp\$(Configuration)\</IntDir>
+    <IntDir>temp\$(ProjectName)\$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir)wxWidgets-2.9.1\include;$(ProjectDir)wxWidgets-2.9.1\lib\vc_dll\mswud;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
