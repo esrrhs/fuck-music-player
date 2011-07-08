@@ -1,6 +1,10 @@
 #include "mainframe.h"
 #include "wx/wxprec.h"
 
+#include "globledefine.h"
+#include <boost/pool/detail/singleton.hpp>
+#include "mainthread.h"
+
 IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
@@ -16,6 +20,9 @@ bool MyApp::OnInit()
     frame->Show(true);
 
     SetTopWindow(frame);
+
+	// 启动主线程
+	SINGLETON(MainThread).ini();
 
     return true;
 }

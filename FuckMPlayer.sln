@@ -49,6 +49,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xml", "wxWidgets-2.9.1\buil
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrc", "wxWidgets-2.9.1\build\msw\wx_xrc.vcxproj", "{A7009E99-30E9-9404-55DD-85BE0353F330}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost", "boost\boost.vcxproj", "{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mainrunning", "mainrunning\mainrunning.vcxproj", "{6B3BE5BA-778C-4560-A831-57D8DA16791A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -147,6 +151,14 @@ Global
 		{A7009E99-30E9-9404-55DD-85BE0353F330}.Debug|Win32.Build.0 = DLL Debug|Win32
 		{A7009E99-30E9-9404-55DD-85BE0353F330}.Release|Win32.ActiveCfg = DLL Release|Win32
 		{A7009E99-30E9-9404-55DD-85BE0353F330}.Release|Win32.Build.0 = DLL Release|Win32
+		{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}.Debug|Win32.Build.0 = Debug|Win32
+		{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}.Release|Win32.ActiveCfg = Release|Win32
+		{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}.Release|Win32.Build.0 = Release|Win32
+		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Debug|Win32.Build.0 = Debug|Win32
+		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Release|Win32.ActiveCfg = Release|Win32
+		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
