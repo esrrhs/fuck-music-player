@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // boostinspect:nounnamed
-#ifdef WIN32
 
 namespace {
 const int MILLISECONDS_PER_SECOND = 1000;
@@ -129,4 +128,3 @@ inline void to_microduration(boost::xtime xt, int& microseconds)
 
 // Change Log:
 //    1 Jun 01  Initial creation.
-#endif

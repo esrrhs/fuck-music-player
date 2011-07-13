@@ -6,7 +6,6 @@
 // Use, modification and distribution are subject to the
 // Boost Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#ifdef WIN32
 
 #include <boost/thread/detail/config.hpp>
 
@@ -282,5 +281,3 @@ namespace boost
 #endif //defined(_MSC_VER) && !defined(UNDER_CE)
 
 #endif //defined(BOOST_HAS_WINTHREADS) && defined(BOOST_THREAD_BUILD_LIB)
-
-#endif

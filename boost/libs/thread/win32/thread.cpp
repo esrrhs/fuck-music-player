@@ -3,11 +3,9 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 // (C) Copyright 2007 Anthony Williams
 // (C) Copyright 2007 David Deakins
-#ifdef WIN32
 
 #define _WIN32_WINNT 0x400
 #define WINVER 0x400
-
 
 #include <boost/thread/thread.hpp>
 #include <algorithm>
@@ -624,4 +622,3 @@ namespace boost
 }
 
 
-#endif

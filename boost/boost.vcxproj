@@ -11,16 +11,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libs\thread\pthread\once.cpp" />
-    <ClCompile Include="libs\thread\pthread\thread.cpp" />
+    <ClCompile Include="libs\date_time\gregorian\date_generators.cpp" />
+    <ClCompile Include="libs\date_time\gregorian\gregorian_types.cpp" />
+    <ClCompile Include="libs\date_time\gregorian\greg_month.cpp" />
+    <ClCompile Include="libs\date_time\gregorian\greg_weekday.cpp" />
+    <ClCompile Include="libs\date_time\posix_time\posix_time_types.cpp" />
     <ClCompile Include="libs\thread\tss_null.cpp" />
     <ClCompile Include="libs\thread\win32\thread.cpp" />
-    <ClCompile Include="libs\thread\win32\tss_dll.cpp" />
     <ClCompile Include="libs\thread\win32\tss_pe.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="libs\thread\pthread\timeconv.inl" />
     <None Include="libs\thread\win32\timeconv.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libs\date_time\gregorian\greg_names.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}</ProjectGuid>
@@ -65,7 +69,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;BOOST_ALL_NO_LIB;BOOST_THREAD_BUILD_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -82,7 +86,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;BOOST_ALL_NO_LIB;BOOST_THREAD_BUILD_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
