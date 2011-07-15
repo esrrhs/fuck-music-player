@@ -3,4 +3,11 @@
 
 #define SINGLETON(t) boost::details::pool::singleton_default<t>::instance()
 
+#ifdef NULL
+#undef NULL
+#endif
+#define NULL 0
+
+#define LOG_TRACE(x) SINGLETON(Logger).log("trace.txt", "trace", x);
+
 #endif

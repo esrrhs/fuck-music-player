@@ -44,7 +44,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)boost;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)boost;$(SolutionDir)common;$(IncludePath)</IncludePath>
     <IntDir>..\temp\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>..\lib\Debug\</OutDir>
   </PropertyGroup>

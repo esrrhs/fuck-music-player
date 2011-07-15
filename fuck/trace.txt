@@ -1,0 +1,4 @@
+trace: ini Main Thread... [2011-Jul-16 00:50:50]
+trace: ini Main Thread ok [2011-Jul-16 00:50:50]
+trace: MainThread start... [2011-Jul-16 00:50:50]
+trace: MainThread start ok [2011-Jul-16 00:50:50]

@@ -20,6 +20,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace services {
 
@@ -99,9 +100,11 @@ public:
   /// Log a message.
   void log(impl_type& impl, const std::string& message)
   {
+	boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+
     // Format the text to be logged.
     std::ostringstream os;
-    os << impl->identifier << ": " << message;
+    os << impl->identifier << ": " << message << " [" << now << "]";
 
     // Pass the work of opening the file to the background thread.
     work_io_service_.post(boost::bind(

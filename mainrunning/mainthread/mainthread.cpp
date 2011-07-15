@@ -1,23 +1,19 @@
 #include "mainthread.h"
 #include <boost/thread/thread.hpp>
-#include <boost/asio.hpp>
-#include <boost/logger/logger.hpp>
+#include "Logger.h"
+#include <boost/pool/detail/singleton.hpp>
 
 #pragma comment(lib, "boost.lib")
 
 void MainThread::ini()
 {
+	LOG_TRACE("ini Main Thread...");
 	boost::thread thrd(boost::bind(&MainThread::run, this));
+	LOG_TRACE("ini Main Thread ok");
 }
 void MainThread::run()
 {
-	boost::asio::io_service io_service;
-	
-	services::logger logger(io_service, "log");
-	logger.use_file("log.txt");
-	
-	logger.log("123");
-	logger.log("123123");
-	logger.log("12312111");
+	LOG_TRACE("MainThread start...");
+	LOG_TRACE("MainThread start ok");
 }
 
