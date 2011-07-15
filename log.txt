@@ -7,3 +7,4 @@
 2011-7-2：建立第一个窗口，下一步加入boost库，好写个mainrunning线程跑主逻辑
 2011-7-8：加入boost库，还没加上thread
 2011-7-13：加上thread
+2011-7-15：加上logger

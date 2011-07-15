@@ -16,7 +16,8 @@
     <ClCompile Include="libs\date_time\gregorian\greg_month.cpp" />
     <ClCompile Include="libs\date_time\gregorian\greg_weekday.cpp" />
     <ClCompile Include="libs\date_time\posix_time\posix_time_types.cpp" />
-    <ClCompile Include="libs\thread\tss_null.cpp" />
+    <ClCompile Include="libs\logger\logger_service.cpp" />
+    <ClCompile Include="libs\system\error_code.cpp" />
     <ClCompile Include="libs\thread\win32\thread.cpp" />
     <ClCompile Include="libs\thread\win32\tss_pe.cpp" />
   </ItemGroup>
@@ -25,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\date_time\gregorian\greg_names.hpp" />
+    <ClInclude Include="libs\system\local_free_on_destruction.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}</ProjectGuid>
