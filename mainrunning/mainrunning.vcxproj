@@ -51,7 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\lib\Release\</OutDir>
     <IntDir>..\temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)boost;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)boost;$(SolutionDir)common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
