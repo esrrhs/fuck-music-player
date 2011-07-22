@@ -16,7 +16,6 @@
     <ClCompile Include="libs\date_time\gregorian\greg_month.cpp" />
     <ClCompile Include="libs\date_time\gregorian\greg_weekday.cpp" />
     <ClCompile Include="libs\date_time\posix_time\posix_time_types.cpp" />
-    <ClCompile Include="libs\logger\logger_service.cpp" />
     <ClCompile Include="libs\system\error_code.cpp" />
     <ClCompile Include="libs\thread\win32\thread.cpp" />
     <ClCompile Include="libs\thread\win32\tss_pe.cpp" />
