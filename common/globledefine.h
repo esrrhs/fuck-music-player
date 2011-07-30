@@ -8,9 +8,12 @@
 #endif
 #define NULL 0
 
-#define LOG_TRACE(tag, x) SINGLETON(Logger).log("trace.txt", tag, x);
-#define LOG_ERROR(tag, x) SINGLETON(Logger).log("error.txt", tag, x);
+#define LOG_TRACE(x) SINGLETON(Logger).log("trace.txt", __FUNCTION__, x);
+#define LOG_ERROR(x) SINGLETON(Logger).log("error.txt", __FUNCTION__, x);
+#define LOG_ENTER LOG_TRACE("begin...")
+#define LOG_LEAVE LOG_TRACE("end")
 
 typedef int s32;
+typedef unsigned u32;
 
 #endif
