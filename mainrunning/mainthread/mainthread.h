@@ -6,6 +6,8 @@
 class MainThread : public boost::noncopyable
 {
 public:
+	MainThread();
+	virtual ~MainThread();
 	void ini();
 	void run();
 };

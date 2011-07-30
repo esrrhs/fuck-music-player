@@ -11,8 +11,8 @@
 #ifndef SERVICES_LOGGER_HPP
 #define SERVICES_LOGGER_HPP
 
-#include <boost/logger/basic_logger.hpp>
-#include <boost/logger/logger_service.hpp>
+#include "basic_logger.hpp"
+#include "logger_service.hpp"
 
 namespace services {
 

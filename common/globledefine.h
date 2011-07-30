@@ -8,6 +8,6 @@
 #endif
 #define NULL 0
 
-#define LOG_TRACE(x) SINGLETON(Logger).log("trace.txt", "trace", x);
+#define LOG_TRACE(tag, x) SINGLETON(Logger).log("trace.txt", tag, x);
 
 #endif

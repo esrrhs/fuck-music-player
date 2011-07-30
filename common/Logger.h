@@ -2,7 +2,7 @@
 #define __LOGGER__
 
 #include <boost/asio.hpp>
-#include <boost/logger/logger.hpp>
+#include <ex/logger/logger.hpp>
 #include "globledefine.h"
 
 class Logger
