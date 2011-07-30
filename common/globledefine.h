@@ -9,5 +9,8 @@
 #define NULL 0
 
 #define LOG_TRACE(tag, x) SINGLETON(Logger).log("trace.txt", tag, x);
+#define LOG_ERROR(tag, x) SINGLETON(Logger).log("error.txt", tag, x);
+
+typedef int s32;
 
 #endif

@@ -4,6 +4,7 @@
 #include "globledefine.h"
 #include <boost/pool/detail/singleton.hpp>
 #include "mainthread.h"
+#include "globle.h"
 
 IMPLEMENT_APP(MyApp)
 
@@ -14,12 +15,13 @@ bool MyApp::OnInit()
 
     // Create the main frame window
 
-    MyFrame* frame = new MyFrame((wxFrame *)NULL, wxID_ANY, wxT("FuckMPlayer"),
+   m_mainFrame = new MainFrame((wxFrame *)NULL, wxID_ANY, wxT("FuckMPlayer"),
                                  wxDefaultPosition, wxSize(500, 400),
                                  wxDEFAULT_FRAME_STYLE);
-    frame->Show(true);
+    m_mainFrame->Show(true);
+    SetTopWindow(m_mainFrame);
 
-    SetTopWindow(frame);
+	SINGLETON(Globle).m_hwnd = (s32)m_mainFrame->GetHWND();
 
 	// 启动主线程
 	SINGLETON(MainThread).ini();
@@ -27,7 +29,7 @@ bool MyApp::OnInit()
     return true;
 }
 
-MyFrame::MyFrame(wxWindow *parent,
+MainFrame::MainFrame(wxWindow *parent,
                  const wxWindowID id,
                  const wxString& title,
                  const wxPoint& pos,
@@ -39,6 +41,6 @@ MyFrame::MyFrame(wxWindow *parent,
 
 }
 
-MyFrame::~MyFrame()
+MainFrame::~MainFrame()
 {
 }

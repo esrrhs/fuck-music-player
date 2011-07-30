@@ -4,23 +4,25 @@
 #include "wx/app.h"
 #include "wx/frame.h"
 
+class MainFrame;
 // Define a new application
 class MyApp : public wxApp
 {
 public:
+	MyApp() : m_mainFrame(0) {}
     bool OnInit();
+	MainFrame* GetMainFrame() { return m_mainFrame; }
+private:
+	MainFrame* m_mainFrame;
 };
 
 // Define a new frame
-class MyFrame : public wxFrame
+class MainFrame : public wxFrame
 {
 public:
-
-    MyFrame(wxWindow *parent, const wxWindowID id, const wxString& title,
+    MainFrame(wxWindow *parent, const wxWindowID id, const wxString& title,
             const wxPoint& pos, const wxSize& size, const long style);
-    ~MyFrame();
-
+    ~MainFrame();
 };
-
 
 #endif
