@@ -23,6 +23,18 @@ public:
     MainFrame(wxWindow *parent, const wxWindowID id, const wxString& title,
             const wxPoint& pos, const wxSize& size, const long style);
     ~MainFrame();
+
+	void OnLeftDown(wxMouseEvent& event);
+	void OnLeftUp(wxMouseEvent& event);
+	void OnRightDown(wxMouseEvent& event);
+	void OnRightUp(wxMouseEvent& event);
+	void OnMouseMove(wxMouseEvent& event);
+
+	void OnKeyDown(wxKeyEvent& event);
+	void OnKeyUp(wxKeyEvent& event);
+	void OnKeyChar(wxKeyEvent& event);
+
+	void OnCloseWindow(wxCloseEvent& event);
 };
 
 #endif

@@ -38,9 +38,58 @@ MainFrame::MainFrame(wxWindow *parent,
        : wxFrame(parent, id, title, pos, size,
                           style | wxNO_FULL_REPAINT_ON_RESIZE)
 {
+	this->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::OnLeftDown));
+	this->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrame::OnLeftUp));
+	this->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainFrame::OnRightDown));
+	this->Connect(wxEVT_RIGHT_UP, wxMouseEventHandler(MainFrame::OnRightUp));
+	this->Connect(wxEVT_MOTION, wxMouseEventHandler(MainFrame::OnMouseMove));
 
+	this->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::OnKeyDown));
+	this->Connect(wxEVT_KEY_UP, wxKeyEventHandler(MainFrame::OnKeyUp));
+	this->Connect(wxEVT_CHAR, wxCharEventHandler(MainFrame::OnKeyChar));
+	
+	this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainFrame::OnCloseWindow));
+	
 }
 
 MainFrame::~MainFrame()
 {
+}
+
+void MainFrame::OnLeftDown(wxMouseEvent& event)
+{
+	int i = 0;
+}
+void MainFrame::OnLeftUp(wxMouseEvent& event)
+{
+	int i = 0;
+}
+void MainFrame::OnRightDown(wxMouseEvent& event)
+{
+	int i = 0;
+}
+void MainFrame::OnRightUp(wxMouseEvent& event)
+{
+	int i = 0;
+}
+void MainFrame::OnMouseMove(wxMouseEvent& event)
+{
+	int i = 0;
+}
+void MainFrame::OnKeyDown(wxKeyEvent& event)
+{
+	int i = 0;
+	event.Skip(true);
+}
+void MainFrame::OnKeyUp(wxKeyEvent& event)
+{
+	int i = 0;
+}
+void MainFrame::OnKeyChar(wxKeyEvent& event)
+{
+	int i = 0;
+}
+void MainFrame::OnCloseWindow(wxCloseEvent& event)
+{
+	int i = 0;
 }
