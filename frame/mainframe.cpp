@@ -5,6 +5,7 @@
 #include <boost/pool/detail/singleton.hpp>
 #include "mainthread.h"
 #include "globle.h"
+#include "uimsg.pb.h"
 
 IMPLEMENT_APP(MyApp)
 
@@ -58,7 +59,7 @@ MainFrame::~MainFrame()
 
 void MainFrame::OnLeftDown(wxMouseEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
 }
 void MainFrame::OnLeftUp(wxMouseEvent& event)
 {
