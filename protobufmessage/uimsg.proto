@@ -1,0 +1,23 @@
+package ui;
+
+option optimize_for = SPEED;
+
+message uimsg {
+
+  enum type {
+    left_down = 1;
+    left_up = 2;
+    right_down = 3;
+    right_up = 4;
+    mouse_move = 5;
+    key_down = 6;
+    key_up = 7;
+    key_char = 8;
+    close_window = 9;
+  }
+
+  required		type		required_type		=		1;
+  optional    float 	optional_x			=		2;
+  optional    float 	optional_y			=		3;
+  optional    int32 	optional_key		=		4;
+}
