@@ -5,11 +5,16 @@
 #include "wx/frame.h"
 
 class MainFrame;
+namespace ui
+{
+	class uimsg;
+}
 // Define a new application
 class MyApp : public wxApp
 {
 public:
 	MyApp() : m_mainFrame(0) {}
+	~MyApp();
     bool OnInit();
 	MainFrame* GetMainFrame() { return m_mainFrame; }
 private:
@@ -35,6 +40,11 @@ public:
 	void OnKeyChar(wxKeyEvent& event);
 
 	void OnCloseWindow(wxCloseEvent& event);
+private:
+	void ini_zmq();
+	void send_zmq_msg(const ui::uimsg & msg);
+private:
+	void * m_zmq_socket;
 };
 
 #endif

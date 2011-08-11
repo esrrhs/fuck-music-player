@@ -15,6 +15,9 @@ private:
 	void create_cegui_system();
 	void ini_cegui_system();
 private:
+	void ini_zmq();
+private:
+	void * m_zmq_socket;
 };
 
 #endif

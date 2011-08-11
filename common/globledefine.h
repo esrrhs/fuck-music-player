@@ -16,4 +16,6 @@
 typedef int s32;
 typedef unsigned u32;
 
+#define UI_ZMQ_NAME "inproc://ui_msg"
+
 #endif

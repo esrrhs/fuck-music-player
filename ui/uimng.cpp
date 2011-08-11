@@ -7,7 +7,11 @@
 #include "CEGUI.h"
 #include "globle.h"
 
-UIMng::UIMng()
+#include "zmq.h"
+#include "zmq_utils.h"
+#include "platform.hpp"
+
+UIMng::UIMng() : m_zmq_socket(0)
 {
 }
 UIMng::~UIMng()
@@ -19,6 +23,7 @@ void UIMng::ini()
 
 	create_cegui_system();
 	ini_cegui_system();
+	ini_zmq();
 
 	LOG_LEAVE;
 }
@@ -123,6 +128,35 @@ void UIMng::ini_cegui_system()
 	wnd->setMaxSize(CEGUI::UVector2(cegui_reldim(1.0f), cegui_reldim( 1.0f)));
 	wnd->setMinSize(CEGUI::UVector2(cegui_reldim(0.1f), cegui_reldim( 0.1f)));
 	wnd->setText("Hello World!");
+
+	LOG_LEAVE;
+}
+void UIMng::ini_zmq()
+{
+	LOG_ENTER;
+
+	void * ctx_ = SINGLETON(Globle).m_zmq_ui_ctx;
+	if (!ctx_)
+	{
+		LOG_ERROR("ctx");
+		return;
+	}
+	
+	void * s = zmq_socket(ctx_, ZMQ_PUSH);
+	if (!s) 
+	{
+		LOG_ERROR("zmq_socket");
+		return;
+	}
+
+	s32 rc = zmq_connect (s, UI_ZMQ_NAME);
+	if (rc != 0) 
+	{
+		LOG_ERROR("zmq_connect");
+		return;
+	}
+
+	m_zmq_socket = s;
 
 	LOG_LEAVE;
 }

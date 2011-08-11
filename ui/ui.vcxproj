@@ -46,12 +46,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\lib\Debug\</OutDir>
     <IntDir>..\temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)boost;$(SolutionDir)common;$(SolutionDir)CEGUI-0.7.5\cegui\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)boost;$(SolutionDir)common;$(SolutionDir)CEGUI-0.7.5\cegui\include;$(SolutionDir)zeromq-2.1.7\include;$(SolutionDir)zeromq-2.1.7\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\lib\Release\</OutDir>
     <IntDir>..\temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)boost;$(SolutionDir)common;$(SolutionDir)CEGUI-0.7.5\cegui\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)boost;$(SolutionDir)common;$(SolutionDir)CEGUI-0.7.5\cegui\include;$(SolutionDir)zeromq-2.1.7\include;$(SolutionDir)zeromq-2.1.7\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
