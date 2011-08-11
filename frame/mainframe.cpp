@@ -60,6 +60,11 @@ MainFrame::~MainFrame()
 void MainFrame::OnLeftDown(wxMouseEvent& event)
 {
 	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_left_down);
+	msg.set_optional_x(event.GetPosition().x);
+	msg.set_optional_y(event.GetPosition().y);
+
+
 }
 void MainFrame::OnLeftUp(wxMouseEvent& event)
 {
