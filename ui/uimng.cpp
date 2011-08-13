@@ -7,6 +7,8 @@
 #include "CEGUI.h"
 #include "globle.h"
 
+#include "uimsg.pb.h"
+
 #include "zmq.h"
 #include "zmq_utils.h"
 #include "platform.hpp"
@@ -29,9 +31,15 @@ void UIMng::ini()
 }
 void UIMng::heartbeat(float elapsed)
 {
-	CEGUI::System& guiSystem = CEGUI::System::getSingleton();
+	CEGUI::System & guiSystem = CEGUI::System::getSingleton();
 
 	guiSystem.injectTimePulse(elapsed);
+
+	zmq_heartbeat();
+}
+void UIMng::render()
+{
+	CEGUI::System & guiSystem = CEGUI::System::getSingleton();
 
 	((LPDIRECT3DDEVICE9)SINGLETON(Globle).m_pD3DDevice)->BeginScene();
 	((LPDIRECT3DDEVICE9)SINGLETON(Globle).m_pD3DDevice)->Clear(0, 0, D3DCLEAR_TARGET,
@@ -82,6 +90,7 @@ void UIMng::create_cegui_system()
 	// ´´½¨cegui
 	CEGUI::Direct3D9Renderer& renderer(CEGUI::Direct3D9Renderer::create((LPDIRECT3DDEVICE9)SINGLETON(Globle).m_pD3DDevice));
 	LOG_TRACE("Create Direct3D9Renderer ok");
+
 	CEGUI::DefaultResourceProvider* rp = new CEGUI::DefaultResourceProvider();
 	CEGUI::System::create(renderer, rp);
 	LOG_TRACE("Create System ok");
@@ -135,28 +144,98 @@ void UIMng::ini_zmq()
 {
 	LOG_ENTER;
 
-	void * ctx_ = SINGLETON(Globle).m_zmq_ui_ctx;
-	if (!ctx_)
+	void * ctx = zmq_init(1);
+	if (!ctx) 
 	{
-		LOG_ERROR("ctx");
+		LOG_ERROR("zmq_init");
 		return;
 	}
-	
-	void * s = zmq_socket(ctx_, ZMQ_PUSH);
+
+	void * s = zmq_socket(ctx, ZMQ_PULL);
 	if (!s) 
 	{
 		LOG_ERROR("zmq_socket");
 		return;
 	}
 
-	s32 rc = zmq_connect (s, UI_ZMQ_NAME);
-	if (rc != 0) 
+	s32 rc = zmq_bind(s, UI_ZMQ_NAME);
+	if (rc) 
 	{
-		LOG_ERROR("zmq_connect");
+		LOG_ERROR("zmq_bind");
 		return;
 	}
 
 	m_zmq_socket = s;
+	SINGLETON(Globle).m_zmq_ui_ctx = ctx;
 
 	LOG_LEAVE;
+}
+void UIMng::zmq_heartbeat()
+{
+	zmq_msg_t zmsg;
+	zmq_msg_init(&zmsg);
+	s32 rc;
+	ui::uimsg msg;
+	while(1)
+	{
+		rc = zmq_recv(m_zmq_socket, &zmsg, ZMQ_NOBLOCK);
+		if (rc < 0) 
+		{
+			break;
+		}
+		msg.ParseFromArray(zmq_msg_data(&zmsg), zmq_msg_size(&zmsg));
+		handle_zmq_msg(msg);
+	}
+	zmq_msg_close(&zmsg);
+}
+void UIMng::handle_zmq_msg(const ui::uimsg & msg)
+{
+	switch(msg.required_type())
+	{
+	case ui::uimsg_type_left_down:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::LeftButton);
+		}
+		break;
+	case ui::uimsg_type_left_up:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::LeftButton);
+		}
+		break;
+	case ui::uimsg_type_right_down:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::RightButton);
+		}
+		break;
+	case ui::uimsg_type_right_up:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::RightButton);
+		}
+		break;
+	case ui::uimsg_type_mouse_move:
+		{
+			CEGUI::System::getSingleton().injectMousePosition(msg.optional_x(), msg.optional_y());
+		}
+		break;
+	case ui::uimsg_type_key_down:
+		{
+			CEGUI::System::getSingleton().injectKeyDown(msg.optional_key());
+		}
+		break;
+	case ui::uimsg_type_key_up:
+		{
+			CEGUI::System::getSingleton().injectKeyUp(msg.optional_key());
+		}
+		break;
+	case ui::uimsg_type_key_char:
+		{
+
+		}
+		break;
+	case ui::uimsg_type_close_window:
+		{
+
+		}
+		break;
+	}
 }

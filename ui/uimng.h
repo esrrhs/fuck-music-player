@@ -4,6 +4,10 @@
 #include <boost/noncopyable.hpp>
 #include "globledefine.h"
 
+namespace ui
+{
+	class uimsg;
+}
 class UIMng : public boost::noncopyable
 {
 public:
@@ -11,11 +15,13 @@ public:
 	virtual ~UIMng();
 	void ini();
 	void heartbeat(float elapsed);
+	void render();
 private:
 	void create_cegui_system();
 	void ini_cegui_system();
-private:
 	void ini_zmq();
+	void zmq_heartbeat();
+	void handle_zmq_msg(const ui::uimsg & msg);
 private:
 	void * m_zmq_socket;
 };

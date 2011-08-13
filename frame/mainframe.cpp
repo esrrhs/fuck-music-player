@@ -33,6 +33,8 @@ bool MyApp::OnInit()
 	// 启动主线程
 	SINGLETON(MainThread).ini();
 
+	m_mainFrame->ini_zmq();
+
     return true;
 }
 
@@ -62,52 +64,46 @@ MainFrame::MainFrame(wxWindow *parent,
 	this->Connect(wxEVT_CHAR, wxCharEventHandler(MainFrame::OnKeyChar));
 	
 	this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainFrame::OnCloseWindow));
-	
-	// 初始化zeromq
-	ini_zmq();
 }
 
 void MainFrame::ini_zmq()
 {
-	void * ctx = zmq_init(1);
-	if (!ctx) 
+	void * ctx_ = SINGLETON(Globle).m_zmq_ui_ctx;
+	if (!ctx_)
 	{
 		return;
 	}
 
-	void * s = zmq_socket(ctx, ZMQ_PUSH);
+	void * s = zmq_socket(ctx_, ZMQ_PUSH);
 	if (!s) 
 	{
 		return;
 	}
 
-	s32 rc = zmq_bind(s, UI_ZMQ_NAME);
-	if (rc) 
+	s32 rc = zmq_connect (s, UI_ZMQ_NAME);
+	if (rc != 0) 
 	{
 		return;
 	}
 
 	m_zmq_socket = s;
-	SINGLETON(Globle).m_zmq_ui_ctx = ctx;
 }
 void MainFrame::send_zmq_msg(const ui::uimsg & msg)
 {
-	std::string str;
-	msg.SerializeToString(&str);
-
+	s32 size = msg.ByteSize();
 	zmq_msg_t zmsg;
-	s32 rc = zmq_msg_init_data(&zmsg, (void*)str.c_str(), str.length(), 0, 0);
+	s32 rc = zmq_msg_init_size(&zmsg, size);
 	if (rc)
 	{
 		return;
 	}
-	rc = zmq_send (m_zmq_socket, &zmsg, ZMQ_NOBLOCK);
+	void * buffer = zmq_msg_data(&zmsg);
+	msg.SerializeToArray(buffer, size);
+
+	rc = zmq_send (m_zmq_socket, &zmsg, 0);
 	if (rc)
 	{
-		if (errno != EAGAIN)
-		{
-			return;
-		}
+		return;
 	}
 }
 MainFrame::~MainFrame()
@@ -122,41 +118,67 @@ void MainFrame::OnLeftDown(wxMouseEvent& event)
 {
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_left_down);
-	msg.set_optional_x(event.GetPosition().x);
-	msg.set_optional_y(event.GetPosition().y);
-	
+
 	send_zmq_msg(msg);
 }
 void MainFrame::OnLeftUp(wxMouseEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_left_up);
+
+	send_zmq_msg(msg);
 }
 void MainFrame::OnRightDown(wxMouseEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_right_down);
+
+	send_zmq_msg(msg);
 }
 void MainFrame::OnRightUp(wxMouseEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_right_up);
+
+	send_zmq_msg(msg);
 }
 void MainFrame::OnMouseMove(wxMouseEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_mouse_move);
+	msg.set_optional_x(event.GetPosition().x);
+	msg.set_optional_y(event.GetPosition().y);
+
+	send_zmq_msg(msg);
 }
 void MainFrame::OnKeyDown(wxKeyEvent& event)
 {
-	int i = 0;
-	event.Skip(true);
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_key_down);
+	msg.set_optional_key(event.GetKeyCode());
+
+	send_zmq_msg(msg);
 }
 void MainFrame::OnKeyUp(wxKeyEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_key_up);
+	msg.set_optional_key(event.GetKeyCode());
+
+	send_zmq_msg(msg);
 }
 void MainFrame::OnKeyChar(wxKeyEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_key_char);
+	msg.set_optional_key(event.GetKeyCode());
+
+	send_zmq_msg(msg);
 }
 void MainFrame::OnCloseWindow(wxCloseEvent& event)
 {
-	int i = 0;
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_close_window);
+
+	send_zmq_msg(msg);
 }

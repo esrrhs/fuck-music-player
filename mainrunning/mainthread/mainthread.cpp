@@ -35,5 +35,6 @@ void MainThread::run()
 void MainThread::heartbeat(float elapsed)
 {
 	SINGLETON(UIMng).heartbeat(elapsed);
+	SINGLETON(UIMng).render();
 }
 

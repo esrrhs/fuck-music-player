@@ -40,8 +40,9 @@ public:
 	void OnKeyChar(wxKeyEvent& event);
 
 	void OnCloseWindow(wxCloseEvent& event);
-private:
+
 	void ini_zmq();
+private:
 	void send_zmq_msg(const ui::uimsg & msg);
 private:
 	void * m_zmq_socket;
