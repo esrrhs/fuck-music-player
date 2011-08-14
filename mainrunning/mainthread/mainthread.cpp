@@ -3,8 +3,10 @@
 #include "Logger.h"
 #include <boost/pool/detail/singleton.hpp>
 #include "uimng.h"
+#include "globle.h"
+#include <boost/timer.hpp>
 
-MainThread::MainThread() : d_lastFrameTime(GetTickCount())	// TODO ¡Ÿ ±
+MainThread::MainThread()
 {
 }
 MainThread::~MainThread()
@@ -20,19 +22,25 @@ void MainThread::ini()
 void MainThread::run()
 {
 	LOG_ENTER;
-	while (1)
+	boost::timer tm;
+	while (!SINGLETON(Globle).m_quit)
 	{
-		DWORD thisTime = GetTickCount();
-		float elapsed = static_cast<float>(thisTime - d_lastFrameTime) / 1000.0f;
-		d_lastFrameTime = thisTime;
-
-		heartbeat(elapsed);
-
-		Sleep(50);
+		double elapsed = tm.elapsed();
+		if (elapsed < TPS)
+		{
+			boost::system_time t = boost::get_system_time();
+			t += boost::posix_time::microseconds((TPS - elapsed) * 1000);
+			boost::thread::sleep(t);
+		}
+		else
+		{
+			tm.restart();
+			heartbeat(elapsed);
+		}
 	}
 	LOG_LEAVE;
 }
-void MainThread::heartbeat(float elapsed)
+void MainThread::heartbeat(double elapsed)
 {
 	SINGLETON(UIMng).heartbeat(elapsed);
 	SINGLETON(UIMng).render();

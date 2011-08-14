@@ -29,11 +29,9 @@ void UIMng::ini()
 
 	LOG_LEAVE;
 }
-void UIMng::heartbeat(float elapsed)
+void UIMng::heartbeat(double elapsed)
 {
-	CEGUI::System & guiSystem = CEGUI::System::getSingleton();
-
-	guiSystem.injectTimePulse(elapsed);
+	CEGUI::System::getSingleton().injectTimePulse((float)elapsed);
 
 	zmq_heartbeat();
 }
@@ -144,29 +142,28 @@ void UIMng::ini_zmq()
 {
 	LOG_ENTER;
 
-	void * ctx = zmq_init(1);
-	if (!ctx) 
+	void * ctx_ = SINGLETON(Globle).m_zmq_ui_ctx;
+	if (!ctx_)
 	{
-		LOG_ERROR("zmq_init");
+		LOG_ERROR("ctx_");
 		return;
 	}
 
-	void * s = zmq_socket(ctx, ZMQ_PULL);
+	void * s = zmq_socket(ctx_, ZMQ_PULL);
 	if (!s) 
 	{
 		LOG_ERROR("zmq_socket");
 		return;
 	}
 
-	s32 rc = zmq_bind(s, UI_ZMQ_NAME);
-	if (rc) 
+	s32 rc = zmq_connect (s, UI_ZMQ_NAME);
+	if (rc != 0) 
 	{
-		LOG_ERROR("zmq_bind");
+		LOG_ERROR("zmq_connect");
 		return;
 	}
 
 	m_zmq_socket = s;
-	SINGLETON(Globle).m_zmq_ui_ctx = ctx;
 
 	LOG_LEAVE;
 }
@@ -229,12 +226,17 @@ void UIMng::handle_zmq_msg(const ui::uimsg & msg)
 		break;
 	case ui::uimsg_type_key_char:
 		{
-
+			CEGUI::System::getSingleton().injectChar(msg.optional_key());
 		}
 		break;
 	case ui::uimsg_type_close_window:
 		{
-
+			SINGLETON(Globle).m_quit = true;
+		}
+		break;
+	case ui::uimsg_type_mouse_wheel:
+		{
+			CEGUI::System::getSingleton().injectMouseWheelChange((float)msg.optional_wheel());
 		}
 		break;
 	}

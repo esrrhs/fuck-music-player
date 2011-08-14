@@ -19,3 +19,4 @@
 2011-8-9：加入protobuff库，加入一个uimsg
 2011-8-11：加入zeromq库，开始与protobuff调试，把cegui和zeromq都弄成多字节，别的还是unicode
 2011-8-13：ui消息传递基本调试ok，不过给cegui有点问题，下次解决，还得把render包装成个lib或dll，恩，dll吧
+2011-8-14：忙活cegui消息处理，鼠标点击事件有点问题，wx关闭响应没做，render没包装成个dll，下回弄。同事传了个客户端框架，先捣鼓捣鼓那东西

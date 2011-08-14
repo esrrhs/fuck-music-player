@@ -30,17 +30,21 @@ bool MyApp::OnInit()
 
 	SINGLETON(Globle).m_hwnd = (s32)m_mainFrame->GetHWND();
 
-	// 启动主线程
-	SINGLETON(MainThread).ini();
-
 	m_mainFrame->ini_zmq();
 
+	// 启动主线程
+	SINGLETON(MainThread).ini();
+	
     return true;
 }
-
-MyApp::~MyApp()
+int MyApp::OnExit()
 {
+	if ( !wxApp::OnExit() )
+		return false;
+
 	google::protobuf::ShutdownProtobufLibrary();
+
+	return true;
 }
 
 MainFrame::MainFrame(wxWindow *parent,
@@ -64,29 +68,42 @@ MainFrame::MainFrame(wxWindow *parent,
 	this->Connect(wxEVT_CHAR, wxCharEventHandler(MainFrame::OnKeyChar));
 	
 	this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainFrame::OnCloseWindow));
+
+	this->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrame::OnEnterWindow));
+	this->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrame::OnLeaveWindow));
+
+	this->Connect(wxEVT_MOUSEWHEEL, wxMouseEventHandler(MainFrame::OnMouseWheel));
+}
+void MainFrame::show_cursor(bool enable)
+{
+#ifdef WIN32
+	::ShowCursor(enable);
+#else
+#error "unknown show_cursor implementation"
+#endif
 }
 
 void MainFrame::ini_zmq()
-{
-	void * ctx_ = SINGLETON(Globle).m_zmq_ui_ctx;
-	if (!ctx_)
+{	void * ctx = zmq_init(1);
+	if (!ctx) 
 	{
 		return;
 	}
 
-	void * s = zmq_socket(ctx_, ZMQ_PUSH);
+	void * s = zmq_socket(ctx, ZMQ_PUSH);
 	if (!s) 
 	{
 		return;
 	}
 
-	s32 rc = zmq_connect (s, UI_ZMQ_NAME);
-	if (rc != 0) 
+	s32 rc = zmq_bind(s, UI_ZMQ_NAME);
+	if (rc) 
 	{
 		return;
 	}
 
 	m_zmq_socket = s;
+	SINGLETON(Globle).m_zmq_ui_ctx = ctx;
 }
 void MainFrame::send_zmq_msg(const ui::uimsg & msg)
 {
@@ -179,6 +196,22 @@ void MainFrame::OnCloseWindow(wxCloseEvent& event)
 {
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_close_window);
+
+	send_zmq_msg(msg);
+}
+void MainFrame::OnEnterWindow(wxMouseEvent& event)
+{
+	show_cursor(false);
+}
+void MainFrame::OnLeaveWindow(wxMouseEvent& event)
+{
+	show_cursor(true);
+}
+void MainFrame::OnMouseWheel(wxMouseEvent& event)
+{
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_mouse_wheel);
+	msg.set_optional_wheel(event.GetWheelRotation());
 
 	send_zmq_msg(msg);
 }

@@ -14,7 +14,7 @@ public:
 	UIMng();
 	virtual ~UIMng();
 	void ini();
-	void heartbeat(float elapsed);
+	void heartbeat(double elapsed);
 	void render();
 private:
 	void create_cegui_system();

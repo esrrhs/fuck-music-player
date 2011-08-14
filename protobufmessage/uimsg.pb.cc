@@ -32,11 +32,12 @@ void protobuf_AssignDesc_uimsg_2eproto() {
       "uimsg.proto");
   GOOGLE_CHECK(file != NULL);
   uimsg_descriptor_ = file->message_type(0);
-  static const int uimsg_offsets_[4] = {
+  static const int uimsg_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(uimsg, required_type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(uimsg, optional_x_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(uimsg, optional_y_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(uimsg, optional_key_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(uimsg, optional_wheel_),
   };
   uimsg_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -80,13 +81,14 @@ void protobuf_AddDesc_uimsg_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\013uimsg.proto\022\002ui\"\371\001\n\005uimsg\022%\n\rrequired_"
+    "\n\013uimsg.proto\022\002ui\"\242\002\n\005uimsg\022%\n\rrequired_"
     "type\030\001 \002(\0162\016.ui.uimsg.type\022\022\n\noptional_x"
     "\030\002 \001(\002\022\022\n\noptional_y\030\003 \001(\002\022\024\n\014optional_k"
-    "ey\030\004 \001(\005\"\212\001\n\004type\022\r\n\tleft_down\020\001\022\013\n\007left"
-    "_up\020\002\022\016\n\nright_down\020\003\022\014\n\010right_up\020\004\022\016\n\nm"
-    "ouse_move\020\005\022\014\n\010key_down\020\006\022\n\n\006key_up\020\007\022\014\n"
-    "\010key_char\020\010\022\020\n\014close_window\020\tB\002H\001", 273);
+    "ey\030\004 \001(\005\022\026\n\016optional_wheel\030\005 \001(\005\"\233\001\n\004typ"
+    "e\022\r\n\tleft_down\020\001\022\013\n\007left_up\020\002\022\016\n\nright_d"
+    "own\020\003\022\014\n\010right_up\020\004\022\016\n\nmouse_move\020\005\022\014\n\010k"
+    "ey_down\020\006\022\n\n\006key_up\020\007\022\014\n\010key_char\020\010\022\020\n\014c"
+    "lose_window\020\t\022\017\n\013mouse_wheel\020\nB\002H\001", 314);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "uimsg.proto", &protobuf_RegisterTypes);
   uimsg::default_instance_ = new uimsg();
@@ -119,6 +121,7 @@ bool uimsg_type_IsValid(int value) {
     case 7:
     case 8:
     case 9:
+    case 10:
       return true;
     default:
       return false;
@@ -135,6 +138,7 @@ const uimsg_type uimsg::key_down;
 const uimsg_type uimsg::key_up;
 const uimsg_type uimsg::key_char;
 const uimsg_type uimsg::close_window;
+const uimsg_type uimsg::mouse_wheel;
 const uimsg_type uimsg::type_MIN;
 const uimsg_type uimsg::type_MAX;
 const int uimsg::type_ARRAYSIZE;
@@ -144,6 +148,7 @@ const int uimsg::kRequiredTypeFieldNumber;
 const int uimsg::kOptionalXFieldNumber;
 const int uimsg::kOptionalYFieldNumber;
 const int uimsg::kOptionalKeyFieldNumber;
+const int uimsg::kOptionalWheelFieldNumber;
 #endif  // !_MSC_VER
 
 uimsg::uimsg()
@@ -166,6 +171,7 @@ void uimsg::SharedCtor() {
   optional_x_ = 0;
   optional_y_ = 0;
   optional_key_ = 0;
+  optional_wheel_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -204,6 +210,7 @@ void uimsg::Clear() {
     optional_x_ = 0;
     optional_y_ = 0;
     optional_key_ = 0;
+    optional_wheel_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -279,6 +286,22 @@ bool uimsg::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(40)) goto parse_optional_wheel;
+        break;
+      }
+      
+      // optional int32 optional_wheel = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_optional_wheel:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &optional_wheel_)));
+          set_has_optional_wheel();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -322,6 +345,11 @@ void uimsg::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->optional_key(), output);
   }
   
+  // optional int32 optional_wheel = 5;
+  if (has_optional_wheel()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->optional_wheel(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -349,6 +377,11 @@ void uimsg::SerializeWithCachedSizes(
   // optional int32 optional_key = 4;
   if (has_optional_key()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->optional_key(), target);
+  }
+  
+  // optional int32 optional_wheel = 5;
+  if (has_optional_wheel()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->optional_wheel(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -383,6 +416,13 @@ int uimsg::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->optional_key());
+    }
+    
+    // optional int32 optional_wheel = 5;
+    if (has_optional_wheel()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->optional_wheel());
     }
     
   }
@@ -424,6 +464,9 @@ void uimsg::MergeFrom(const uimsg& from) {
     if (from.has_optional_key()) {
       set_optional_key(from.optional_key());
     }
+    if (from.has_optional_wheel()) {
+      set_optional_wheel(from.optional_wheel());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -452,6 +495,7 @@ void uimsg::Swap(uimsg* other) {
     std::swap(optional_x_, other->optional_x_);
     std::swap(optional_y_, other->optional_y_);
     std::swap(optional_key_, other->optional_key_);
+    std::swap(optional_wheel_, other->optional_wheel_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

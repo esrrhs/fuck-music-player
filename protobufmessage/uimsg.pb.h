@@ -43,11 +43,12 @@ enum uimsg_type {
   uimsg_type_key_down = 6,
   uimsg_type_key_up = 7,
   uimsg_type_key_char = 8,
-  uimsg_type_close_window = 9
+  uimsg_type_close_window = 9,
+  uimsg_type_mouse_wheel = 10
 };
 bool uimsg_type_IsValid(int value);
 const uimsg_type uimsg_type_type_MIN = uimsg_type_left_down;
-const uimsg_type uimsg_type_type_MAX = uimsg_type_close_window;
+const uimsg_type uimsg_type_type_MAX = uimsg_type_mouse_wheel;
 const int uimsg_type_type_ARRAYSIZE = uimsg_type_type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* uimsg_type_descriptor();
@@ -124,6 +125,7 @@ class uimsg : public ::google::protobuf::Message {
   static const type key_up = uimsg_type_key_up;
   static const type key_char = uimsg_type_key_char;
   static const type close_window = uimsg_type_close_window;
+  static const type mouse_wheel = uimsg_type_mouse_wheel;
   static inline bool type_IsValid(int value) {
     return uimsg_type_IsValid(value);
   }
@@ -175,6 +177,13 @@ class uimsg : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 optional_key() const;
   inline void set_optional_key(::google::protobuf::int32 value);
   
+  // optional int32 optional_wheel = 5;
+  inline bool has_optional_wheel() const;
+  inline void clear_optional_wheel();
+  static const int kOptionalWheelFieldNumber = 5;
+  inline ::google::protobuf::int32 optional_wheel() const;
+  inline void set_optional_wheel(::google::protobuf::int32 value);
+  
   // @@protoc_insertion_point(class_scope:ui.uimsg)
  private:
   inline void set_has_required_type();
@@ -185,6 +194,8 @@ class uimsg : public ::google::protobuf::Message {
   inline void clear_has_optional_y();
   inline void set_has_optional_key();
   inline void clear_has_optional_key();
+  inline void set_has_optional_wheel();
+  inline void clear_has_optional_wheel();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -192,9 +203,10 @@ class uimsg : public ::google::protobuf::Message {
   float optional_x_;
   float optional_y_;
   ::google::protobuf::int32 optional_key_;
+  ::google::protobuf::int32 optional_wheel_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_uimsg_2eproto();
   friend void protobuf_AssignDesc_uimsg_2eproto();
@@ -297,6 +309,28 @@ inline ::google::protobuf::int32 uimsg::optional_key() const {
 inline void uimsg::set_optional_key(::google::protobuf::int32 value) {
   set_has_optional_key();
   optional_key_ = value;
+}
+
+// optional int32 optional_wheel = 5;
+inline bool uimsg::has_optional_wheel() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void uimsg::set_has_optional_wheel() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void uimsg::clear_has_optional_wheel() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void uimsg::clear_optional_wheel() {
+  optional_wheel_ = 0;
+  clear_has_optional_wheel();
+}
+inline ::google::protobuf::int32 uimsg::optional_wheel() const {
+  return optional_wheel_;
+}
+inline void uimsg::set_optional_wheel(::google::protobuf::int32 value) {
+  set_has_optional_wheel();
+  optional_wheel_ = value;
 }
 
 

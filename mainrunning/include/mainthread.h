@@ -11,9 +11,8 @@ public:
 	virtual ~MainThread();
 	void ini();
 	void run();
-	void heartbeat(float elapsed);
+	void heartbeat(double elapsed);
 private:
-	u32 d_lastFrameTime;
 };
 
 #endif	

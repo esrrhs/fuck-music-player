@@ -19,4 +19,7 @@ typedef char c8;
 
 #define UI_ZMQ_NAME "inproc://ui_msg"
 
+#define FPS 50
+#define TPS (1.f / 50)
+
 #endif

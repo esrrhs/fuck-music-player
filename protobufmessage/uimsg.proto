@@ -14,10 +14,12 @@ message uimsg {
     key_up = 7;
     key_char = 8;
     close_window = 9;
+    mouse_wheel = 10;
   }
 
   required		type		required_type		=		1;
   optional    float 	optional_x			=		2;
   optional    float 	optional_y			=		3;
   optional    int32 	optional_key		=		4;
+  optional    int32 	optional_wheel		=		5;
 }

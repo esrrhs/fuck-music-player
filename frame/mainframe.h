@@ -14,8 +14,9 @@ class MyApp : public wxApp
 {
 public:
 	MyApp() : m_mainFrame(0) {}
-	~MyApp();
+	~MyApp() {}
     bool OnInit();
+	int OnExit();
 	MainFrame* GetMainFrame() { return m_mainFrame; }
 private:
 	MainFrame* m_mainFrame;
@@ -41,9 +42,15 @@ public:
 
 	void OnCloseWindow(wxCloseEvent& event);
 
+	void OnEnterWindow(wxMouseEvent& event);
+	void OnLeaveWindow(wxMouseEvent& event);
+
+	void OnMouseWheel(wxMouseEvent& event);
+
 	void ini_zmq();
 private:
 	void send_zmq_msg(const ui::uimsg & msg);
+	void show_cursor(bool enable);
 private:
 	void * m_zmq_socket;
 };
