@@ -11,6 +11,8 @@
 #include "zmq_utils.h"
 #include "platform.hpp"
 
+#include "Config.h"
+
 IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
@@ -27,6 +29,8 @@ bool MyApp::OnInit()
                                  wxDEFAULT_FRAME_STYLE);
     m_mainFrame->Show(true);
     SetTopWindow(m_mainFrame);
+
+	Config config(L"module.cfg");
 
 	SINGLETON(Globle).m_hwnd = (s32)m_mainFrame->GetHWND();
 

@@ -29,7 +29,7 @@ void MainThread::run()
 		if (elapsed < TPS)
 		{
 			boost::system_time t = boost::get_system_time();
-			t += boost::posix_time::microseconds((TPS - elapsed) * 1000);
+			t += boost::posix_time::microseconds((boost::int64_t)(TPS - elapsed) * 1000);
 			boost::thread::sleep(t);
 		}
 		else

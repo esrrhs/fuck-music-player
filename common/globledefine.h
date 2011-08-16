@@ -22,4 +22,14 @@ typedef char c8;
 #define FPS 50
 #define TPS (1.f / 50)
 
+#ifdef UNICODE
+#define ZCHAR wchar_t
+#define STRING std::wstring
+#define IFSTREAM std::wifstream
+#else
+#define ZCHAR char
+#define STRING std::string
+#define IFSTREAM std::ifstream
+#endif
+
 #endif
