@@ -13,7 +13,7 @@ public:
 	{
 		IFSTREAM fs(str);
 		ZCHAR buffer[MAX_LINE_SIZE];
-		boost::char_separator<ZCHAR> sep(L"=");
+		boost::char_separator<ZCHAR> sep(L"= ");
 		while (!fs.eof())
 		{
 			memset(buffer, 0, sizeof(ZCHAR) * MAX_LINE_SIZE);
@@ -23,7 +23,7 @@ public:
 			m_data[*tok.begin()] = *(++tok.begin());
 		}
 	}
-	STRING Get(STRING key)
+	STRING Get(const STRING & key)
 	{
 		return m_data[key];
 	}

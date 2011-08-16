@@ -9,17 +9,22 @@ namespace ui
 {
 	class uimsg;
 }
+namespace PluginSys
+{
+	class PluginContainer;
+}
 // Define a new application
 class MyApp : public wxApp
 {
 public:
-	MyApp() : m_mainFrame(0) {}
+	MyApp() : m_mainFrame(0), m_pc(0) {}
 	~MyApp() {}
     bool OnInit();
 	int OnExit();
 	MainFrame* GetMainFrame() { return m_mainFrame; }
 private:
 	MainFrame* m_mainFrame;
+	PluginSys::PluginContainer * m_pc;
 };
 
 // Define a new frame
