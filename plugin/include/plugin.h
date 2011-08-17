@@ -4,6 +4,8 @@
 #include "globledefine.h"
 #include <string>
 #include "plheader.h"
+#include <vector>
+#include <algorithm>
 
 #ifdef WIN32
 	#define PLUGIN_HANDLE HMODULE
@@ -21,33 +23,46 @@ namespace PluginSys
 	class Plugin
 	{
 	public:
-		typedef bool (*IniFunc) (void);
+		typedef bool (*IniFunc) (Plugin*);
+		typedef bool (*QuitFunc) (void);
 		typedef bool (*RunFunc) (void);
-		typedef bool (*InputFunc) (void*);
-		Plugin(const STRING & filename, const STRING & name, 
-			const STRING & inistr = PLUGIN_INI_FUNC_DEFAAULT_NAME, 
-			const STRING & runstr = PLUGIN_RUN_FUNC_DEFAAULT_NAME, 
-			const STRING & inputstr = PLUGIN_INPUT_FUNC_DEFAAULT_NAME) : m_filename(filename), 
+		typedef PLUGIN_HANDLE_INPUT_STATUS (*InputFunc) (void*, void*);
+		typedef bool (*GetFunc) (void*, void*);
+		typedef bool (*SetFunc) (void*, void*);
+
+		Plugin(const STRING & filename, const STRING & name) : m_filename(filename), 
 			m_name(name), m_handle(0)
 		{
 			m_handle = PLUGIN_LOAD(filename.c_str());
 			if (m_handle)
 			{
 #if defined UNICODE && defined WIN32
-				const s32 maxProcName = 256;
+				const s32 maxProcName = PLUGIN_MAX_FUNC_NAME_LENGTH;
 				c8 temp[maxProcName];
 
 				memset(temp, 0, sizeof(c8) * maxProcName);
-				WideCharToMultiByte(CP_ACP, 0, inistr.c_str(), -1, temp, maxProcName, NULL, 0); 
+				WideCharToMultiByte(CP_ACP, 0, PLUGIN_INI_FUNC_DEFAAULT_NAME_STR, -1, temp, maxProcName, NULL, 0); 
 				m_inifunc = (IniFunc)PLUGIN_GETSYM(m_handle, temp);
 
 				memset(temp, 0, sizeof(c8) * maxProcName);
-				WideCharToMultiByte(CP_ACP, 0, runstr.c_str(), -1, temp, maxProcName, NULL, 0);
+				WideCharToMultiByte(CP_ACP, 0, PLUGIN_QUIT_FUNC_DEFAAULT_NAME_STR, -1, temp, maxProcName, NULL, 0); 
+				m_quitfunc = (QuitFunc)PLUGIN_GETSYM(m_handle, temp);
+
+				memset(temp, 0, sizeof(c8) * maxProcName);
+				WideCharToMultiByte(CP_ACP, 0, PLUGIN_RUN_FUNC_DEFAAULT_NAME_STR, -1, temp, maxProcName, NULL, 0);
 				m_runfunc = (RunFunc)PLUGIN_GETSYM(m_handle, temp); 
 
 				memset(temp, 0, sizeof(c8) * maxProcName);
-				WideCharToMultiByte(CP_ACP, 0, inputstr.c_str(), -1, temp, maxProcName, NULL, 0); 
+				WideCharToMultiByte(CP_ACP, 0, PLUGIN_INPUT_FUNC_DEFAAULT_NAME_STR, -1, temp, maxProcName, NULL, 0); 
 				m_inputfunc = (InputFunc)PLUGIN_GETSYM(m_handle, temp);
+
+				memset(temp, 0, sizeof(c8) * maxProcName);
+				WideCharToMultiByte(CP_ACP, 0, PLUGIN_GET_FUNC_DEFAAULT_NAME_STR, -1, temp, maxProcName, NULL, 0); 
+				m_getfunc = (GetFunc)PLUGIN_GETSYM(m_handle, temp);
+
+				memset(temp, 0, sizeof(c8) * maxProcName);
+				WideCharToMultiByte(CP_ACP, 0, PLUGIN_SET_FUNC_DEFAAULT_NAME_STR, -1, temp, maxProcName, NULL, 0); 
+				m_setfunc = (SetFunc)PLUGIN_GETSYM(m_handle, temp);
 #endif
 			}
 		}
@@ -61,22 +76,78 @@ namespace PluginSys
 		}
 		bool Ini()
 		{
-			return m_inifunc();
+			if (m_inifunc)
+			{
+				return m_inifunc(this);
+			}
+			return true;
+		}
+		bool Quit()
+		{
+			if (m_quitfunc)
+			{
+				return m_quitfunc();
+			}
+			return true;
 		}
 		bool Run()
 		{
-			return m_runfunc();
+			if (m_runfunc)
+			{
+				return m_runfunc();
+			}
+			return true;
 		}
-		bool Input(void * param)
+		PLUGIN_HANDLE_INPUT_STATUS Input(void * type, void * param)
 		{
-			return m_inputfunc(param);
+			if (m_inputfunc)
+			{
+				return m_inputfunc(type, param);
+			}
+			return PLUGIN_HANDLE_INPUT_CONTINUE;
 		}
+		bool Get(void * type, void * param)
+		{
+			if (m_getfunc)
+			{
+				return m_getfunc(type, param);
+			}
+			return true;
+		}
+		bool Set(void * type, void * param)
+		{
+			if (m_setfunc)
+			{
+				return m_setfunc(type, param);
+			}
+			return true;
+		}
+		bool AddSon(Plugin* p)
+		{
+			m_son.push_back(p);
+		}
+		bool DelSon(Plugin* p)
+		{
+			SonContainer::iterator it = std::find(m_son.begin(), m_son.end(), p);
+			if (it != m_son.end())
+			{
+				m_son.erase(it);
+			}
+		}
+		// TODO 遍历其他节点
+		// GetOther
 	private:
 		STRING m_filename, m_name;
 		PLUGIN_HANDLE m_handle;
 		IniFunc m_inifunc;
+		QuitFunc m_quitfunc;
 		RunFunc m_runfunc;
 		InputFunc m_inputfunc;
+		GetFunc m_getfunc;
+		SetFunc m_setfunc;
+		// 儿子节点
+		typedef std::vector<Plugin*> SonContainer;
+		SonContainer m_son;
 	};
 
 }

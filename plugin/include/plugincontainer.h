@@ -72,18 +72,19 @@ namespace PluginSys
 			}
 			return true;
 		}
-		bool Input(void * param)
+		PLUGIN_HANDLE_INPUT_STATUS Input(void * type, void * param)
 		{
 			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)
 			{
 				Plugin * p = *it;
-				if (!p->Input(param))
+				if (p->Input(type, param) == PLUGIN_HANDLE_INPUT_END)
 				{
-					return false;
+					return PLUGIN_HANDLE_INPUT_END;
 				}
 			}
-			return true;
+			return PLUGIN_HANDLE_INPUT_CONTINUE;
 		}
+		// TODO get set ·½·¨
 	private:
 		Container m_container;
 	};
