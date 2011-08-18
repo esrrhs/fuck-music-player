@@ -3,10 +3,10 @@
 
 #include "plheader.h"
 
-#ifndef FRAME_ADAPTER_EXPORTS
-#define FRAME_ADAPTER_API __declspec(dllexport)
+#ifdef FRAMEADAPTER_EXPORTS
+#define FRAMEADAPTER_API __declspec(dllexport)
 #else
-#define FRAME_ADAPTER_API __declspec(dllimport)
+#define FRAMEADAPTER_API __declspec(dllimport)
 #endif
 
 #endif

@@ -31,6 +31,8 @@ bool MyApp::OnInit()
 	STRING nl = config.Get(PLUGIN_CONTAINER_CONFIG_NAME_LIST_KEY);
 	m_pc = new PluginSys::PluginContainer(fl, nl);
 
+	m_pc->Ini();
+
     return true;
 }
 int MyApp::OnExit()

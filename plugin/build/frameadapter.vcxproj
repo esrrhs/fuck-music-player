@@ -11,10 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\plframeadapter.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="..\include\plframeadapter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5F34EA1C-2241-4CE9-A1C1-2838CA5D8328}</ProjectGuid>
+    <ProjectGuid>{885D5DF7-CF88-429B-9F29-318B00E34C4D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>frameadapter</RootNamespace>
   </PropertyGroup>
@@ -42,12 +47,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)lib\Debug\</OutDir>
+    <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)lib\Release\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)plugin\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
