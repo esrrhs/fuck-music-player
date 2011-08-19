@@ -9,4 +9,13 @@
 #define FRAMEADAPTER_API __declspec(dllimport)
 #endif
 
+enum FrameAdapterInputType
+{
+	FA_I_UI_MSG
+};
+
+enum FrameAdapterGetSetType
+{
+	FA_GS_UI_WIN_HANDLE
+};
 #endif

@@ -47,7 +47,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)lib\Debug\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -55,7 +55,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)lib\Release\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

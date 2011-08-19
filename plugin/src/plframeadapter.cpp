@@ -1,5 +1,7 @@
 #include "plframeadapter.h"
 #include "plugin.h"
+#include "plugincontainer.h"
+#include "config.h"
 
 #ifdef WIN32
 
@@ -31,12 +33,68 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 }
 #endif
 
+#ifdef WIN32
+HWND g_hwnd = NULL;
+#else
+#error "unknown HWND implementation"
+#endif
+
+PluginSys::PluginContainer * g_pc = NULL;
+
 extern "C" FRAMEADAPTER_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 {
-	int i = 0;
+	STRING name = p->name();
+	name += L".cfg";
+	Config config(name);
+	STRING fl = config.Get(PLUGIN_CONTAINER_CONFIG_FILE_LIST_KEY);
+	STRING nl = config.Get(PLUGIN_CONTAINER_CONFIG_NAME_LIST_KEY);
+	g_pc = new PluginSys::PluginContainer(fl, nl);
+	return true;
+}
+extern "C" FRAMEADAPTER_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
+{
+	delete g_pc;
+	g_pc = 0;
 	return true;
 }
 extern "C" FRAMEADAPTER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 {
 	return true;
+}
+extern "C" FRAMEADAPTER_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
+{
+	FrameAdapterInputType t = (FrameAdapterInputType)(s32)type;
+	switch (t)
+	{
+	case FA_I_UI_MSG:
+		return g_pc->Input(type, param);
+		break;
+	}
+	return false;
+}
+extern "C" FRAMEADAPTER_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
+{
+	FrameAdapterGetSetType t = (FrameAdapterGetSetType)(s32)type;
+	switch (t)
+	{
+	case FA_GS_UI_WIN_HANDLE:
+		*((HWND*)param) = g_hwnd;
+		return true;
+	default:
+		return g_pc->Get(type, param);
+	}
+	return false;
+}
+extern "C" FRAMEADAPTER_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * param)
+{
+	FrameAdapterGetSetType t = (FrameAdapterGetSetType)(s32)type;
+	switch (t)
+	{
+	case FA_GS_UI_WIN_HANDLE:
+		g_hwnd = *((HWND*)param);
+		return true;
+	default:
+		return g_pc->Set(type, param);
+	}
+	return false;
 }

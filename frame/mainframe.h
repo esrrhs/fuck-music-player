@@ -22,6 +22,7 @@ public:
     bool OnInit();
 	int OnExit();
 	MainFrame* GetMainFrame() { return m_mainFrame; }
+	PluginSys::PluginContainer * GetPluginContainer() { return m_pc; }
 private:
 	MainFrame* m_mainFrame;
 	PluginSys::PluginContainer * m_pc;

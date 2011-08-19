@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "plheader.h"
+#include <boost/tokenizer.hpp>
 
 namespace PluginSys
 {
@@ -84,7 +85,30 @@ namespace PluginSys
 			}
 			return PLUGIN_HANDLE_INPUT_CONTINUE;
 		}
-		// TODO get set ·½·¨
+		bool Get(void * type, void * param)
+		{
+			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)
+			{
+				Plugin * p = *it;
+				if (p->Get(type, param))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		bool Set(void * type, void * param)
+		{
+			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)
+			{
+				Plugin * p = *it;
+				if (p->Set(type, param))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 	private:
 		Container m_container;
 	};

@@ -70,6 +70,10 @@ namespace PluginSys
 		{
 			PLUGIN_UNLOAD(m_handle);
 		}
+		const ZCHAR * name() const
+		{
+			return m_name.c_str();
+		}
 		bool IsOK() const
 		{
 			return m_handle != 0;

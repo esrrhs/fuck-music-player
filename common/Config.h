@@ -5,6 +5,7 @@
 #include <boost/tokenizer.hpp>
 #include <fstream>
 #include <string>
+#include <map>
 
 class Config
 {
