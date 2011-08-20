@@ -73,6 +73,18 @@ namespace PluginSys
 			}
 			return true;
 		}
+		bool Quit()
+		{
+			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)
+			{
+				Plugin * p = *it;
+				if (!p->Quit())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 		PLUGIN_HANDLE_INPUT_STATUS Input(void * type, void * param)
 		{
 			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)

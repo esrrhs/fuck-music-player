@@ -49,16 +49,16 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin
 	STRING fl = config.Get(PLUGIN_CONTAINER_CONFIG_FILE_LIST_KEY);
 	STRING nl = config.Get(PLUGIN_CONTAINER_CONFIG_NAME_LIST_KEY);
 	g_pc = new PluginSys::PluginContainer(fl, nl);
+
+	g_pc->Ini();
+
 	return true;
 }
 extern "C" FRAMEADAPTER_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 {
+	g_pc->Quit();
 	delete g_pc;
 	g_pc = 0;
-	return true;
-}
-extern "C" FRAMEADAPTER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
-{
 	return true;
 }
 extern "C" FRAMEADAPTER_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)

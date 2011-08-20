@@ -44,6 +44,7 @@ int MyApp::OnExit()
 	if ( !wxApp::OnExit() )
 		return false;
 
+	m_pc->Quit();
 	delete m_pc;
 	google::protobuf::ShutdownProtobufLibrary();
 

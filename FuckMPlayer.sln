@@ -130,6 +130,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugin", "plugin", "{44657B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "frameadapter", "plugin\build\frameadapter.vcxproj", "{885D5DF7-CF88-429B-9F29-318B00E34C4D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thread", "plugin\build\thread.vcxproj", "{816EBDF2-A6F2-41C9-A2CB-DCD657501008}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -312,6 +314,10 @@ Global
 		{885D5DF7-CF88-429B-9F29-318B00E34C4D}.Debug|Win32.Build.0 = Debug|Win32
 		{885D5DF7-CF88-429B-9F29-318B00E34C4D}.Release|Win32.ActiveCfg = Release|Win32
 		{885D5DF7-CF88-429B-9F29-318B00E34C4D}.Release|Win32.Build.0 = Release|Win32
+		{816EBDF2-A6F2-41C9-A2CB-DCD657501008}.Debug|Win32.ActiveCfg = Debug|Win32
+		{816EBDF2-A6F2-41C9-A2CB-DCD657501008}.Debug|Win32.Build.0 = Debug|Win32
+		{816EBDF2-A6F2-41C9-A2CB-DCD657501008}.Release|Win32.ActiveCfg = Release|Win32
+		{816EBDF2-A6F2-41C9-A2CB-DCD657501008}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -357,5 +363,6 @@ Global
 		{28B58FEB-9A41-4B91-9172-4EA37DF5D9F1} = {F3A8F6EA-6112-4CFF-991A-DE64E8790B3B}
 		{641C5F36-32EE-4323-B740-992B651CF9D6} = {DA7E9DA9-F04F-4FD3-8C43-D9990C02F381}
 		{885D5DF7-CF88-429B-9F29-318B00E34C4D} = {44657B31-D9D6-469E-BE97-027E9CBA930B}
+		{816EBDF2-A6F2-41C9-A2CB-DCD657501008} = {44657B31-D9D6-469E-BE97-027E9CBA930B}
 	EndGlobalSection
 EndGlobal
