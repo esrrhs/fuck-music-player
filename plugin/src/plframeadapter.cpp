@@ -63,10 +63,10 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 }
 extern "C" FRAMEADAPTER_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	FrameAdapterInputType t = (FrameAdapterInputType)(s32)type;
+	PluginInInputType t = (PluginInInputType)(s32)type;
 	switch (t)
 	{
-	case FA_I_UI_MSG:
+	case PI_I_UI_MSG:
 		return g_pc->Input(type, param);
 		break;
 	}
@@ -74,10 +74,10 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, vo
 }
 extern "C" FRAMEADAPTER_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	FrameAdapterGetSetType t = (FrameAdapterGetSetType)(s32)type;
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
 	switch (t)
 	{
-	case FA_GS_UI_WIN_HANDLE:
+	case PI_GS_UI_WIN_HANDLE:
 		*((HWND*)param) = g_hwnd;
 		return true;
 	default:
@@ -87,10 +87,10 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void
 }
 extern "C" FRAMEADAPTER_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	FrameAdapterGetSetType t = (FrameAdapterGetSetType)(s32)type;
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
 	switch (t)
 	{
-	case FA_GS_UI_WIN_HANDLE:
+	case PI_GS_UI_WIN_HANDLE:
 		g_hwnd = *((HWND*)param);
 		return true;
 	default:

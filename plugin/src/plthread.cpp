@@ -4,6 +4,7 @@
 #include "config.h"
 #include <boost/thread/thread.hpp>
 #include <boost/timer.hpp>
+#include <boost/lexical_cast.hpp>
 
 #ifdef WIN32
 
@@ -36,23 +37,27 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 #endif
 
 PluginSys::PluginContainer * g_pc = NULL;
+double g_elapsed = 0;
+u8 g_quit = 0;
+u32 g_fps = 50;
 
-// TODO
 void heartbeat(double elapsed)
 {
+	g_elapsed = elapsed;
 	g_pc->Run();
 }
-// TODO
+
 void Run()
 {
+	double tps = 1.f / g_fps;
 	boost::timer tm;
-	while (1)
+	while (!g_quit)
 	{
 		double elapsed = tm.elapsed();
-		if (elapsed < 1.f / 50)
+		if (elapsed < tps)
 		{
 			boost::system_time t = boost::get_system_time();
-			t += boost::posix_time::microseconds((boost::int64_t)(1.f / 50 - elapsed) * 1000);
+			t += boost::posix_time::microseconds((boost::int64_t)(tps - elapsed) * 1000);
 			boost::thread::sleep(t);
 		}
 		else
@@ -68,6 +73,11 @@ extern "C" THREAD_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 	STRING name = p->name();
 	name += L".cfg";
 	Config config(name);
+
+	// load fps
+	STRING fps = config.Get(PLUGIN_THREAD_FPS_CONFIG_NAME);
+	g_fps = boost::lexical_cast<u32>(fps.c_str());
+
 	STRING fl = config.Get(PLUGIN_CONTAINER_CONFIG_FILE_LIST_KEY);
 	STRING nl = config.Get(PLUGIN_CONTAINER_CONFIG_NAME_LIST_KEY);
 	g_pc = new PluginSys::PluginContainer(fl, nl);
@@ -93,9 +103,33 @@ extern "C" THREAD_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * p
 }
 extern "C" THREAD_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	return g_pc->Get(type, param);
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
+	switch (t)
+	{
+	case PI_GS_THREAD_ELAPSED:
+		*((double*)param) = g_elapsed;
+		return true;
+	case PI_GS_THREAD_QUIT_FLG:
+		*((u8*)param) = g_quit;
+		return true;
+	default:
+		return g_pc->Get(type, param);
+	}
+	return false;
 }
 extern "C" THREAD_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	return g_pc->Set(type, param);
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
+	switch (t)
+	{
+	case PI_GS_THREAD_ELAPSED:
+		g_elapsed = *((double*)param);
+		return true;
+	case PI_GS_THREAD_QUIT_FLG:
+		g_quit = *((u8*)param);
+		return true;
+	default:
+		return g_pc->Set(type, param);
+	}
+	return false;
 }

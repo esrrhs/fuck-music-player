@@ -34,7 +34,7 @@ bool MyApp::OnInit()
 	m_pc = new PluginSys::PluginContainer(fl, nl);
 
 	WXHWND hwnd = m_mainFrame->GetHWND();
-	m_pc->Set((void*)FA_GS_UI_WIN_HANDLE, (void*)&hwnd);
+	m_pc->Set((void*)PI_GS_UI_WIN_HANDLE, (void*)&hwnd);
 	m_pc->Ini();
 
     return true;
@@ -96,28 +96,28 @@ void MainFrame::OnLeftDown(wxMouseEvent& event)
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_left_down);
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnLeftUp(wxMouseEvent& event)
 {
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_left_up);
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnRightDown(wxMouseEvent& event)
 {
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_right_down);
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnRightUp(wxMouseEvent& event)
 {
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_right_up);
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnMouseMove(wxMouseEvent& event)
 {
@@ -126,7 +126,7 @@ void MainFrame::OnMouseMove(wxMouseEvent& event)
 	msg.set_optional_x(event.GetPosition().x);
 	msg.set_optional_y(event.GetPosition().y);
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnKeyDown(wxKeyEvent& event)
 {
@@ -134,7 +134,7 @@ void MainFrame::OnKeyDown(wxKeyEvent& event)
 	msg.set_required_type(ui::uimsg_type_key_down);
 	msg.set_optional_key(event.GetKeyCode());
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnKeyUp(wxKeyEvent& event)
 {
@@ -142,7 +142,7 @@ void MainFrame::OnKeyUp(wxKeyEvent& event)
 	msg.set_required_type(ui::uimsg_type_key_up);
 	msg.set_optional_key(event.GetKeyCode());
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnKeyChar(wxKeyEvent& event)
 {
@@ -150,14 +150,14 @@ void MainFrame::OnKeyChar(wxKeyEvent& event)
 	msg.set_required_type(ui::uimsg_type_key_char);
 	msg.set_optional_key(event.GetKeyCode());
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnCloseWindow(wxCloseEvent& event)
 {
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_close_window);
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }
 void MainFrame::OnEnterWindow(wxMouseEvent& event)
 {
@@ -173,5 +173,5 @@ void MainFrame::OnMouseWheel(wxMouseEvent& event)
 	msg.set_required_type(ui::uimsg_type_mouse_wheel);
 	msg.set_optional_wheel(event.GetWheelRotation());
 
-	wxGetApp().GetPluginContainer()->Input((void*)FA_I_UI_MSG, (void*)&msg);
+	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
 }

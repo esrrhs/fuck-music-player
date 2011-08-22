@@ -7,8 +7,9 @@
 #define NULL 0
 
 typedef int s32;
-typedef unsigned u32;
+typedef unsigned int u32;
 typedef char c8;
+typedef unsigned char u8;
 
 #ifdef UNICODE
 #define ZCHAR wchar_t
