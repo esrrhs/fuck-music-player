@@ -122,8 +122,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zeromq", "zeromq", "{DA7E9D
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libzmq", "zeromq-2.1.7\builds\msvc\libzmq\libzmq.vcxproj", "{641C5F36-32EE-4323-B740-992B651CF9D6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mainrunning", "mainrunning\mainrunning.vcxproj", "{6B3BE5BA-778C-4560-A831-57D8DA16791A}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui", "ui\ui.vcxproj", "{D733E44A-50D0-4B31-A2AE-8AEF79A8C63A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugin", "plugin", "{44657B31-D9D6-469E-BE97-027E9CBA930B}"
@@ -302,10 +300,6 @@ Global
 		{641C5F36-32EE-4323-B740-992B651CF9D6}.Debug|Win32.Build.0 = Debug|Win32
 		{641C5F36-32EE-4323-B740-992B651CF9D6}.Release|Win32.ActiveCfg = Release|Win32
 		{641C5F36-32EE-4323-B740-992B651CF9D6}.Release|Win32.Build.0 = Release|Win32
-		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Debug|Win32.Build.0 = Debug|Win32
-		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Release|Win32.ActiveCfg = Release|Win32
-		{6B3BE5BA-778C-4560-A831-57D8DA16791A}.Release|Win32.Build.0 = Release|Win32
 		{D733E44A-50D0-4B31-A2AE-8AEF79A8C63A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D733E44A-50D0-4B31-A2AE-8AEF79A8C63A}.Debug|Win32.Build.0 = Debug|Win32
 		{D733E44A-50D0-4B31-A2AE-8AEF79A8C63A}.Release|Win32.ActiveCfg = Release|Win32
