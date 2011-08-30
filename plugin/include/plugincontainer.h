@@ -15,6 +15,8 @@ namespace PluginSys
 	{
 	public:
 		typedef std::vector<Plugin*> Container;
+		typedef Container::iterator Iter;
+		typedef Container::const_iterator ConstIter;
 		PluginContainer(const STRING & plugin_file_str_list, const STRING & plugin_name_str_list)
 		{
 			boost::char_separator<ZCHAR> sep(PLUGIN_CONTAINER_SEP_STR);
@@ -120,6 +122,14 @@ namespace PluginSys
 				}
 			}
 			return false;
+		}
+		ConstIter begin()
+		{
+			return m_container.begin();
+		}
+		ConstIter end()
+		{
+			return m_container.end();
 		}
 	private:
 		Container m_container;
