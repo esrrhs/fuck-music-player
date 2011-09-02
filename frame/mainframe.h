@@ -12,6 +12,7 @@ namespace ui
 namespace PluginSys
 {
 	class PluginContainer;
+	class Plugin;
 }
 // Define a new application
 class MyApp : public wxApp
@@ -26,6 +27,7 @@ public:
 private:
 	MainFrame* m_mainFrame;
 	PluginSys::PluginContainer * m_pc;
+	PluginSys::Plugin * m_root;
 };
 
 // Define a new frame

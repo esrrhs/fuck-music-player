@@ -21,9 +21,12 @@ bool MyApp::OnInit()
 
     // Create the main frame window
 
-   m_mainFrame = new MainFrame((wxFrame *)NULL, wxID_ANY, wxT("FuckMPlayer"),
+	m_mainFrame = new MainFrame((wxFrame *)NULL, wxID_ANY, wxT("FuckMPlayer"),
                                  wxDefaultPosition, wxSize(500, 400),
                                  wxDEFAULT_FRAME_STYLE);
+
+	m_root = new PluginSys::Plugin(L"", L"");
+
     m_mainFrame->Show(true);
     SetTopWindow(m_mainFrame);
 
@@ -32,6 +35,7 @@ bool MyApp::OnInit()
 	STRING fl = config.Get(PLUGIN_CONTAINER_CONFIG_FILE_LIST_KEY);
 	STRING nl = config.Get(PLUGIN_CONTAINER_CONFIG_NAME_LIST_KEY);
 	m_pc = new PluginSys::PluginContainer(fl, nl);
+	m_pc->AddFather(m_root);
 
 	WXHWND hwnd = m_mainFrame->GetHWND();
 	m_pc->Set((void*)PI_GS_UI_WIN_HANDLE, (void*)&hwnd);

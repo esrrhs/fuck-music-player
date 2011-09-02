@@ -131,6 +131,24 @@ namespace PluginSys
 		{
 			return m_container.end();
 		}
+		bool AddFather(Plugin * f)
+		{
+			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)
+			{
+				Plugin * p = *it;
+				f->AddSon(p);
+			}
+			return true;
+		}
+		bool DelFather(Plugin * f)
+		{
+			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)
+			{
+				Plugin * p = *it;
+				f->DelSon(p);
+			}
+			return true;
+		}
 	private:
 		Container m_container;
 	};

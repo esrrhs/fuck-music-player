@@ -129,6 +129,7 @@ namespace PluginSys
 		bool AddSon(Plugin* p)
 		{
 			m_son.push_back(p);
+			return true;
 		}
 		bool DelSon(Plugin* p)
 		{
@@ -136,7 +137,9 @@ namespace PluginSys
 			if (it != m_son.end())
 			{
 				m_son.erase(it);
+				return true;
 			}
+			return false;
 		}
 		// TODO 遍历其他节点
 		// GetOther

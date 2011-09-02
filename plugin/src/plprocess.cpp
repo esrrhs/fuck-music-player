@@ -14,6 +14,7 @@ extern "C" PROCESS_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 	STRING fl = config.Get(PLUGIN_CONTAINER_CONFIG_FILE_LIST_KEY);
 	STRING nl = config.Get(PLUGIN_CONTAINER_CONFIG_NAME_LIST_KEY);
 	g_pc = new PluginSys::PluginContainer(fl, nl);
+	g_pc->AddFather(p);
 
 	g_pc->Ini();
 
