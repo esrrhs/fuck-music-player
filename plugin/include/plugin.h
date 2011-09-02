@@ -31,7 +31,7 @@ namespace PluginSys
 		typedef bool (*SetFunc) (void*, void*);
 
 		Plugin(const STRING & filename, const STRING & name) : m_filename(filename), 
-			m_name(name), m_handle(0)
+			m_name(name), m_handle(0), m_father(NULL)
 		{
 			m_handle = PLUGIN_LOAD(filename.c_str());
 			if (m_handle)
@@ -129,10 +129,12 @@ namespace PluginSys
 		bool AddSon(Plugin* p)
 		{
 			m_son.push_back(p);
+			p->SetFather(this);
 			return true;
 		}
 		bool DelSon(Plugin* p)
 		{
+			p->SetFather(NULL);
 			SonContainer::iterator it = std::find(m_son.begin(), m_son.end(), p);
 			if (it != m_son.end())
 			{
@@ -141,8 +143,27 @@ namespace PluginSys
 			}
 			return false;
 		}
-		// TODO 遍历其他节点
-		// GetOther
+		void SetFather(Plugin * _father)
+		{
+			m_father = _father;
+		}
+		Plugin * GetFather()
+		{
+			return m_father;
+		}
+		// 先找父亲，不行再让他帮忙找
+		bool GetOther(void * type, void * param)
+		{
+			if (m_father)
+			{
+				if (m_father->Get(type, param))
+				{
+					return true;
+				}
+				return m_father->GetOther(type, param);
+			}
+			return false;
+		}
 	private:
 		STRING m_filename, m_name;
 		PLUGIN_HANDLE m_handle;
@@ -155,6 +176,7 @@ namespace PluginSys
 		// 儿子节点
 		typedef std::vector<Plugin*> SonContainer;
 		SonContainer m_son;
+		Plugin * m_father;
 	};
 
 }

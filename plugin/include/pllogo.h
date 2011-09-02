@@ -11,5 +11,6 @@
 #endif
 
 #define PLUGIN_LOG_FILE_CONFIG_NAME L"logo"
+#define PLUGIN_LOG_FPS_CONFIG_NAME L"fps"
 
 #endif

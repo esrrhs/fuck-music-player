@@ -36,10 +36,10 @@ bool MyApp::OnInit()
 	STRING nl = config.Get(PLUGIN_CONTAINER_CONFIG_NAME_LIST_KEY);
 	m_pc = new PluginSys::PluginContainer(fl, nl);
 	m_pc->AddFather(m_root);
+	m_pc->Ini();
 
 	WXHWND hwnd = m_mainFrame->GetHWND();
 	m_pc->Set((void*)PI_GS_UI_WIN_HANDLE, (void*)&hwnd);
-	m_pc->Ini();
 
     return true;
 }

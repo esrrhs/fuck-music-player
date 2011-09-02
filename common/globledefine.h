@@ -21,4 +21,6 @@ typedef unsigned char u8;
 #define IFSTREAM std::ifstream
 #endif
 
+#define SAFE_DELETE(x) if(x) delete x
+
 #endif
