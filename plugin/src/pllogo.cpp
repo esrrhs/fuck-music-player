@@ -146,7 +146,7 @@ namespace OpenGl
 		glBindTexture(GL_TEXTURE_2D, g_texture);
 
 		glColor4f(1.0f, 1.0f, 1.0f, g_alpha);
-		g_alpha -= elapsed * g_alphaspeed;
+		g_alpha -= (f32)(elapsed * g_alphaspeed);
 
 		glBegin(GL_QUADS);
 
@@ -254,7 +254,7 @@ extern "C" LOGO_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 
 	boost::timer tm;
 	double tps = 1.f / g_fps;
-	while (1)
+	while (g_alpha >= 0.f)
 	{
 		double elapsed = tm.elapsed();
 		if (elapsed < tps)

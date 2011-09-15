@@ -31,7 +31,13 @@ namespace PluginSys
 		typedef bool (*SetFunc) (void*, void*);
 
 		Plugin(const STRING & filename, const STRING & name) : m_filename(filename), 
-			m_name(name), m_handle(0), m_father(NULL)
+			m_name(name), m_handle(0), m_father(NULL),
+			m_inifunc(NULL),
+			m_quitfunc(NULL),
+			m_runfunc(NULL),
+			m_inputfunc(NULL),
+			m_getfunc(NULL),
+			m_setfunc(NULL)
 		{
 			m_handle = PLUGIN_LOAD(filename.c_str());
 			if (m_handle)
@@ -78,7 +84,7 @@ namespace PluginSys
 		{
 			return m_handle != 0;
 		}
-		bool Ini()
+		bool Ini()	// 串行true
 		{
 			if (m_inifunc)
 			{
@@ -86,7 +92,7 @@ namespace PluginSys
 			}
 			return true;
 		}
-		bool Quit()
+		bool Quit()	// 串行true
 		{
 			if (m_quitfunc)
 			{
@@ -94,7 +100,7 @@ namespace PluginSys
 			}
 			return true;
 		}
-		bool Run()
+		bool Run()	// 串行true
 		{
 			if (m_runfunc)
 			{
@@ -102,7 +108,7 @@ namespace PluginSys
 			}
 			return true;
 		}
-		PLUGIN_HANDLE_INPUT_STATUS Input(void * type, void * param)
+		PLUGIN_HANDLE_INPUT_STATUS Input(void * type, void * param)	// 树形
 		{
 			if (m_inputfunc)
 			{
@@ -110,21 +116,21 @@ namespace PluginSys
 			}
 			return PLUGIN_HANDLE_INPUT_CONTINUE;
 		}
-		bool Get(void * type, void * param)
+		bool Get(void * type, void * param)	// 树形
 		{
 			if (m_getfunc)
 			{
 				return m_getfunc(type, param);
 			}
-			return true;
+			return false;
 		}
-		bool Set(void * type, void * param)
+		bool Set(void * type, void * param)	// 树形
 		{
 			if (m_setfunc)
 			{
 				return m_setfunc(type, param);
 			}
-			return true;
+			return false;
 		}
 		bool AddSon(Plugin* p)
 		{

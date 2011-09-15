@@ -50,5 +50,5 @@ extern "C" PROCESS_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 			return false;
 		}
 	}
-	return true;
+	return false;
 }

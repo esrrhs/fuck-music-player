@@ -44,7 +44,7 @@ u32 g_fps = 50;
 void heartbeat(double elapsed)
 {
 	g_elapsed = elapsed;
-	g_pc->Run();
+	g_quit = (u8)(!g_pc->Run());
 }
 
 void Run()

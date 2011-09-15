@@ -1,0 +1,13 @@
+#ifndef __PLUG_IN_MAIN__
+#define __PLUG_IN_MAIN__
+
+#include "plheader.h"
+#include "plmsgheader.h"
+
+#ifdef MAIN_EXPORTS
+#define MAIN_API __declspec(dllexport)
+#else
+#define MAIN_API __declspec(dllimport)
+#endif
+
+#endif
