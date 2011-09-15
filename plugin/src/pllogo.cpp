@@ -24,6 +24,8 @@ GLuint	g_texture = 0;			// Storage For One Texture ( NEW )
 STRING g_logo;
 PluginSys::Plugin * g_Plugin = NULL;
 u32 g_fps = 50;
+f32 g_alpha = 1.f;
+f32 g_alphaspeed = 0.1f;
 
 namespace OpenGl
 {
@@ -113,7 +115,8 @@ namespace OpenGl
 		glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
 		glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
-
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glEnable(GL_BLEND);
 		return true;										// Initialization Went OK
 	}
 	void ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize The GL Window
@@ -134,13 +137,16 @@ namespace OpenGl
 		glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
 		glLoadIdentity();									// Reset The Modelview Matrix
 	}
-	void DrawGLScene()									// Here's Where We Do All The Drawing
+	void DrawGLScene(double elapsed)									// Here's Where We Do All The Drawing
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
 		glLoadIdentity();									// Reset The View
 		glTranslatef(0.0f, 0.0f, -10.0f);
 
 		glBindTexture(GL_TEXTURE_2D, g_texture);
+
+		glColor4f(1.0f, 1.0f, 1.0f, g_alpha);
+		g_alpha -= elapsed * g_alphaspeed;
 
 		glBegin(GL_QUADS);
 
@@ -185,9 +191,9 @@ bool IniLogo()
 
 	return true;
 }
-void DrawLogo()
+void DrawLogo(double elapsed)
 {
-	OpenGl::DrawGLScene();
+	OpenGl::DrawGLScene(elapsed);
 }
 extern "C" LOGO_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 {
@@ -199,6 +205,14 @@ extern "C" LOGO_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 	// load fps
 	STRING fps = config.Get(PLUGIN_LOG_FPS_CONFIG_NAME);
 	g_fps = boost::lexical_cast<u32>(fps.c_str());
+
+	// load alpha
+	STRING alpha = config.Get(PLUGIN_LOG_ALPHA_CONFIG_NAME);
+	g_alpha = boost::lexical_cast<f32>(alpha.c_str());
+
+	// load alphaspeed
+	STRING alphaspeed = config.Get(PLUGIN_LOG_ALPHA_SPEED_CONFIG_NAME);
+	g_alphaspeed = boost::lexical_cast<f32>(alphaspeed.c_str());
 
 	g_Plugin = p;
 	
@@ -254,7 +268,7 @@ extern "C" LOGO_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 		else
 		{
 			tm.restart();
-			DrawLogo();
+			DrawLogo(elapsed);
 		}
 	}
 	
