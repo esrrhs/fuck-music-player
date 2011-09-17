@@ -1,3 +1,5 @@
+#include "Logger.h"
+
 #include "main.h"
 #include "plugin.h"
 #include "plugincontainer.h"
@@ -6,7 +8,10 @@
 #include <boost/timer.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <boost/lexical_cast.hpp>
 #include "god/god.h"
+#include "localheader.h"
+#include <boost/pool/singleton_pool.hpp>
 
 #ifdef WIN32
 
@@ -77,9 +82,11 @@ extern "C" MAIN_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * param
 }
 extern "C" MAIN_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 {
+	LOG_ENTER
 	God god;
 	god.Ini();
 	god.Loop();
 	god.Quit();
+	LOG_LEAVE
 	return true;
 }

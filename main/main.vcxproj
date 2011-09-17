@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="god\god.h" />
+    <ClInclude Include="localheader.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
