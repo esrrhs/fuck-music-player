@@ -164,12 +164,8 @@ bool IniLogo()
 {
 	while (!g_hwnd)
 	{
-#ifdef WIN32
 		g_Plugin->GetOther((void*)PI_GS_UI_WIN_HANDLE, (void*)&g_hwnd);
-		::Sleep(1);
-#else
-#error "unknown Sleep implementation"
-#endif
+		SLEEP(1);
 	}
 
 	if (!OpenGl::CreateOpenGLWindow())
@@ -259,11 +255,7 @@ extern "C" LOGO_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 		double elapsed = tm.elapsed();
 		if (elapsed < tps)
 		{
-#ifdef WIN32
-			::Sleep(1);
-#else
-#error "unknown Sleep implementation"
-#endif
+			SLEEP(1);
 		}
 		else
 		{

@@ -24,4 +24,10 @@ typedef float f32;
 
 #define SAFE_DELETE(x) if(x) delete x
 
+#ifdef WIN32
+#define SLEEP(ms) ::Sleep((DWORD)ms)
+#else
+#error "unknown sleep implementation"
+#endif
+
 #endif

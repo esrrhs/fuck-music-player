@@ -10,4 +10,6 @@
 #define MAIN_API __declspec(dllimport)
 #endif
 
+#define PLUGIN_MAIN_FPS_CONFIG_NAME L"fps"
+
 #endif

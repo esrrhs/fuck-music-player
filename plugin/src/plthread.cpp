@@ -56,9 +56,7 @@ void Run()
 		double elapsed = tm.elapsed();
 		if (elapsed < tps)
 		{
-			boost::system_time t = boost::get_system_time();
-			t += boost::posix_time::microseconds((boost::int64_t)(tps - elapsed) * 1000);
-			boost::thread::sleep(t);
+			SLEEP(1);
 		}
 		else
 		{

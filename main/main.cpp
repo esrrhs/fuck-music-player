@@ -43,7 +43,14 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 }
 #endif
 
+#ifdef WIN32
+HWND		g_hwnd = NULL;
+#else
+#error "unknown HWND implementation"
+#endif
+
 PluginSys::PluginContainer * g_pc = NULL;
+PluginSys::Plugin * g_Plugin = NULL;
 
 extern "C" MAIN_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 {
@@ -56,7 +63,14 @@ extern "C" MAIN_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 	g_pc = new PluginSys::PluginContainer(fl, nl);
 	g_pc->AddFather(p);
 
+	// load fps
+	STRING fps = config.Get(PLUGIN_MAIN_FPS_CONFIG_NAME);
+	u32 ufps = boost::lexical_cast<u32>(fps.c_str());
+	SINGLETON(God).SetFps(ufps);
+
 	g_pc->Ini();
+
+	g_Plugin = p;
 
 	return true;
 }
@@ -70,23 +84,57 @@ extern "C" MAIN_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 
 extern "C" MAIN_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	return g_pc->Input(type, param);
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
+	switch (t)
+	{
+	case PI_GS_UI_WIN_HANDLE:
+		*((HWND*)param) = g_hwnd;
+		return g_hwnd != 0;
+	}
+	return false;
 }
 extern "C" MAIN_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	return g_pc->Get(type, param);
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
+	switch (t)
+	{
+	case PI_GS_UI_WIN_HANDLE:
+		*((HWND*)param) = g_hwnd;
+		return g_hwnd != 0;
+	}
+	return false;
 }
 extern "C" MAIN_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	return g_pc->Set(type, param);
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
+	switch (t)
+	{
+	case PI_GS_UI_WIN_HANDLE:
+		g_hwnd = *((HWND*)param);
+		return true;
+	}
+	return false;
+}
+void WaitGetHwnd()
+{
+	LOG_ENTER
+	while (!g_hwnd)
+	{
+		g_Plugin->GetOther((void*)PI_GS_UI_WIN_HANDLE, (void*)&g_hwnd);
+		boost::system_time t = boost::get_system_time();
+		t += boost::posix_time::microseconds((boost::int64_t)1000);
+		boost::thread::sleep(t);
+	}
+	SINGLETON(God).SetHwnd((void*)g_hwnd);
+	LOG_LEAVE
 }
 extern "C" MAIN_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 {
 	LOG_ENTER
-	God god;
-	god.Ini();
-	god.Loop();
-	god.Quit();
+	WaitGetHwnd();
+	SINGLETON(God).Ini();
+	SINGLETON(God).Loop();
+	SINGLETON(God).Quit();
 	LOG_LEAVE
 	return true;
 }
