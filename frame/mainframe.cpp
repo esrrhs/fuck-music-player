@@ -158,6 +158,7 @@ void MainFrame::OnKeyChar(wxKeyEvent& event)
 }
 void MainFrame::OnCloseWindow(wxCloseEvent& event)
 {
+	this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainFrame::OnCloseWindow));
 	ui::uimsg msg;
 	msg.set_required_type(ui::uimsg_type_close_window);
 

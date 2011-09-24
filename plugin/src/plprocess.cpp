@@ -28,7 +28,7 @@ extern "C" PROCESS_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 	return true;
 }
 
-extern "C" PROCESS_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
+extern "C" PROCESS_API PLUGIN_HANDLE_INPUT_STATUS PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
 	return g_pc->Input(type, param);
 }

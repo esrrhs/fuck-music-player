@@ -15,6 +15,14 @@ public:
 	{
 		m_hwnd = hwnd;
 	}
+	void * GetZeromqCtx()
+	{
+		return m_zeromq_ctx;
+	}
+	void SetZeromqCtx(void * zeromq_ctx)
+	{
+		m_zeromq_ctx = zeromq_ctx;
+	}
 	u32 GetFps()
 	{
 		return m_fps;
@@ -23,10 +31,20 @@ public:
 	{
 		m_fps = fps;
 	}
+	void * GetZeromqSocket()
+	{
+		return m_zeromq_socket;
+	}
+	void SetZeromqSocket(void * zeromq_socket)
+	{
+		m_zeromq_socket = zeromq_socket;
+	}
 private:
 	bool Hearbeat(double elapsed);
 private:
 	void * m_hwnd;
+	void * m_zeromq_ctx;
+	void * m_zeromq_socket;
 	u32 m_fps;
 };
 

@@ -52,6 +52,45 @@ HWND		g_hwnd = NULL;
 PluginSys::PluginContainer * g_pc = NULL;
 PluginSys::Plugin * g_Plugin = NULL;
 
+void * g_zmq_socket = NULL;
+void * g_zmq_ui_ctx = NULL;
+c8 g_zeromq_ok = 0; 
+
+#include "zmq.h"
+#include "zmq_utils.h"
+#include "platform.hpp"
+
+void ini_zmq()
+{
+	LOG_ENTER;
+
+	void * ctx_ = g_zmq_ui_ctx;
+	if (!ctx_)
+	{
+		LOG_ERROR("ctx_");
+		return;
+	}
+
+	void * s = zmq_socket(ctx_, ZMQ_PULL);
+	if (!s) 
+	{
+		LOG_ERROR("zmq_socket");
+		return;
+	}
+
+	s32 rc = zmq_connect (s, UI_ZMQ_NAME);
+	if (rc != 0) 
+	{
+		LOG_ERROR("zmq_connect");
+		return;
+	}
+
+	g_zmq_socket = s;
+
+	g_zeromq_ok = 1;
+
+	LOG_LEAVE;
+}
 extern "C" MAIN_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 {
 	STRING name = p->name();
@@ -82,16 +121,9 @@ extern "C" MAIN_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 	return true;
 }
 
-extern "C" MAIN_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
+extern "C" MAIN_API PLUGIN_HANDLE_INPUT_STATUS PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
-	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
-	switch (t)
-	{
-	case PI_GS_UI_WIN_HANDLE:
-		*((HWND*)param) = g_hwnd;
-		return g_hwnd != 0;
-	}
-	return false;
+	return PLUGIN_HANDLE_INPUT_END;
 }
 extern "C" MAIN_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
@@ -101,6 +133,12 @@ extern "C" MAIN_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param
 	case PI_GS_UI_WIN_HANDLE:
 		*((HWND*)param) = g_hwnd;
 		return g_hwnd != 0;
+	case PI_GS_ZEROMQ_CTX:
+		*((void**)param) = g_zmq_ui_ctx;
+		return g_zmq_ui_ctx != 0;
+	case PI_GS_ZEROMQ_OK_FLG:
+		*((c8*)param) = g_zeromq_ok;
+		return true;
 	}
 	return false;
 }
@@ -112,25 +150,33 @@ extern "C" MAIN_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * param
 	case PI_GS_UI_WIN_HANDLE:
 		g_hwnd = *((HWND*)param);
 		return true;
+	case PI_GS_ZEROMQ_CTX:
+		g_zmq_ui_ctx = *((void**)param);
+		return true;
+	case PI_GS_ZEROMQ_OK_FLG:
+		g_zeromq_ok = *((c8*)param);
+		return true;
 	}
 	return false;
 }
 void WaitGetHwnd()
 {
 	LOG_ENTER
-	while (!g_hwnd)
+	while (!g_hwnd || !g_zmq_ui_ctx)
 	{
 		g_Plugin->GetOther((void*)PI_GS_UI_WIN_HANDLE, (void*)&g_hwnd);
-		boost::system_time t = boost::get_system_time();
-		t += boost::posix_time::microseconds((boost::int64_t)1000);
-		boost::thread::sleep(t);
+		g_Plugin->GetOther((void*)PI_GS_ZEROMQ_CTX, (void*)&g_zmq_ui_ctx);
+		SLEEP(1);
 	}
 	SINGLETON(God).SetHwnd((void*)g_hwnd);
+	SINGLETON(God).SetZeromqCtx((void*)g_zmq_ui_ctx);
+	SINGLETON(God).SetZeromqSocket((void*)g_zmq_socket);
 	LOG_LEAVE
 }
 extern "C" MAIN_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 {
 	LOG_ENTER
+	ini_zmq();
 	WaitGetHwnd();
 	SINGLETON(God).Ini();
 	SINGLETON(God).Loop();

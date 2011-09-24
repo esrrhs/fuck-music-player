@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "plugincontainer.h"
 #include "config.h"
+#include "uimsg.pb.h"
 
 #ifdef WIN32
 
@@ -40,7 +41,54 @@ HWND g_hwnd = NULL;
 #endif
 
 PluginSys::PluginContainer * g_pc = NULL;
+void * g_zmq_socket = NULL;
+void * g_zmq_ui_ctx = NULL;
+c8 g_zeromq_ok = 0; 
 
+#include "zmq.h"
+#include "zmq_utils.h"
+#include "platform.hpp"
+void ini_zmq()
+{
+	void * ctx = zmq_init(1);
+	if (!ctx) 
+	{
+		return;
+	}
+
+	void * s = zmq_socket(ctx, ZMQ_PUSH);
+	if (!s) 
+	{
+		return;
+	}
+
+	s32 rc = zmq_bind(s, UI_ZMQ_NAME);
+	if (rc) 
+	{
+		return;
+	}
+
+	g_zmq_socket = s;
+	g_zmq_ui_ctx = ctx;
+}
+void send_zmq_msg(const ui::uimsg & msg)
+{
+	s32 size = msg.ByteSize();
+	zmq_msg_t zmsg;
+	s32 rc = zmq_msg_init_size(&zmsg, size);
+	if (rc)
+	{
+		return;
+	}
+	void * buffer = zmq_msg_data(&zmsg);
+	msg.SerializeToArray(buffer, size);
+
+	rc = zmq_send (g_zmq_socket, &zmsg, 0);
+	if (rc)
+	{
+		return;
+	}
+}
 extern "C" FRAMEADAPTER_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 {
 	STRING name = p->name();
@@ -51,7 +99,9 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin
 	g_pc = new PluginSys::PluginContainer(fl, nl);
 	g_pc->AddFather(p);
 
+	ini_zmq();
 	g_pc->Ini();
+	g_pc->Set((void*)PI_GS_ZEROMQ_CTX, (void*)&g_zmq_ui_ctx);
 
 	return true;
 }
@@ -62,16 +112,25 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 	g_pc = 0;
 	return true;
 }
-extern "C" FRAMEADAPTER_API bool PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
+extern "C" FRAMEADAPTER_API PLUGIN_HANDLE_INPUT_STATUS PLUGIN_INPUT_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
 	PluginInInputType t = (PluginInInputType)(s32)type;
 	switch (t)
 	{
 	case PI_I_UI_MSG:
-		return g_pc->Input(type, param);
+		{
+			if (!g_zeromq_ok)
+			{
+				g_pc->Get((void*)PI_GS_ZEROMQ_OK_FLG, (void*)&g_zeromq_ok);
+				return PLUGIN_HANDLE_INPUT_END;
+			}
+			ui::uimsg * msg = (ui::uimsg *)param;
+			send_zmq_msg(*msg);
+			return PLUGIN_HANDLE_INPUT_END;
+		}
 		break;
 	}
-	return false;
+	return PLUGIN_HANDLE_INPUT_CONTINUE;
 }
 extern "C" FRAMEADAPTER_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
@@ -81,6 +140,9 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void
 	case PI_GS_UI_WIN_HANDLE:
 		*((HWND*)param) = g_hwnd;
 		return true;
+	case PI_GS_ZEROMQ_CTX:
+		*((void**)param) = g_zmq_ui_ctx;
+		return true;;
 	default:
 		return g_pc->Get(type, param);
 	}
@@ -93,6 +155,9 @@ extern "C" FRAMEADAPTER_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void
 	{
 	case PI_GS_UI_WIN_HANDLE:
 		g_hwnd = *((HWND*)param);
+		return true;
+	case PI_GS_ZEROMQ_CTX:
+		g_zmq_ui_ctx = *((void**)param);
 		return true;
 	default:
 		return g_pc->Set(type, param);

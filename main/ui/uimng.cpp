@@ -8,6 +8,13 @@
 #include "globle.h"
 #include "../localheader.h"
 #include "../render/render.h"
+#include "../god/god.h"
+
+#include "uimsg.pb.h"
+
+#include "zmq.h"
+#include "zmq_utils.h"
+#include "platform.hpp"
 
 UIMng::UIMng() : m_zmq_socket(0)
 {
@@ -26,6 +33,7 @@ void UIMng::ini()
 }
 void UIMng::heartbeat(double elapsed)
 {
+	zmq_heartbeat();
 	CEGUI::System::getSingleton().injectTimePulse((float)elapsed);
 }
 void UIMng::render()
@@ -91,4 +99,80 @@ void UIMng::ini_cegui_system()
 	wnd->setText("Hello World!");
 
 	LOG_LEAVE;
+}
+void UIMng::zmq_heartbeat()
+{
+	void * zmq_socket = SINGLETON(God).GetZeromqSocket();
+
+	zmq_msg_t zmsg;
+	zmq_msg_init(&zmsg);
+	s32 rc;
+	ui::uimsg msg;
+	while(1)
+	{
+		rc = zmq_recv(zmq_socket, &zmsg, ZMQ_NOBLOCK);
+		if (rc < 0) 
+		{
+			break;
+		}
+		msg.ParseFromArray(zmq_msg_data(&zmsg), zmq_msg_size(&zmsg));
+		handle_zmq_msg(msg);
+	}
+	zmq_msg_close(&zmsg);
+}
+void UIMng::handle_zmq_msg(const ui::uimsg & msg)
+{
+	switch(msg.required_type())
+	{
+	case ui::uimsg_type_left_down:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::LeftButton);
+		}
+		break;
+	case ui::uimsg_type_left_up:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::LeftButton);
+		}
+		break;
+	case ui::uimsg_type_right_down:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonDown(CEGUI::RightButton);
+		}
+		break;
+	case ui::uimsg_type_right_up:
+		{
+			CEGUI::System::getSingleton().injectMouseButtonUp(CEGUI::RightButton);
+		}
+		break;
+	case ui::uimsg_type_mouse_move:
+		{
+			CEGUI::System::getSingleton().injectMousePosition(msg.optional_x(), msg.optional_y());
+		}
+		break;
+	case ui::uimsg_type_key_down:
+		{
+			CEGUI::System::getSingleton().injectKeyDown(msg.optional_key());
+		}
+		break;
+	case ui::uimsg_type_key_up:
+		{
+			CEGUI::System::getSingleton().injectKeyUp(msg.optional_key());
+		}
+		break;
+	case ui::uimsg_type_key_char:
+		{
+			CEGUI::System::getSingleton().injectChar(msg.optional_key());
+		}
+		break;
+	case ui::uimsg_type_close_window:
+		{
+			::PostMessage((HWND)SINGLETON(God).GetHwnd(), WM_CLOSE, 0, 0);
+		}
+		break;
+	case ui::uimsg_type_mouse_wheel:
+		{
+			CEGUI::System::getSingleton().injectMouseWheelChange((float)msg.optional_wheel());
+		}
+		break;
+	}
 }

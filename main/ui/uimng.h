@@ -19,6 +19,8 @@ public:
 private:
 	void create_cegui_system();
 	void ini_cegui_system();
+	void zmq_heartbeat();
+	void handle_zmq_msg(const ui::uimsg & msg);
 private:
 	void * m_zmq_socket;
 };
