@@ -9,6 +9,8 @@
 #include "../localheader.h"
 #include "../render/render.h"
 #include "../god/god.h"
+#include "uiwheel.h"
+#include "ScriptingModules/LuaScriptModule/CEGUILua.h"
 
 #include "uimsg.pb.h"
 
@@ -82,22 +84,14 @@ void UIMng::ini_cegui_system()
 {
 	LOG_ENTER;
 
-	// TODO ÏÈÁÙÊ±ÓÃ
-	CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
-	LOG_TRACE("create Scheme ok");
+	CEGUI::LuaScriptModule& scriptmod(CEGUI::LuaScriptModule::create());
 
-	CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
-	CEGUI::WindowManager& winMgr = CEGUI::WindowManager::getSingleton();
-	CEGUI::DefaultWindow* root = (CEGUI::DefaultWindow*)winMgr.createWindow("DefaultWindow", "Root");
-	CEGUI::System::getSingleton().setGUISheet(root);
-	CEGUI::FrameWindow* wnd = (CEGUI::FrameWindow*)winMgr.createWindow("TaharezLook/FrameWindow", "Demo Window");
-	root->addChildWindow(wnd);
-	wnd->setPosition(CEGUI::UVector2(cegui_reldim(0.25f), cegui_reldim( 0.25f)));
-	wnd->setSize(CEGUI::UVector2(cegui_reldim(0.5f), cegui_reldim( 0.5f)));
-	wnd->setMaxSize(CEGUI::UVector2(cegui_reldim(1.0f), cegui_reldim( 1.0f)));
-	wnd->setMinSize(CEGUI::UVector2(cegui_reldim(0.1f), cegui_reldim( 0.1f)));
-	wnd->setText("Hello World!");
+	CEGUI::System::getSingleton().setScriptingModule(&scriptmod);
 
+	CEGUI::System::getSingleton().executeScriptFile("ini_cegui_system.lua");
+
+	SINGLETON(UIWheel).ini();
+	
 	LOG_LEAVE;
 }
 void UIMng::zmq_heartbeat()

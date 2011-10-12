@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<GUILayout>
+            <Window Type="TaharezLook/StaticText" Name="Demo8/Window2/Tips">
+                <Property Name="UnifiedPosition" Value="{{0.05,0},{0.4,0}}" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.9,0},{0.55,0}}" />
+                <Property Name="HorzFormatting" Value="WordWrapCentred" />
+                <Property Name="Text" Value="We removed this, and now use proper Tooltips instead!" />
+            </Window>
+</GUILayout>
