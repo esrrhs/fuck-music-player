@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <GUIScheme Name="TaharezLook">
 	<Imageset Filename="TaharezLook.imageset" />
-	<Font Filename="DejaVuSans-10.font" />
+	<Font Filename="SIMYOU-26.font" />
 	<LookNFeel Filename="TaharezLook.looknfeel" />
 	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
 	<FalagardMapping WindowType="TaharezLook/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="TaharezLook/Button" />

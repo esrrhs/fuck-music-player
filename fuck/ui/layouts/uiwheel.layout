@@ -1,13 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <GUILayout >
-    <Window Type="TaharezLook/StaticText" Name="music_item_0" >
-        <Property Name="Font" Value="Batang-26" />
-        <Property Name="Text" Value="testtesttesttesttesttesttesttesttesttesttesttesttesttesttest" />
-        <Property Name="HorzExtent" Value="720" />
-        <Property Name="VertExtent" Value="24.4219" />
-        <Property Name="TextColours" Value="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFF00 br:FF00FFFF" />
-        <Property Name="HorzFormatting" Value="WordWrapCentred" />
-        <Property Name="UnifiedAreaRect" Value="{{0.05,0},{0.4,0},{0.95,0},{0.95,0}}" />
+    <Window Type="DefaultWindow" Name="uiwheel" >
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Window Type="TaharezLook/StaticText" Name="music_item_0" >
+            <Property Name="Text" Value="哇哈哈哈" />
+            <Property Name="HorzExtent" Value="128" />
+            <Property Name="VertExtent" Value="25" />
+            <Property Name="TextColours" Value="tl:FF00FF00 tr:FF00FF00 bl:FF00FF00 br:FF00FF00" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.0653432,0},{0.8,0},{0.210722,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="music_item_1" >
+            <Property Name="Text" Value="哇哈哈哈" />
+            <Property Name="HorzExtent" Value="128" />
+            <Property Name="VertExtent" Value="25" />
+            <Property Name="TextColours" Value="tl:FF00FF00 tr:FF00FF00 bl:FF00FF00 br:FF00FF00" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.245849,0},{0.8,0},{0.391228,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="music_item_2" >
+            <Property Name="Text" Value="哇哈哈哈" />
+            <Property Name="HorzExtent" Value="128" />
+            <Property Name="VertExtent" Value="25" />
+            <Property Name="TextColours" Value="tl:FFFF0000 tr:FFFF0000 bl:FFFF0000 br:FFFF0000" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.426354,0},{0.8,0},{0.571733,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="music_item_3" >
+            <Property Name="Text" Value="哇哈哈哈" />
+            <Property Name="HorzExtent" Value="128" />
+            <Property Name="VertExtent" Value="25" />
+            <Property Name="TextColours" Value="tl:FF0000FF tr:FF0000FF bl:FF0000FF br:FF0000FF" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.60686,0},{0.8,0},{0.752239,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="music_item_4" >
+            <Property Name="Text" Value="哇哈哈哈" />
+            <Property Name="HorzExtent" Value="128" />
+            <Property Name="VertExtent" Value="25" />
+            <Property Name="TextColours" Value="tl:FF0000FF tr:FF0000FF bl:FF0000FF br:FF0000FF" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.787365,0},{0.8,0},{0.932744,0}}" />
+        </Window>
     </Window>
 </GUILayout>
