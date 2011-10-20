@@ -131,6 +131,14 @@ namespace PluginSys
 		{
 			return m_container.end();
 		}
+		void erase(ConstIter it)
+		{
+			m_container.erase(it);
+		}
+		size_t size()
+		{
+			return m_container.size();
+		}
 		bool AddFather(Plugin * f)
 		{
 			for (Container::const_iterator it = m_container.begin(); it != m_container.end(); it++)

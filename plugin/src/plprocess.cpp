@@ -22,7 +22,7 @@ extern "C" PROCESS_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 }
 extern "C" PROCESS_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 {
-	g_pc->Quit();
+	//g_pc->Quit();
 	delete g_pc;
 	g_pc = 0;
 	return true;
@@ -43,12 +43,19 @@ extern "C" PROCESS_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * pa
 
 extern "C" PROCESS_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 {
-	for (PluginSys::PluginContainer::ConstIter it = g_pc->begin(); it != g_pc->end(); it++)
+	while (g_pc->size() > 0)
 	{
+		PluginSys::PluginContainer::ConstIter it = g_pc->begin();
 		if(!(*it)->Run())
 		{
 			return false;
 		}
+		if(!(*it)->Quit())
+		{
+			return false;
+		}
+		delete (*it);
+		g_pc->erase(it);
 	}
 	return false;
 }

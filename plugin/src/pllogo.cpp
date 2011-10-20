@@ -159,6 +159,13 @@ namespace OpenGl
 
 		SwapBuffers(g_hDC);
 	}
+	void QuitGL()
+	{
+		glDeleteTextures(1, &g_texture);
+		wglMakeCurrent(NULL,NULL);
+		wglDeleteContext(g_hRC);
+		ReleaseDC(g_hwnd, g_hDC);
+	}
 }
 bool IniLogo()
 {
@@ -216,6 +223,7 @@ extern "C" LOGO_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 }
 extern "C" LOGO_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
 {
+	OpenGl::QuitGL();
 	return true;
 }
 
