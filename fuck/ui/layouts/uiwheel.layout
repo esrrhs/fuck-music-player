@@ -3,7 +3,7 @@
 <GUILayout >
     <Window Type="DefaultWindow" Name="uiwheel" >
         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
-        <Window Type="TaharezLook/StaticText" Name="music_item_0" >
+        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_0" >
             <Property Name="Text" Value="哇哈哈哈" />
             <Property Name="HorzExtent" Value="128" />
             <Property Name="VertExtent" Value="25" />
@@ -11,7 +11,7 @@
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.0653432,0},{0.8,0},{0.210722,0}}" />
         </Window>
-        <Window Type="TaharezLook/StaticText" Name="music_item_1" >
+        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_1" >
             <Property Name="Text" Value="哇哈哈哈" />
             <Property Name="HorzExtent" Value="128" />
             <Property Name="VertExtent" Value="25" />
@@ -19,7 +19,7 @@
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.245849,0},{0.8,0},{0.391228,0}}" />
         </Window>
-        <Window Type="TaharezLook/StaticText" Name="music_item_2" >
+        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_2" >
             <Property Name="Text" Value="哇哈哈哈" />
             <Property Name="HorzExtent" Value="128" />
             <Property Name="VertExtent" Value="25" />
@@ -27,7 +27,7 @@
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.426354,0},{0.8,0},{0.571733,0}}" />
         </Window>
-        <Window Type="TaharezLook/StaticText" Name="music_item_3" >
+        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_3" >
             <Property Name="Text" Value="哇哈哈哈" />
             <Property Name="HorzExtent" Value="128" />
             <Property Name="VertExtent" Value="25" />
@@ -35,7 +35,7 @@
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.60686,0},{0.8,0},{0.752239,0}}" />
         </Window>
-        <Window Type="TaharezLook/StaticText" Name="music_item_4" >
+        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_4" >
             <Property Name="Text" Value="哇哈哈哈" />
             <Property Name="HorzExtent" Value="128" />
             <Property Name="VertExtent" Value="25" />
