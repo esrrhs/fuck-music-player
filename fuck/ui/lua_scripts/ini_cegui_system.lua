@@ -34,5 +34,4 @@ winMgr:getWindow("uiwheel/music_item_2"):setText(GetWheelName(2));
 winMgr:getWindow("uiwheel/music_item_3"):setText(GetWheelName(3));
 winMgr:getWindow("uiwheel/music_item_4"):setText(GetWheelName(4));
 
-logger:logEvent( GetWheelName(0) )  
 logger:logEvent( "ini_cegui_system ok" )  
