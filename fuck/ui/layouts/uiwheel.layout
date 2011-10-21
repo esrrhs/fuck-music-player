@@ -9,6 +9,8 @@
             <Property Name="VertExtent" Value="24.8125" />
             <Property Name="TextColours" Value="tl:FF00FF00 tr:FF00FF00 bl:FF00FF00 br:FF00FF00" />
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="ZRotation" Value="30" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.0653432,0},{0.8,0},{0.210722,0}}" />
         </Window>
         <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_1" >
@@ -17,23 +19,9 @@
             <Property Name="VertExtent" Value="24.8125" />
             <Property Name="TextColours" Value="tl:FF00FF00 tr:FF00FF00 bl:FF00FF00 br:FF00FF00" />
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="ZRotation" Value="15" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.245849,0},{0.8,0},{0.391228,0}}" />
-        </Window>
-        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_2" >
-            <Property Name="Text" Value="哇哈哈哈" />
-            <Property Name="HorzExtent" Value="128" />
-            <Property Name="VertExtent" Value="24.8125" />
-            <Property Name="TextColours" Value="tl:FFFF0000 tr:FFFF0000 bl:FFFF0000 br:FFFF0000" />
-            <Property Name="HorzFormatting" Value="WordWrapCentred" />
-            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.426354,0},{0.8,0},{0.571733,0}}" />
-        </Window>
-        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_3" >
-            <Property Name="Text" Value="哇哈哈哈" />
-            <Property Name="HorzExtent" Value="128" />
-            <Property Name="VertExtent" Value="24.8125" />
-            <Property Name="TextColours" Value="tl:FF0000FF tr:FF0000FF bl:FF0000FF br:FF0000FF" />
-            <Property Name="HorzFormatting" Value="WordWrapCentred" />
-            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.60686,0},{0.8,0},{0.752239,0}}" />
         </Window>
         <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_4" >
             <Property Name="Text" Value="哇哈哈哈" />
@@ -41,7 +29,19 @@
             <Property Name="VertExtent" Value="24.8125" />
             <Property Name="TextColours" Value="tl:FF0000FF tr:FF0000FF bl:FF0000FF br:FF0000FF" />
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="ZRotation" Value="-30" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.787365,0},{0.8,0},{0.932744,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_3" >
+            <Property Name="Text" Value="哇哈哈哈" />
+            <Property Name="HorzExtent" Value="128" />
+            <Property Name="VertExtent" Value="24.8125" />
+            <Property Name="TextColours" Value="tl:FF0000FF tr:FF0000FF bl:FF0000FF br:FF0000FF" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="ZRotation" Value="-15" />
+            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.60686,0},{0.8,0},{0.752239,0}}" />
         </Window>
         <Window Type="TaharezLook/Button" Name="uiwheel/last" >
             <Property Name="Text" Value="上" />
@@ -50,6 +50,15 @@
         <Window Type="TaharezLook/Button" Name="uiwheel/next" >
             <Property Name="Text" Value="下" />
             <Property Name="UnifiedAreaRect" Value="{{0.82,0},{0.46,0},{0.92,0},{0.52,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_2" >
+            <Property Name="Text" Value="哇哈哈哈" />
+            <Property Name="HorzExtent" Value="128" />
+            <Property Name="VertExtent" Value="24.8125" />
+            <Property Name="TextColours" Value="tl:FFFF0000 tr:FFFF0000 bl:FFFF0000 br:FFFF0000" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.426354,0},{0.8,0},{0.571733,0}}" />
         </Window>
     </Window>
 </GUILayout>
