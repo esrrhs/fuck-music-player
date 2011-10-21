@@ -88,9 +88,9 @@ void UIMng::ini_cegui_system()
 
 	CEGUI::System::getSingleton().setScriptingModule(&scriptmod);
 
-	CEGUI::System::getSingleton().executeScriptFile("ini_cegui_system.lua");
-
 	SINGLETON(UIWheel).ini();
+
+	CEGUI::System::getSingleton().executeScriptFile("ini_cegui_system.lua");
 	
 	LOG_LEAVE;
 }

@@ -7,6 +7,9 @@
 local guiSystem = CEGUI.System:getSingleton()
 local schemeMgr = CEGUI.SchemeManager:getSingleton()
 local winMgr = CEGUI.WindowManager:getSingleton()
+local logger = CEGUI.Logger:getSingleton()  
+
+logger:logEvent( "ini_cegui_system begin..." )  
 
 schemeMgr:create("TaharezLook.scheme");
 
@@ -24,3 +27,12 @@ guiSystem:setDefaultTooltip("TaharezLook/Tooltip")
 --winMgr:getWindow("uiwheel/music_item_1"):setRotation(CEGUI.Vector3(0,0,15));
 --winMgr:getWindow("uiwheel/music_item_3"):setRotation(CEGUI.Vector3(0,0,-15));
 --winMgr:getWindow("uiwheel/music_item_4"):setRotation(CEGUI.Vector3(0,0,-30));
+
+winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(0));
+winMgr:getWindow("uiwheel/music_item_1"):setText(GetWheelName(1));
+winMgr:getWindow("uiwheel/music_item_2"):setText(GetWheelName(2));
+winMgr:getWindow("uiwheel/music_item_3"):setText(GetWheelName(3));
+winMgr:getWindow("uiwheel/music_item_4"):setText(GetWheelName(4));
+
+logger:logEvent( GetWheelName(0) )  
+logger:logEvent( "ini_cegui_system ok" )  
