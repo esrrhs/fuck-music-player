@@ -16,18 +16,20 @@
     <ClInclude Include="localheader.h" />
     <ClInclude Include="lua_tinker\lua_tinker.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="music\musicmng.h" />
     <ClInclude Include="render\render.h" />
     <ClInclude Include="ui\uimng.h" />
-    <ClInclude Include="ui\uiwheel.h" />
+    <ClInclude Include="ui\uiscript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="god\god.cpp" />
     <ClCompile Include="helper\helper.cpp" />
     <ClCompile Include="lua_tinker\lua_tinker.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="music\musicmng.cpp" />
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="ui\uimng.cpp" />
-    <ClCompile Include="ui\uiwheel.cpp" />
+    <ClCompile Include="ui\uiscript.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{19F9FBC2-051C-4C0F-9976-7B3F33DEBB1F}</ProjectGuid>

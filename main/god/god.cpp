@@ -8,11 +8,13 @@
 
 #include "../ui/uimng.h"
 #include "../render/render.h"
+#include "../music/musicmng.h"
 
 bool God::Ini()
 {
 	LOG_ENTER
 	SINGLETON(Render).Ini();
+	SINGLETON(MusicMng).ini();
 	SINGLETON(UIMng).ini();
 	LOG_LEAVE
 	return true;

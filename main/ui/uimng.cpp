@@ -9,7 +9,7 @@
 #include "../localheader.h"
 #include "../render/render.h"
 #include "../god/god.h"
-#include "uiwheel.h"
+#include "uiscript.h"
 #include "ScriptingModules/LuaScriptModule/CEGUILua.h"
 
 #include "uimsg.pb.h"
@@ -88,10 +88,10 @@ void UIMng::ini_cegui_system()
 
 	CEGUI::System::getSingleton().setScriptingModule(&scriptmod);
 
-	SINGLETON(UIWheel).ini();
+	SINGLETON(UIScript).ini();
 
 	CEGUI::System::getSingleton().executeScriptFile("ini_cegui_system.lua");
-	
+
 	LOG_LEAVE;
 }
 void UIMng::zmq_heartbeat()

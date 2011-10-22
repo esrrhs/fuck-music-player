@@ -1,5 +1,5 @@
-#ifndef __UI_WHEEL__
-#define __UI_WHEEL__
+#ifndef __MUSIC_MNG__
+#define __MUSIC_MNG__
 
 #include <boost/noncopyable.hpp>
 #include "globledefine.h"
@@ -10,16 +10,17 @@ namespace CEGUI
 {
 	class String;
 }
-class UIWheel : public boost::noncopyable
+class MusicMng : public boost::noncopyable
 {
 public:
-	UIWheel();
-	virtual ~UIWheel();
+	MusicMng();
+	virtual ~MusicMng();
 	void ini();
 	void heartbeat(double elapsed);
 	const c8 * get_list_item_name(s32 pos);
 private:
-	void ini_wheel_list();
+	void start_load_music_list();
+	void end_load_music_list();
 private:
 	std::vector<CEGUI::String *> m_list;
 };

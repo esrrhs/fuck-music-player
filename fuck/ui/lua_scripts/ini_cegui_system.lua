@@ -1,6 +1,17 @@
 -----------------------------------------
 -- Start of handler functions
 -----------------------------------------
+function click_next(args)
+    local winMgr = CEGUI.WindowManager:getSingleton()
+
+   	winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(1));
+end
+function click_last(args)
+    local winMgr = CEGUI.WindowManager:getSingleton()
+
+   	winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(2));
+end
+
 -----------------------------------------
 -- Script Entry Point
 -----------------------------------------
@@ -33,5 +44,9 @@ winMgr:getWindow("uiwheel/music_item_1"):setText(GetWheelName(1));
 winMgr:getWindow("uiwheel/music_item_2"):setText(GetWheelName(2));
 winMgr:getWindow("uiwheel/music_item_3"):setText(GetWheelName(3));
 winMgr:getWindow("uiwheel/music_item_4"):setText(GetWheelName(4));
+
+
+winMgr:getWindow("uiwheel/next"):subscribeEvent("Clicked", "click_next")
+winMgr:getWindow("uiwheel/last"):subscribeEvent("Clicked", "click_last")
 
 logger:logEvent( "ini_cegui_system ok" )  
