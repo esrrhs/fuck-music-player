@@ -35,6 +35,8 @@ void UIMng::ini()
 }
 void UIMng::heartbeat(double elapsed)
 {
+	SINGLETON(UIScript).heartbeat(elapsed);
+
 	zmq_heartbeat();
 	CEGUI::System::getSingleton().injectTimePulse((float)elapsed);
 }

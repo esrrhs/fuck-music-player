@@ -17,6 +17,14 @@
     <ClCompile Include="libs\date_time\gregorian\greg_month.cpp" />
     <ClCompile Include="libs\date_time\gregorian\greg_weekday.cpp" />
     <ClCompile Include="libs\date_time\posix_time\posix_time_types.cpp" />
+    <ClCompile Include="libs\filesystem\codecvt_error_category.cpp" />
+    <ClCompile Include="libs\filesystem\operations.cpp" />
+    <ClCompile Include="libs\filesystem\path.cpp" />
+    <ClCompile Include="libs\filesystem\path_traits.cpp" />
+    <ClCompile Include="libs\filesystem\portability.cpp" />
+    <ClCompile Include="libs\filesystem\unique_path.cpp" />
+    <ClCompile Include="libs\filesystem\utf8_codecvt_facet.cpp" />
+    <ClCompile Include="libs\filesystem\windows_file_codecvt.cpp" />
     <ClCompile Include="libs\system\error_code.cpp" />
     <ClCompile Include="libs\thread\win32\thread.cpp" />
     <ClCompile Include="libs\thread\win32\tss_pe.cpp" />
@@ -26,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\date_time\gregorian\greg_names.hpp" />
+    <ClInclude Include="libs\filesystem\windows_file_codecvt.hpp" />
     <ClInclude Include="libs\system\local_free_on_destruction.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

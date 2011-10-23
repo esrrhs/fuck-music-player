@@ -44,6 +44,8 @@ bool God::Hearbeat(double elapsed)
 {
 	SINGLETON(Render).Begin();
 
+	SINGLETON(MusicMng).heartbeat(elapsed);
+
 	SINGLETON(UIMng).heartbeat(elapsed);
 	SINGLETON(UIMng).render();
 
