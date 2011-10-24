@@ -22,7 +22,7 @@ typedef float f32;
 #define IFSTREAM std::ifstream
 #endif
 
-#define SAFE_DELETE(x) if(x) delete x
+#define SAFE_DELETE(x) if(x) { delete x; x = 0; }
 
 #ifdef WIN32
 #define SLEEP(ms) ::Sleep((DWORD)ms)

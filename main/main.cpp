@@ -107,6 +107,11 @@ extern "C" MAIN_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 	u32 ufps = boost::lexical_cast<u32>(fps.c_str());
 	SINGLETON(God).SetFps(ufps);
 
+	// load filefinder
+	STRING filefinder_filename = config.Get(PLUGIN_MAIN_FILEFINDER_FILENAME_CONFIG_NAME);
+	STRING filefinder_name = config.Get(PLUGIN_MAIN_FILEFINDER_NAME_CONFIG_NAME);
+	SINGLETON(God).SetPluginName(FILE_FINDER_PLUGIN_TYPE, filefinder_filename, filefinder_name);
+
 	g_pc->Ini();
 
 	g_Plugin = p;

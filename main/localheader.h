@@ -8,4 +8,6 @@
 #define LOG_ENTER LOG_TRACE("begin...")
 #define LOG_LEAVE LOG_TRACE("end")
 
+#define FILE_FINDER_PLUGIN_TYPE L"filefinder"
+
 #endif

@@ -19,10 +19,12 @@ public:
 	void heartbeat(double elapsed);
 	const c8 * get_list_item_name(s32 pos);
 private:
+	void load_file_finder();
 	void start_load_music_list();
 	void end_load_music_list();
 private:
 	std::vector<CEGUI::String *> m_list;
+	void * m_filefinder;
 };
 
 #endif
