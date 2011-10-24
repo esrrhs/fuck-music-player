@@ -14,7 +14,7 @@ public:
 	{
 		IFSTREAM fs(str);
 		ZCHAR buffer[MAX_LINE_SIZE];
-		boost::char_separator<ZCHAR> sep(L"= ");
+		boost::char_separator<ZCHAR> sep(L"=");
 		while (!fs.eof())
 		{
 			memset(buffer, 0, sizeof(ZCHAR) * MAX_LINE_SIZE);
