@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout >
+    <Window Type="DefaultWindow" Name="uiloading" >
+        <Property Name="UnifiedAreaRect" Value="{{0.00105708,0},{0,0},{1.00106,0},{1,0}}" />
+        <Window Type="TaharezLook/StaticText" Name="uiloading/loading_text" >
+            <Property Name="Text" Value="加载" />
+            <Property Name="HorzExtent" Value="64" />
+            <Property Name="VertExtent" Value="24.8125" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{0.085,0},{0.1,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="uiloading/loading_dir" >
+            <Property Name="Text" Value="啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊" />
+            <Property Name="HorzExtent" Value="832" />
+            <Property Name="VertExtent" Value="49.625" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="HorzFormatting" Value="WordWrapLeftAligned" />
+            <Property Name="VertFormatting" Value="TopAligned" />
+            <Property Name="UnifiedAreaRect" Value="{{0.09,0},{0,0},{1,0},{0.232727,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="uiloading/num_text" >
+            <Property Name="Text" Value="数目" />
+            <Property Name="HorzExtent" Value="64" />
+            <Property Name="VertExtent" Value="24.8125" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0,0},{0.255455,0},{0.085,0},{0.355454,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="uiloading/num" >
+            <Property Name="Text" Value="123" />
+            <Property Name="HorzExtent" Value="96" />
+            <Property Name="VertExtent" Value="24.8125" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="HorzFormatting" Value="WordWrapLeftAligned" />
+            <Property Name="UnifiedAreaRect" Value="{{0.09,0},{0.255455,0},{1,0},{0.355454,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="uiloading/deatail_text" >
+            <Property Name="Text" Value="详细" />
+            <Property Name="HorzExtent" Value="64" />
+            <Property Name="VertExtent" Value="24.8125" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="HorzFormatting" Value="WordWrapCentred" />
+            <Property Name="UnifiedAreaRect" Value="{{0,0},{0.382728,0},{0.085,0},{0.482727,0}}" />
+        </Window>
+        <Window Type="TaharezLook/StaticText" Name="uiloading/deatail" >
+            <Property Name="Text" Value="啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊" />
+            <Property Name="HorzExtent" Value="832" />
+            <Property Name="VertExtent" Value="74.4375" />
+            <Property Name="RiseOnClick" Value="False" />
+            <Property Name="HorzFormatting" Value="WordWrapLeftAligned" />
+            <Property Name="VertFormatting" Value="TopAligned" />
+            <Property Name="UnifiedAreaRect" Value="{{0.09,0},{0.382728,0},{1,0},{1,0}}" />
+        </Window>
+    </Window>
+</GUILayout>
