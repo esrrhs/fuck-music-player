@@ -14,6 +14,9 @@ public:
 	void ini();
 	void heartbeat(double elapsed);
 	const c8 * get_list_item_name(s32 pos);
+	const c8 * get_find_dir_name();
+	const c8 * get_find_name();
+	const c8 * get_find_num();
 	void * GetFileFinder() { return m_filefinder; }
 	void parse_from_find_list();
 	void end_load_music_list();

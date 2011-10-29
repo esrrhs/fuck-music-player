@@ -6,6 +6,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #ifdef WIN32
 
@@ -40,6 +42,15 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 std::vector<STRING> g_dir;
 std::vector<STRING> g_filter;
 std::vector<STRING> g_find;
+STRING g_finding_dir;
+STRING g_finding_name;
+s32 g_finding_num;
+
+typedef boost::mutex MUTEX;
+typedef boost::mutex::scoped_lock LOCK;
+MUTEX g_get_mutex;
+
+u32 g_sleep_time = 0;
 
 std::wstring Utf8ToUtf16(const std::string& utf8text)
 {
@@ -80,6 +91,10 @@ extern "C" FILE_FINDER_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin 
 	{
 		g_filter.push_back(*f_it);
 	}
+
+	STRING sleep_time = config.Get(PLUGIN_FILE_FINDER_SLEEP_TIME_CONFIG_NAME);
+	g_sleep_time = boost::lexical_cast<u32>(sleep_time.c_str());
+
 	return true;
 }
 extern "C" FILE_FINDER_API bool PLUGIN_QUIT_FUNC_DEFAAULT_NAME()
@@ -103,11 +118,21 @@ extern "C" FILE_FINDER_API PLUGIN_HANDLE_INPUT_STATUS PLUGIN_INPUT_FUNC_DEFAAULT
 }
 extern "C" FILE_FINDER_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
+	LOCK lock(g_get_mutex);
 	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
 	switch (t)
 	{
 	case PI_GS_FILE_FINDER_RESULT_LIST:
 		*((std::vector<STRING>**)param) = &g_find;
+		return true;
+	case PI_GS_FILE_FINDER_FINDING_DIR:
+		*((c8 **)param) = (c8*)g_finding_dir.c_str();
+		return true;
+	case PI_GS_FILE_FINDER_FIND_NUM:
+		*((s32 *)param) = g_finding_num;
+		return true;
+	case PI_GS_FILE_FINDER_FINDING_NAME:
+		*((c8 **)param) = (c8*)g_finding_name.c_str();
 		return true;
 	}
 	return false;
@@ -151,6 +176,11 @@ extern "C" FILE_FINDER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 		fs::path dir = dirvec.back();
 		dirvec.pop_back();
 
+		{
+			LOCK lock(g_get_mutex);
+			g_finding_dir = dir.c_str();
+		}
+
 		fs::directory_iterator end_iter;
 		for (fs::directory_iterator file_itr(dir); file_itr != end_iter; ++file_itr)
 		{
@@ -172,7 +202,16 @@ extern "C" FILE_FINDER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 				{
 					// find it
 					g_find.push_back(file_itr->path().c_str());
+					g_finding_num = g_find.size();
 				}
+				{
+					LOCK lock(g_get_mutex);
+					g_finding_name = file_itr->path().filename().c_str();
+				}
+			}
+			if (g_sleep_time > 0)
+			{
+				SLEEP(g_sleep_time);
 			}
 		}
 	} 

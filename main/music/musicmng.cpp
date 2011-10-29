@@ -109,14 +109,48 @@ const c8 * MusicMng::get_list_item_name(s32 pos)
 		rootPath = fs::system_complete(fs::path(strPath, fs::native));    //将相对路径转换为绝对路径
 
 #ifdef UNICODE
-		static std::string str;
-		str = Helper::Utf16ToUtf8(rootPath.leaf().c_str());
-		return str.c_str();
+		static std::string tmp;
+		tmp = Helper::Utf16ToUtf8(rootPath.leaf().c_str());
+		return tmp.c_str();
 #else
-		static std::string str;
-		str = rootPath.leaf().c_str();
-		return str.c_str();
+		static std::string tmp;
+		tmp = rootPath.leaf().c_str();
+		return tmp.c_str();
 #endif
 	}
 	return "empty";
+}
+
+const c8 * MusicMng::get_find_dir_name()
+{
+	const c8 * p = NULL;
+	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_FINDING_DIR, (void*)&p);
+#ifdef UNICODE
+	static std::string tmp;
+	tmp = Helper::Utf16ToUtf8((wchar_t*)p);
+	return tmp.c_str();
+#else
+	return p;
+#endif
+}
+const c8 * MusicMng::get_find_name()
+{
+	const c8 * p = NULL;
+	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_FINDING_NAME, (void*)&p);
+#ifdef UNICODE
+	static std::string tmp;
+	tmp = Helper::Utf16ToUtf8((wchar_t*)p);
+	return tmp.c_str();
+#else
+	return p;
+#endif
+}
+const c8 * MusicMng::get_find_num()
+{
+	s32 num = 0;
+	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_FIND_NUM, (void*)&num);
+
+	static std::string tmp;
+	tmp = boost::lexical_cast<std::string>(num);
+	return tmp.c_str();
 }

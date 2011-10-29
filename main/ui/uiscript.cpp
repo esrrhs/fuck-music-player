@@ -24,6 +24,18 @@ const c8 * lua_GetWheelName(s32 pos)
 {
 	return SINGLETON(MusicMng).get_list_item_name(pos);
 }
+const c8 * lua_GetFindDir()
+{
+	return SINGLETON(MusicMng).get_find_dir_name();
+}
+const c8 * lua_GetFindName()
+{
+	return SINGLETON(MusicMng).get_find_name();
+}
+const c8 * lua_GetFindNum()
+{
+	return SINGLETON(MusicMng).get_find_num();
+}
 s32 lua_GetStatus()
 {
 	return (s32)SINGLETON(God).GetStauts();
@@ -66,6 +78,9 @@ void UIScript::ini()
 	lua_tinker::def(L, "OnFindEnd", lua_OnFindEnd);
 	lua_tinker::def(L, "GetCustomValue", lua_GetCustomValue);
 	lua_tinker::def(L, "SetCustomValue", lua_SetCustomValue);
+	lua_tinker::def(L, "GetFindDir", lua_GetFindDir);
+	lua_tinker::def(L, "GetFindName", lua_GetFindName);
+	lua_tinker::def(L, "GetFindNum", lua_GetFindNum);
 	
 	LOG_LEAVE;
 }

@@ -5,9 +5,14 @@ function UIScript_Heartbeat(elapsed)
     local logger = CEGUI.Logger:getSingleton()  
     local s = GetStatus();
     --正在查找
-    if s == 2 then
+    if s == 2 then        
         winMgr:getWindow("uiloading"):show()
         winMgr:getWindow("uiwheel"):hide()
+        
+        --更新数目和列表
+        winMgr:getWindow("uiloading/loading_dir"):setText(GetFindDir());
+        winMgr:getWindow("uiloading/num"):setText(GetFindNum());
+        winMgr:getWindow("uiloading/deatail"):setText(GetFindName());
     end 
     --查找结束
     if s == 3 then
@@ -15,7 +20,8 @@ function UIScript_Heartbeat(elapsed)
         time = time + elapsed;
         SetCustomValue("find_end_stay_time", time);
         
-        if time > 5 then
+        if time > 3 then 
+            
             OnFindEnd();
             winMgr:getWindow("uiloading"):hide()
             winMgr:getWindow("uiwheel"):show()
@@ -32,6 +38,10 @@ function UIScript_Heartbeat(elapsed)
         
             winMgr:getWindow("uiloading"):show()
             winMgr:getWindow("uiwheel"):hide()
+            
+            winMgr:getWindow("uiloading/loading_dir"):setText("-done-");
+            winMgr:getWindow("uiloading/deatail"):setText("-done-");
+            winMgr:getWindow("uiloading/num"):setText(GetFindNum());
             
         end
     end 
