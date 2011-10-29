@@ -25,6 +25,8 @@ function ini_uioading()
     local root = guiSystem:getGUISheet()
     root:addChildWindow(wheel);
     
+    winMgr:getWindow("uiloading"):hide()
+
     logger:logEvent( "ini_uiwheel ok" )  
 
 end
@@ -48,15 +50,10 @@ function ini_uiwheel()
     --winMgr:getWindow("uiwheel/music_item_3"):setRotation(CEGUI.Vector3(0,0,-15));
     --winMgr:getWindow("uiwheel/music_item_4"):setRotation(CEGUI.Vector3(0,0,-30));
 
-    winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(0));
-    winMgr:getWindow("uiwheel/music_item_1"):setText(GetWheelName(1));
-    winMgr:getWindow("uiwheel/music_item_2"):setText(GetWheelName(2));
-    winMgr:getWindow("uiwheel/music_item_3"):setText(GetWheelName(3));
-    winMgr:getWindow("uiwheel/music_item_4"):setText(GetWheelName(4));
-
-
     winMgr:getWindow("uiwheel/next"):subscribeEvent("Clicked", "click_next")
     winMgr:getWindow("uiwheel/last"):subscribeEvent("Clicked", "click_last")
+
+    winMgr:getWindow("uiwheel"):hide()
 
     logger:logEvent( "ini_uiwheel ok" )  
 end
@@ -81,7 +78,5 @@ guiSystem:setDefaultTooltip("TaharezLook/Tooltip")
 
 ini_uioading()
 ini_uiwheel()
-
-winMgr:getWindow("uiwheel"):hide()
 
 logger:logEvent( "ini_cegui_system ok" )  

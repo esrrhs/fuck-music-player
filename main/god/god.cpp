@@ -10,9 +10,14 @@
 #include "../render/render.h"
 #include "../music/musicmng.h"
 
+God::God() : m_status(GS_NONE), m_hwnd(NULL), m_zeromq_ctx(NULL), m_zeromq_socket(NULL), m_fps(50)
+{
+
+}
 bool God::Ini()
 {
 	LOG_ENTER
+	SetStauts(God::GS_START);
 	SINGLETON(Render).Ini();
 	SINGLETON(MusicMng).ini();
 	SINGLETON(UIMng).ini();

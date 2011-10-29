@@ -7,6 +7,7 @@
 class God
 {
 public:
+	God();
 	bool Ini();
 	bool Loop();
 	bool Quit();
@@ -51,6 +52,22 @@ public:
 	{
 		m_plugin_name[plugintype] = std::make_pair(filename, name);
 	}
+	enum GodStauts
+	{
+		GS_NONE,
+		GS_START,
+		GS_FIND,
+		GS_FIND_OK,
+		GS_PLAY,
+	};
+	GodStauts GetStauts()
+	{
+		return m_status;
+	}
+	void SetStauts(GodStauts s)
+	{
+		m_status = s;
+	}
 private:
 	bool Hearbeat(double elapsed);
 private:
@@ -59,6 +76,7 @@ private:
 	void * m_zeromq_socket;
 	std::map<STRING, std::pair<STRING, STRING> > m_plugin_name;
 	u32 m_fps;
+	GodStauts m_status;
 };
 
 #endif	

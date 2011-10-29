@@ -24,16 +24,55 @@ const c8 * lua_GetWheelName(s32 pos)
 {
 	return SINGLETON(MusicMng).get_list_item_name(pos);
 }
+s32 lua_GetStatus()
+{
+	return (s32)SINGLETON(God).GetStauts();
+}
+void lua_SetStatus(s32 status)
+{
+	SINGLETON(God).SetStauts((God::GodStauts)status);
+}
+void lua_OnFindEnd()
+{
+	SINGLETON(MusicMng).parse_from_find_list();
+}
+UIScript::CustomValueType lua_GetCustomValue(const c8 * name)
+{
+	return SINGLETON(UIScript).GetCustomValue(name);
+}
+void lua_SetCustomValue(const c8 * name, UIScript::CustomValueType value)
+{
+	SINGLETON(UIScript).SetCustomValue(name, value);
+}
+UIScript::CustomValueType UIScript::GetCustomValue(const c8 * name)
+{
+	return m_CustomValueMap[name];
+}
+void UIScript::SetCustomValue(const c8 * name, const UIScript::CustomValueType & value)
+{
+	m_CustomValueMap[name] = value;
+}
 void UIScript::ini()
 {
 	LOG_ENTER;
-	
+
+	CEGUI::System::getSingleton().executeScriptFile("globlefunc.lua");
+
 	CEGUI::LuaScriptModule * ls = (CEGUI::LuaScriptModule*)CEGUI::System::getSingleton().getScriptingModule();
 	lua_State* L = ls->getLuaState();
 	lua_tinker::def(L, "GetWheelName", lua_GetWheelName);
-
+	lua_tinker::def(L, "GetStatus", lua_GetStatus);
+	lua_tinker::def(L, "SetStatus", lua_SetStatus);
+	lua_tinker::def(L, "OnFindEnd", lua_OnFindEnd);
+	lua_tinker::def(L, "GetCustomValue", lua_GetCustomValue);
+	lua_tinker::def(L, "SetCustomValue", lua_SetCustomValue);
+	
 	LOG_LEAVE;
 }
 void UIScript::heartbeat(double elapsed)
 {
+	CEGUI::LuaScriptModule * ls = (CEGUI::LuaScriptModule*)CEGUI::System::getSingleton().getScriptingModule();
+	lua_State* L = ls->getLuaState();
+
+	lua_tinker::call<double>(L, "UIScript_Heartbeat", elapsed);
 }

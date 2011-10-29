@@ -39,4 +39,20 @@ std::wstring Utf8ToUtf16(const std::string& utf8text)
 		&wideStr[0], wideStr.size());
 	return wideStr;
 }
+std::string Utf16ToUtf8(const std::wstring& utf16text)
+{
+	const int len = WideCharToMultiByte(CP_UTF8, 0, utf16text.c_str(), -1,
+		0, 0, 0, 0);
+	if (!len)
+		CEGUI_THROW(CEGUI::InvalidRequestException(
+		"Utf16ToUtf8 - WideCharToMultiByte failed"));
+
+	char* buff = new char[len];
+	WideCharToMultiByte(CP_UTF8, 0, utf16text.c_str(), -1,
+		buff, len, 0, 0);
+	const std::string result(buff);
+	delete[] buff;
+
+	return result;
+}
 }

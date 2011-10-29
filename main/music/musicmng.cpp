@@ -9,6 +9,9 @@
 #include "plmsgheader.h"
 
 #include <boost/filesystem.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/timer.hpp>
+#include <boost/lexical_cast.hpp>
 
 MusicMng::MusicMng() : m_filefinder(NULL)
 {
@@ -49,26 +52,37 @@ void MusicMng::load_file_finder()
 void MusicMng::heartbeat(double elapsed)
 {
 }
+void RunFileFinder()
+{
+	PluginSys::Plugin * m_filefinder = (PluginSys::Plugin*)SINGLETON(MusicMng).GetFileFinder();
+	m_filefinder->Run();
+
+	SINGLETON(MusicMng).end_load_music_list();
+}
 void MusicMng::start_load_music_list()
 {
 	LOG_ENTER;
 
-	LOG_TRACE("begin find");
-	((PluginSys::Plugin*)m_filefinder)->Run();
-	LOG_TRACE("end find");
+	LOG_TRACE("start find thread");
 
-	LOG_TRACE("start parse");
+	SINGLETON(God).SetStauts(God::GS_FIND);
+
+	// 启动thread
+	boost::thread fd(boost::bind(RunFileFinder));
+
+	LOG_LEAVE;
+}
+void MusicMng::parse_from_find_list()
+{
+	LOG_ENTER;
+
 	std::vector<STRING> * pvec;
 	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_RESULT_LIST, (void*)&pvec);
 
 	for (size_t i = 0; i < pvec->size(); i++)
 	{
 		STRING tmp = (*pvec)[i];
-#ifdef UNICODE
-		m_list.push_back(new CEGUI::String(Helper::Utf16ToString(tmp.c_str())));
-#else
-		m_list.push_back(new CEGUI::String(tmp.c_str()));
-#endif
+		m_list.push_back(tmp);
 	}
 
 	LOG_TRACE("clear tmp");
@@ -78,27 +92,30 @@ void MusicMng::start_load_music_list()
 }
 void MusicMng::end_load_music_list()
 {
-	LOG_ENTER;
-
-	LOG_LEAVE;
+	SINGLETON(God).SetStauts(God::GS_FIND_OK);
 }
 const c8 * MusicMng::get_list_item_name(s32 pos)
 {
 	if (pos >= 0 && pos < (s32)m_list.size())
 	{
 		namespace fs = boost::filesystem;
+
 #ifdef UNICODE
-		STRING strPath = Helper::Utf8ToUtf16(m_list[pos]->c_str());
+		STRING strPath = m_list[pos];
 #else
-		STRING strPath = m_list[pos]->c_str();
+		std::wstring strPath = Helper::Utf8ToUtf16(m_list[pos].c_str());
 #endif
 		fs::path rootPath(fs::initial_path());        // 初始化为本项目路径
 		rootPath = fs::system_complete(fs::path(strPath, fs::native));    //将相对路径转换为绝对路径
 
 #ifdef UNICODE
-		return Helper::Utf16ToString(rootPath.leaf().c_str()).c_str();
+		static std::string str;
+		str = Helper::Utf16ToUtf8(rootPath.leaf().c_str());
+		return str.c_str();
 #else
-		return p.leaf().c_str();
+		static std::string str;
+		str = rootPath.leaf().c_str();
+		return str.c_str();
 #endif
 	}
 	return "empty";
