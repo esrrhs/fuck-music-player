@@ -24,6 +24,10 @@ const c8 * lua_GetWheelName(s32 pos)
 {
 	return SINGLETON(MusicMng).get_list_item_name(pos);
 }
+s32 lua_GetWheelNum(s32 pos)
+{
+	return SINGLETON(MusicMng).get_list_item_num();
+}
 const c8 * lua_GetFindDir()
 {
 	return SINGLETON(MusicMng).get_find_dir_name();
@@ -73,6 +77,7 @@ void UIScript::ini()
 	CEGUI::LuaScriptModule * ls = (CEGUI::LuaScriptModule*)CEGUI::System::getSingleton().getScriptingModule();
 	lua_State* L = ls->getLuaState();
 	lua_tinker::def(L, "GetWheelName", lua_GetWheelName);
+	lua_tinker::def(L, "GetWheelNum", lua_GetWheelNum);
 	lua_tinker::def(L, "GetStatus", lua_GetStatus);
 	lua_tinker::def(L, "SetStatus", lua_SetStatus);
 	lua_tinker::def(L, "OnFindEnd", lua_OnFindEnd);

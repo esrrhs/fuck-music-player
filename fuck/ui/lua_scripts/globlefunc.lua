@@ -26,11 +26,7 @@ function UIScript_Heartbeat(elapsed)
             winMgr:getWindow("uiloading"):hide()
             winMgr:getWindow("uiwheel"):show()
         
-		        winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(0));
-		        winMgr:getWindow("uiwheel/music_item_1"):setText(GetWheelName(1));
-		        winMgr:getWindow("uiwheel/music_item_2"):setText(GetWheelName(2));
-		        winMgr:getWindow("uiwheel/music_item_3"):setText(GetWheelName(3));
-		        winMgr:getWindow("uiwheel/music_item_4"):setText(GetWheelName(4));
+		        SetNowListPos(0);
         
             SetStatus(4);
             
@@ -49,4 +45,59 @@ function UIScript_Heartbeat(elapsed)
     if s == 4 then
     
     end
+end
+function GetNowListPos()
+    return GetCustomValue("now_list_pos");
+end
+function SetNowListPos(pos)
+    
+    local guiSystem = CEGUI.System:getSingleton()
+    local schemeMgr = CEGUI.SchemeManager:getSingleton()
+    local winMgr = CEGUI.WindowManager:getSingleton()
+    local logger = CEGUI.Logger:getSingleton()  
+    
+    if pos < 0 then
+        return
+    end
+    
+    if pos < 0 then
+        return
+    end
+    
+    local wheelnum = GetWheelNum();
+    if pos >= wheelnum then
+        return
+    end
+    
+    if (pos - 2) >= 0 then
+        winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(pos - 2));
+        winMgr:getWindow("uiwheel/music_item_0"):show();
+    else
+        winMgr:getWindow("uiwheel/music_item_0"):hide();
+    end
+    
+    if (pos - 1) >= 0 then
+        winMgr:getWindow("uiwheel/music_item_1"):setText(GetWheelName(pos - 1));
+        winMgr:getWindow("uiwheel/music_item_1"):show();
+    else
+        winMgr:getWindow("uiwheel/music_item_1"):hide();
+    end
+     
+    winMgr:getWindow("uiwheel/music_item_2"):setText(GetWheelName(pos));
+    
+    if (pos + 1) < wheelnum then
+        winMgr:getWindow("uiwheel/music_item_3"):setText(GetWheelName(pos + 1));
+        winMgr:getWindow("uiwheel/music_item_3"):show();
+    else
+        winMgr:getWindow("uiwheel/music_item_3"):hide();
+    end
+       
+    if (pos + 2) < wheelnum then
+        winMgr:getWindow("uiwheel/music_item_4"):setText(GetWheelName(pos + 2));
+        winMgr:getWindow("uiwheel/music_item_4"):show();
+    else
+        winMgr:getWindow("uiwheel/music_item_4"):hide();
+    end
+    
+    SetCustomValue("now_list_pos", pos);
 end

@@ -154,3 +154,7 @@ const c8 * MusicMng::get_find_num()
 	tmp = boost::lexical_cast<std::string>(num);
 	return tmp.c_str();
 }
+s32 MusicMng::get_list_item_num()
+{
+	return (s32)m_list.size();
+}

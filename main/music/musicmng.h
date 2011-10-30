@@ -14,6 +14,7 @@ public:
 	void ini();
 	void heartbeat(double elapsed);
 	const c8 * get_list_item_name(s32 pos);
+	s32 get_list_item_num();
 	const c8 * get_find_dir_name();
 	const c8 * get_find_name();
 	const c8 * get_find_num();

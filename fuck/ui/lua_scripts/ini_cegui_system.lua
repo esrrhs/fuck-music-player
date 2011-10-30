@@ -4,12 +4,14 @@
 function click_next(args)
     local winMgr = CEGUI.WindowManager:getSingleton()
 
-   	winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(1));
+   	local pos = GetNowListPos();
+   	SetNowListPos(pos + 1);
 end
 function click_last(args)
     local winMgr = CEGUI.WindowManager:getSingleton()
 
-   	winMgr:getWindow("uiwheel/music_item_0"):setText(GetWheelName(2));
+   	local pos = GetNowListPos();
+   	SetNowListPos(pos - 1);
 end
 
 function ini_uioading()
