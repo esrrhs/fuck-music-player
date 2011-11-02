@@ -2,6 +2,7 @@
 <GUIScheme Name="TaharezLook">
 	<Imageset Filename="TaharezLook.imageset" />
 	<Font Filename="SIMYOU-26.font" />
+	<Font Filename="FZCY-26.font" />
 	<LookNFeel Filename="TaharezLook.looknfeel" />
 	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
 	<FalagardMapping WindowType="TaharezLook/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="TaharezLook/Button" />
