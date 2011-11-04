@@ -9,5 +9,6 @@
 #define LOG_LEAVE LOG_TRACE("end")
 
 #define FILE_FINDER_PLUGIN_TYPE L"filefinder"
+#define MUSIC_ENGINE_PLUGIN_TYPE L"musicengine"
 
 #endif

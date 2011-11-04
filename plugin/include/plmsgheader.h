@@ -5,6 +5,7 @@ enum PluginInInputType
 {
 	PI_I_UI_MSG,
 	PI_I_FILE_FINDER_CLEAR_RESULT_LIST,
+	PI_I_MUSIC_ENGINE_PLAY_MUSIC,
 };
 
 enum PluginInGetSetType

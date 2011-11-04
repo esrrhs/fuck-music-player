@@ -19,7 +19,10 @@ UIScript::UIScript()
 UIScript::~UIScript()
 {
 }
-
+void lua_PlayMusic(s32 pos)
+{
+	SINGLETON(MusicMng).play_music(pos);
+}
 const c8 * lua_GetWheelName(s32 pos)
 {
 	return SINGLETON(MusicMng).get_list_item_name(pos);
@@ -86,6 +89,7 @@ void UIScript::ini()
 	lua_tinker::def(L, "GetFindDir", lua_GetFindDir);
 	lua_tinker::def(L, "GetFindName", lua_GetFindName);
 	lua_tinker::def(L, "GetFindNum", lua_GetFindNum);
+	lua_tinker::def(L, "PlayMusic", lua_PlayMusic);
 	
 	LOG_LEAVE;
 }

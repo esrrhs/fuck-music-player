@@ -21,12 +21,16 @@ public:
 	void * GetFileFinder() { return m_filefinder; }
 	void parse_from_find_list();
 	void end_load_music_list();
+	void play_music(const c8 * name);
+	void play_music(s32 pos);
 private:
+	void ini_music_engine();
 	void load_file_finder();
 	void start_load_music_list();
 private:
 	std::vector<STRING> m_list;
 	void * m_filefinder;
+	void * m_musicengine;
 };
 
 #endif

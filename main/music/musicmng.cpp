@@ -13,7 +13,7 @@
 #include <boost/timer.hpp>
 #include <boost/lexical_cast.hpp>
 
-MusicMng::MusicMng() : m_filefinder(NULL)
+MusicMng::MusicMng() : m_filefinder(NULL), m_musicengine(NULL)
 {
 }
 MusicMng::~MusicMng()
@@ -23,8 +23,31 @@ void MusicMng::ini()
 {
 	LOG_ENTER;
 
+	ini_music_engine();
+
 	load_file_finder();
 	start_load_music_list();
+
+	LOG_LEAVE;
+}
+void MusicMng::ini_music_engine()
+{
+	LOG_ENTER;
+
+	STRING filename, name;
+	SINGLETON(God).GetPluginName(MUSIC_ENGINE_PLUGIN_TYPE, filename, name);
+
+	PluginSys::Plugin * musicengine = new PluginSys::Plugin(filename, name);
+
+	if (!musicengine->IsOK())
+	{
+		LOG_ERROR("m_musicengine Is not OK");
+		SAFE_DELETE(musicengine);
+	}
+
+	musicengine->Ini();
+
+	m_musicengine = musicengine;
 
 	LOG_LEAVE;
 }
@@ -51,6 +74,24 @@ void MusicMng::load_file_finder()
 }
 void MusicMng::heartbeat(double elapsed)
 {
+	((PluginSys::Plugin*)m_musicengine)->Run();
+}
+void MusicMng::play_music(s32 pos)
+{
+	if (pos >= 0 && pos < (s32)m_list.size())
+	{
+#ifdef UNICODE
+		std::string str = Helper::Utf16ToACP(m_list[pos]);
+		const c8 * name = str.c_str();
+#else
+		const c8 * name = m_list[pos].c_str();
+#endif
+		play_music(name);
+	}
+}
+void MusicMng::play_music(const c8 * name)
+{
+	((PluginSys::Plugin*)m_musicengine)->Input((void*)PI_I_MUSIC_ENGINE_PLAY_MUSIC, (void*)name);
 }
 void RunFileFinder()
 {

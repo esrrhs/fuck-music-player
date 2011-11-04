@@ -15,4 +15,7 @@
 #define PLUGIN_MAIN_FILEFINDER_FILENAME_CONFIG_NAME L"filefinder_filename"
 #define PLUGIN_MAIN_FILEFINDER_NAME_CONFIG_NAME L"filefinder_name"
 
+#define PLUGIN_MAIN_MUSICENGINE_FILENAME_CONFIG_NAME L"musicengine_filename"
+#define PLUGIN_MAIN_MUSICENGINE_NAME_CONFIG_NAME L"musicengine_name"
+
 #endif

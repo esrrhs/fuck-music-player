@@ -84,6 +84,7 @@ function SetNowListPos(pos)
     end
      
     winMgr:getWindow("uiwheel/music_item_2"):setText(GetWheelName(pos));
+    PlayMusic(pos);
     
     if (pos + 1) < wheelnum then
         winMgr:getWindow("uiwheel/music_item_3"):setText(GetWheelName(pos + 1));
