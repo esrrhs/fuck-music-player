@@ -13,6 +13,8 @@
 #include <boost/timer.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <algorithm>
+
 MusicMng::MusicMng() : m_filefinder(NULL), m_musicengine(NULL)
 {
 }
@@ -198,4 +200,12 @@ const c8 * MusicMng::get_find_num()
 s32 MusicMng::get_list_item_num()
 {
 	return (s32)m_list.size();
+}
+void MusicMng::random_shuffle()
+{
+	std::random_shuffle(m_list.begin(), m_list.end());
+}
+void MusicMng::set_music_volume(f32 volume)
+{
+	((PluginSys::Plugin*)m_musicengine)->Input((void*)PI_I_MUSIC_ENGINE_SET_VOLUME, (void*)&volume);
 }

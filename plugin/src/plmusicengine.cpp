@@ -6,12 +6,21 @@
 #include "fmod.hpp"
 #include "fmod_errors.h"
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/timer.hpp>
+#include <boost/lexical_cast.hpp>
+#include <vector>
 
 FMOD::System * g_system = NULL;
 FMOD::Sound * g_playing_sound = NULL;
 FMOD::Channel * g_channel = NULL;
 FMOD_RESULT g_result;
 f32 g_volume = 0.f;
+
+typedef boost::mutex MUTEX;
+typedef boost::mutex::scoped_lock LOCK;
+MUTEX g_play_music_mutex;
+std::vector<std::string> g_temp_play_music_list;
 
 void ini_fmod_system()
 {
@@ -33,7 +42,39 @@ void ini_fmod_system()
 	g_result = g_system->init(32, FMOD_INIT_NORMAL, 0);
 
 }
+void play_thread()
+{
+	std::string name;
+	do
+	{
+		if (g_channel)
+		{
+			g_channel->setVolume(g_volume);
+		}
+		g_play_music_mutex.lock();
+		if (g_temp_play_music_list.size() == 0)
+		{
+			g_play_music_mutex.unlock();
+			SLEEP(10);
+			continue;
+		}
+		name = g_temp_play_music_list.back();
+		g_temp_play_music_list.clear();
+		g_play_music_mutex.unlock();
 
+		// 开始播放
+		if (g_playing_sound)
+		{
+			g_playing_sound->release();
+			g_playing_sound = NULL;
+		}
+		g_result = g_system->createSound(name.c_str(), FMOD_HARDWARE, 0, &g_playing_sound);
+		g_result = g_playing_sound->setMode(FMOD_LOOP_OFF);
+		g_result = g_system->playSound(FMOD_CHANNEL_FREE, g_playing_sound, false, &g_channel);
+		g_result = g_channel->setVolume(g_volume);
+	}
+	while (1);
+}
 extern "C" MUSIC_ENGINE_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin * p)
 {
 	STRING name = p->name();
@@ -44,6 +85,9 @@ extern "C" MUSIC_ENGINE_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin
 	g_volume = boost::lexical_cast<f32>(volume.c_str());
 
 	ini_fmod_system();
+
+	// 启动thread
+	boost::thread td(boost::bind(play_thread));
 
 	return true;
 }
@@ -62,15 +106,15 @@ extern "C" MUSIC_ENGINE_API PLUGIN_HANDLE_INPUT_STATUS PLUGIN_INPUT_FUNC_DEFAAUL
 	case PI_I_MUSIC_ENGINE_PLAY_MUSIC:
 		{
 			const char * name = (const char *)param;
-			if (g_playing_sound)
-			{
-				g_playing_sound->release();
-				g_playing_sound = NULL;
-			}
-			g_result = g_system->createSound(name, FMOD_HARDWARE, 0, &g_playing_sound);
-			g_result = g_playing_sound->setMode(FMOD_LOOP_OFF);
-			g_result = g_system->playSound(FMOD_CHANNEL_FREE, g_playing_sound, false, &g_channel);
-			g_result = g_channel->setVolume(g_volume);
+			LOCK lock(g_play_music_mutex);
+			g_temp_play_music_list.push_back(name);
+			return PLUGIN_HANDLE_INPUT_END;
+		}
+		break;
+	case PI_I_MUSIC_ENGINE_SET_VOLUME:
+		{
+			const f32 * volume = (const f32 *)param;
+			g_volume = *volume;
 			return PLUGIN_HANDLE_INPUT_END;
 		}
 		break;

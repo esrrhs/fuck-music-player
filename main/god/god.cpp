@@ -60,6 +60,7 @@ bool God::Hearbeat(double elapsed)
 bool God::Quit()
 {
 	LOG_ENTER
+
 	LOG_LEAVE
 	return true;
 }

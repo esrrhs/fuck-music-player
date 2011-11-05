@@ -23,6 +23,14 @@ void lua_PlayMusic(s32 pos)
 {
 	SINGLETON(MusicMng).play_music(pos);
 }
+void lua_RandomShuffleMusic()
+{
+	SINGLETON(MusicMng).random_shuffle();
+}
+void lua_SetMusicVolume(f32 volume)
+{
+	SINGLETON(MusicMng).set_music_volume(volume);
+}
 const c8 * lua_GetWheelName(s32 pos)
 {
 	return SINGLETON(MusicMng).get_list_item_name(pos);
@@ -90,6 +98,8 @@ void UIScript::ini()
 	lua_tinker::def(L, "GetFindName", lua_GetFindName);
 	lua_tinker::def(L, "GetFindNum", lua_GetFindNum);
 	lua_tinker::def(L, "PlayMusic", lua_PlayMusic);
+	lua_tinker::def(L, "RandomShuffleMusic", lua_RandomShuffleMusic);
+	lua_tinker::def(L, "SetMusicVolume", lua_SetMusicVolume);
 	
 	LOG_LEAVE;
 }

@@ -14,6 +14,30 @@ function click_last(args)
    	SetNowListPos(pos - 1);
 end
 
+function click_random(args)
+    local winMgr = CEGUI.WindowManager:getSingleton()
+    local logger = CEGUI.Logger:getSingleton()  
+
+   	local random = CEGUI.toCheckbox(winMgr:getWindow("uiwheel/random_checkbox"));
+   	
+   	if random:isSelected() then
+   	
+        RandomShuffleMusic();
+   	    SetNowListPos(0); 
+        logger:logEvent( "click_random random ok" ) 
+   	end
+   	
+end
+function change_volume(args)
+    local winMgr = CEGUI.WindowManager:getSingleton()
+    local logger = CEGUI.Logger:getSingleton()  
+
+   	local volumewin = CEGUI.toScrollbar(winMgr:getWindow("uiwheel/Controls/volume"));
+   	local volume = volumewin:getScrollPosition();
+   	
+   	SetMusicVolume(volume);
+end
+
 function ini_uioading()
 
     local guiSystem = CEGUI.System:getSingleton()
@@ -54,6 +78,8 @@ function ini_uiwheel()
 
     winMgr:getWindow("uiwheel/next"):subscribeEvent("Clicked", "click_next")
     winMgr:getWindow("uiwheel/last"):subscribeEvent("Clicked", "click_last")
+    winMgr:getWindow("uiwheel/random_checkbox"):subscribeEvent("CheckStateChanged", "click_random")
+    winMgr:getWindow("uiwheel/Controls/volume"):subscribeEvent("ScrollPosChanged", "change_volume")
 
     winMgr:getWindow("uiwheel"):hide()
 

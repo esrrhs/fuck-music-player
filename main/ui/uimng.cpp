@@ -162,6 +162,7 @@ void UIMng::handle_zmq_msg(const ui::uimsg & msg)
 		break;
 	case ui::uimsg_type_close_window:
 		{
+			SINGLETON(God).Quit();
 			::PostMessage((HWND)SINGLETON(God).GetHwnd(), WM_CLOSE, 0, 0);
 		}
 		break;

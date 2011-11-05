@@ -54,10 +54,12 @@
         <Window Type="TaharezLook/Button" Name="uiwheel/last" >
             <Property Name="Text" Value="上" />
             <Property Name="UnifiedAreaRect" Value="{{0.08,0},{0.46,0},{0.18,0},{0.52,0}}" />
+            <Property Name="Tooltip" Value="上一曲" />
         </Window>
         <Window Type="TaharezLook/Button" Name="uiwheel/next" >
             <Property Name="Text" Value="下" />
             <Property Name="UnifiedAreaRect" Value="{{0.82,0},{0.46,0},{0.92,0},{0.52,0}}" />
+            <Property Name="Tooltip" Value="下一曲" />
         </Window>
         <Window Type="TaharezLook/StaticText" Name="uiwheel/music_item_2" >
             <Property Name="Font" Value="FZCY-26" />
@@ -68,6 +70,24 @@
             <Property Name="TextColours" Value="tl:FFFF0000 tr:FFFF0000 bl:FFFF0000 br:FFFF0000" />
             <Property Name="HorzFormatting" Value="WordWrapCentred" />
             <Property Name="UnifiedAreaRect" Value="{{0.2,0},{0.426354,0},{0.8,0},{0.571733,0}}" />
+            <Property Name="Tooltip" Value="正在播放" />
+        </Window>
+        <Window Type="TaharezLook/Checkbox" Name="uiwheel/random_checkbox" >
+            <Property Name="Font" Value="SIMYOU-26" />
+            <Property Name="Text" Value="随机" />
+            <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{0.0917717,0},{0.061244,0}}" />
+            <Property Name="Tooltip" Value="随机" />
+        </Window>
+        <Window Type="TaharezLook/VerticalScrollbar" Name="uiwheel/Controls/volume" >
+            <Property Name="Text" Value="音量" />
+            <Property Name="Tooltip" Value="Slider to adjust the volume." />
+            <Property Name="PageSize" Value="0.0625" />
+            <Property Name="StepSize" Value="0.00392" />
+            <Property Name="OverlapSize" Value="0.00392" />
+            <Property Name="DocumentSize" Value="1" />
+            <Property Name="ScrollPosition" Value="0" />
+            <Property Name="UnifiedAreaRect" Value="{{0.98,0},{0,0},{1,0},{1,0}}" />
+            <Property Name="Tooltip" Value="音量" />
         </Window>
     </Window>
 </GUILayout>

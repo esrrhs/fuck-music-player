@@ -26,6 +26,7 @@ function UIScript_Heartbeat(elapsed)
             winMgr:getWindow("uiloading"):hide()
             winMgr:getWindow("uiwheel"):show()
         
+            RandomShuffleMusic();
 		        SetNowListPos(0);
         
             SetStatus(4);
