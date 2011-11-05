@@ -17,6 +17,7 @@ God::God() : m_status(GS_NONE), m_hwnd(NULL), m_zeromq_ctx(NULL), m_zeromq_socke
 bool God::Ini()
 {
 	LOG_ENTER
+	srand((u32)time(0));
 	SetStauts(God::GS_START);
 	SINGLETON(Render).Ini();
 	SINGLETON(MusicMng).ini();
