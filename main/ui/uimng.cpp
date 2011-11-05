@@ -173,9 +173,9 @@ void UIMng::handle_zmq_msg(const ui::uimsg & msg)
 		break;
 	case ui::uimsg_type_size:
 		{
-			CEGUI::System::getSingleton().notifyDisplaySizeChanged(
-				CEGUI::Size(msg.optional_x(), msg.optional_y()));
-			CEGUI::System::getSingleton().signalRedraw();
+			//CEGUI::System::getSingleton().notifyDisplaySizeChanged(
+			//	CEGUI::Size(msg.optional_x(), msg.optional_y()));
+			//CEGUI::System::getSingleton().signalRedraw();
 		}
 		break;
 	}
