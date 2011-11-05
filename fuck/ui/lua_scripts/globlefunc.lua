@@ -44,7 +44,28 @@ function UIScript_Heartbeat(elapsed)
     end 
     --²¥·Å
     if s == 4 then
-    
+        if IsPlaying() == true then
+            SetCustomValue("stopped_stay_time", 0);
+        else
+            local time = GetCustomValue("stopped_stay_time");
+            time = time + elapsed;
+            SetCustomValue("stopped_stay_time", time);
+            
+            if time > 1 then
+      	        local pos = GetNowListPos();
+   
+                local wheelnum = GetWheelNum();
+                
+                if (pos + 1) < wheelnum then
+   	                SetNowListPos(pos + 1);
+                else
+   	                SetNowListPos(0);
+                end
+   	        
+                logger:logEvent( "auto next ok" ) 
+                SetCustomValue("stopped_stay_time", 0);
+            end
+        end
     end
 end
 function GetNowListPos()

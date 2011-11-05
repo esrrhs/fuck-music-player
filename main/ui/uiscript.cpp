@@ -19,6 +19,10 @@ UIScript::UIScript()
 UIScript::~UIScript()
 {
 }
+bool lua_IsPlaying()
+{
+	return SINGLETON(MusicMng).is_playing();
+}
 void lua_PlayMusic(s32 pos)
 {
 	SINGLETON(MusicMng).play_music(pos);
@@ -100,6 +104,7 @@ void UIScript::ini()
 	lua_tinker::def(L, "PlayMusic", lua_PlayMusic);
 	lua_tinker::def(L, "RandomShuffleMusic", lua_RandomShuffleMusic);
 	lua_tinker::def(L, "SetMusicVolume", lua_SetMusicVolume);
+	lua_tinker::def(L, "IsPlaying", lua_IsPlaying);
 	
 	LOG_LEAVE;
 }

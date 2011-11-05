@@ -44,11 +44,12 @@ enum uimsg_type {
   uimsg_type_key_up = 7,
   uimsg_type_key_char = 8,
   uimsg_type_close_window = 9,
-  uimsg_type_mouse_wheel = 10
+  uimsg_type_mouse_wheel = 10,
+  uimsg_type_size = 11
 };
 bool uimsg_type_IsValid(int value);
 const uimsg_type uimsg_type_type_MIN = uimsg_type_left_down;
-const uimsg_type uimsg_type_type_MAX = uimsg_type_mouse_wheel;
+const uimsg_type uimsg_type_type_MAX = uimsg_type_size;
 const int uimsg_type_type_ARRAYSIZE = uimsg_type_type_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* uimsg_type_descriptor();
@@ -126,6 +127,7 @@ class uimsg : public ::google::protobuf::Message {
   static const type key_char = uimsg_type_key_char;
   static const type close_window = uimsg_type_close_window;
   static const type mouse_wheel = uimsg_type_mouse_wheel;
+  static const type size = uimsg_type_size;
   static inline bool type_IsValid(int value) {
     return uimsg_type_IsValid(value);
   }

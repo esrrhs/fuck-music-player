@@ -81,14 +81,15 @@ void protobuf_AddDesc_uimsg_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\013uimsg.proto\022\002ui\"\242\002\n\005uimsg\022%\n\rrequired_"
+    "\n\013uimsg.proto\022\002ui\"\254\002\n\005uimsg\022%\n\rrequired_"
     "type\030\001 \002(\0162\016.ui.uimsg.type\022\022\n\noptional_x"
     "\030\002 \001(\002\022\022\n\noptional_y\030\003 \001(\002\022\024\n\014optional_k"
-    "ey\030\004 \001(\005\022\026\n\016optional_wheel\030\005 \001(\005\"\233\001\n\004typ"
+    "ey\030\004 \001(\005\022\026\n\016optional_wheel\030\005 \001(\005\"\245\001\n\004typ"
     "e\022\r\n\tleft_down\020\001\022\013\n\007left_up\020\002\022\016\n\nright_d"
     "own\020\003\022\014\n\010right_up\020\004\022\016\n\nmouse_move\020\005\022\014\n\010k"
     "ey_down\020\006\022\n\n\006key_up\020\007\022\014\n\010key_char\020\010\022\020\n\014c"
-    "lose_window\020\t\022\017\n\013mouse_wheel\020\nB\002H\001", 314);
+    "lose_window\020\t\022\017\n\013mouse_wheel\020\n\022\010\n\004size\020\013"
+    "B\002H\001", 324);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "uimsg.proto", &protobuf_RegisterTypes);
   uimsg::default_instance_ = new uimsg();
@@ -122,6 +123,7 @@ bool uimsg_type_IsValid(int value) {
     case 8:
     case 9:
     case 10:
+    case 11:
       return true;
     default:
       return false;
@@ -139,6 +141,7 @@ const uimsg_type uimsg::key_up;
 const uimsg_type uimsg::key_char;
 const uimsg_type uimsg::close_window;
 const uimsg_type uimsg::mouse_wheel;
+const uimsg_type uimsg::size;
 const uimsg_type uimsg::type_MIN;
 const uimsg_type uimsg::type_MAX;
 const int uimsg::type_ARRAYSIZE;

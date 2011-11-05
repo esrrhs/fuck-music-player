@@ -209,3 +209,9 @@ void MusicMng::set_music_volume(f32 volume)
 {
 	((PluginSys::Plugin*)m_musicengine)->Input((void*)PI_I_MUSIC_ENGINE_SET_VOLUME, (void*)&volume);
 }
+bool MusicMng::is_playing()
+{
+	u8 ret;
+	((PluginSys::Plugin*)m_musicengine)->Get((void*)PI_GS_MUSIC_ENGINE_IS_PLAYING, (void*)&ret);
+	return ret != 0;
+}

@@ -16,6 +16,7 @@ FMOD::Sound * g_playing_sound = NULL;
 FMOD::Channel * g_channel = NULL;
 FMOD_RESULT g_result;
 f32 g_volume = 0.f;
+u8 g_is_playing = 0;
 
 typedef boost::mutex MUTEX;
 typedef boost::mutex::scoped_lock LOCK;
@@ -41,6 +42,15 @@ void ini_fmod_system()
 
 	g_result = g_system->init(32, FMOD_INIT_NORMAL, 0);
 
+}
+FMOD_RESULT F_CALLBACK play_call_back(FMOD_CHANNEL *channel, FMOD_CHANNEL_CALLBACKTYPE type, void *commanddata1, void *commanddata2)
+{
+	if(type == FMOD_CHANNEL_CALLBACKTYPE_END)
+	{
+		g_is_playing = 0;
+	}
+
+	return FMOD_OK;
 }
 void play_thread()
 {
@@ -72,6 +82,7 @@ void play_thread()
 		g_result = g_playing_sound->setMode(FMOD_LOOP_OFF);
 		g_result = g_system->playSound(FMOD_CHANNEL_FREE, g_playing_sound, false, &g_channel);
 		g_result = g_channel->setVolume(g_volume);
+		g_channel->setCallback(play_call_back);
 	}
 	while (1);
 }
@@ -107,6 +118,7 @@ extern "C" MUSIC_ENGINE_API PLUGIN_HANDLE_INPUT_STATUS PLUGIN_INPUT_FUNC_DEFAAUL
 		{
 			const char * name = (const char *)param;
 			LOCK lock(g_play_music_mutex);
+			g_is_playing = 1;
 			g_temp_play_music_list.push_back(name);
 			return PLUGIN_HANDLE_INPUT_END;
 		}
@@ -123,6 +135,13 @@ extern "C" MUSIC_ENGINE_API PLUGIN_HANDLE_INPUT_STATUS PLUGIN_INPUT_FUNC_DEFAAUL
 }
 extern "C" MUSIC_ENGINE_API bool PLUGIN_GET_FUNC_DEFAAULT_NAME(void * type, void * param)
 {
+	PluginInGetSetType t = (PluginInGetSetType)(s32)type;
+	switch (t)
+	{
+	case PI_GS_MUSIC_ENGINE_IS_PLAYING:
+		*((u8*)param) = (u8)g_is_playing;
+		return true;
+	}
 	return false;
 }
 extern "C" MUSIC_ENGINE_API bool PLUGIN_SET_FUNC_DEFAAULT_NAME(void * type, void * param)

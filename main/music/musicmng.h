@@ -25,6 +25,7 @@ public:
 	void play_music(s32 pos);
 	void random_shuffle();
 	void set_music_volume(f32 volume);
+	bool is_playing();
 private:
 	void ini_music_engine();
 	void load_file_finder();

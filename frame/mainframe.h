@@ -54,6 +54,7 @@ public:
 	void OnLeaveWindow(wxMouseEvent& event);
 
 	void OnMouseWheel(wxMouseEvent& event);
+	void OnSize(wxSizeEvent& event);
 
 	void ini_zmq();
 private:

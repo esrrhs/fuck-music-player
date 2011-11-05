@@ -171,5 +171,11 @@ void UIMng::handle_zmq_msg(const ui::uimsg & msg)
 			CEGUI::System::getSingleton().injectMouseWheelChange((float)msg.optional_wheel());
 		}
 		break;
+	case ui::uimsg_type_size:
+		{
+			CEGUI::System::getSingleton().notifyDisplaySizeChanged(
+				CEGUI::Size(msg.optional_x(), msg.optional_y()));
+		}
+		break;
 	}
 }

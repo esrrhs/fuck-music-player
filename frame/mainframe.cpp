@@ -81,6 +81,7 @@ MainFrame::MainFrame(wxWindow *parent,
 	this->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrame::OnLeaveWindow));
 
 	this->Connect(wxEVT_MOUSEWHEEL, wxMouseEventHandler(MainFrame::OnMouseWheel));
+	this->Connect(wxEVT_SIZE, wxSizeEventHandler(MainFrame::OnSize));
 }
 void MainFrame::show_cursor(bool enable)
 {
@@ -179,4 +180,16 @@ void MainFrame::OnMouseWheel(wxMouseEvent& event)
 	msg.set_optional_wheel(event.GetWheelRotation());
 
 	wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
+}
+void MainFrame::OnSize(wxSizeEvent& event)
+{
+	ui::uimsg msg;
+	msg.set_required_type(ui::uimsg_type_size);
+	msg.set_optional_x(event.GetSize().x);
+	msg.set_optional_y(event.GetSize().y);
+
+	if (wxGetApp().GetPluginContainer())
+	{
+		wxGetApp().GetPluginContainer()->Input((void*)PI_I_UI_MSG, (void*)&msg);
+	}
 }
