@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <omp.h>
+#include <set>
 
 #ifdef WIN32
 
@@ -51,6 +53,7 @@ typedef boost::mutex::scoped_lock LOCK;
 MUTEX g_get_mutex;
 
 u32 g_sleep_time = 0;
+u32 g_thread_num = 2;
 
 std::wstring Utf8ToUtf16(const std::string& utf8text)
 {
@@ -94,6 +97,10 @@ extern "C" FILE_FINDER_API bool PLUGIN_INI_FUNC_DEFAAULT_NAME(PluginSys::Plugin 
 
 	STRING sleep_time = config.Get(PLUGIN_FILE_FINDER_SLEEP_TIME_CONFIG_NAME);
 	g_sleep_time = boost::lexical_cast<u32>(sleep_time.c_str());
+
+	STRING thread_num = config.Get(PLUGIN_FILE_FINDER_THREAD_NUM_CONFIG_NAME);
+	g_thread_num = boost::lexical_cast<u32>(thread_num.c_str());
+	omp_set_num_threads(g_thread_num);
 
 	return true;
 }
@@ -169,13 +176,35 @@ extern "C" FILE_FINDER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 
 		dirvec.push_back(rootPath);
 	}
-	
-	// 开始查找
-	while (!dirvec.empty())
-	{
-		fs::path dir = dirvec.back();
-		dirvec.pop_back();
 
+	std::set<int> id_set;
+
+#pragma omp parallel
+	id_set.insert(omp_get_thread_num());
+	u32 size = id_set.size();
+	// 开始查找
+#pragma omp parallel shared(id_set)
+	while (id_set.size() > 0)
+	{
+		fs::path dir;
+#pragma omp critical(DIR_VEC)
+		if (!dirvec.empty())
+		{
+			dir = dirvec.back();
+			dirvec.pop_back();
+			id_set.insert(omp_get_thread_num());
+		}
+		else
+		{
+			id_set.erase(omp_get_thread_num());
+		}
+
+		// empty...wait
+		if (dir.empty())
+		{
+			continue;
+		}
+		
 		{
 			LOCK lock(g_get_mutex);
 			g_finding_dir = dir.c_str();
@@ -186,6 +215,7 @@ extern "C" FILE_FINDER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 		{
 			if (fs::is_directory(*file_itr))
 			{
+#pragma omp critical(DIR_VEC)
 				dirvec.push_back(file_itr->path());
 			}
 			else
@@ -197,9 +227,10 @@ extern "C" FILE_FINDER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 #else
 				STRING last = ex;
 #endif
-				
+
 				if (std::find(g_filter.begin(), g_filter.end(), last) != g_filter.end())
 				{
+#pragma omp critical(PUSH_FIND_LIST)
 					// find it
 					g_find.push_back(file_itr->path().c_str());
 					g_finding_num = g_find.size();
@@ -215,6 +246,7 @@ extern "C" FILE_FINDER_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 			}
 		}
 	} 
+	
 
 	return true;
 }
