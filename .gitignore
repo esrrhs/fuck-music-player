@@ -1,0 +1,36 @@
+# Visual Studio / MSBuild
+.vs/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+ipch/
+*.aps
+*.ncb
+
+# Intermediate / local build trees (tracked bin/ and fuck/ runtime stay)
+temp/
+**/temp/
+lib/
+*.ilk
+*.pdb
+*.exp
+*.idb
+*.obj
+*.pch
+*.ipch
+
+# Local logs / editor junk
+log.txt
+*.log
+.DS_Store
+Thumbs.db
+*~
+
+# Pack output
+pack/
+pack.zip
+*.zip
+!fuck/**/*.zip
