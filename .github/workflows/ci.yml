@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  check:
+    name: Structure and pack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Validate project layout
+        run: |
+          set -euo pipefail
+          test -f FuckMPlayer.sln
+          test -f FuckMPlayer.vcxproj
+          test -f VERSION
+          test -f pack.sh
+          test -d main
+          test -d plugin
+          test -d frame
+          test -d common
+          test -d fuck
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          test -n "${VERSION}"
+          echo "VERSION=${VERSION}"
+
+      - name: Package runtime snapshot
+        run: |
+          chmod +x ./pack.sh
+          ./pack.sh
+          test -f pack.zip
+          ls -lh pack/*.zip pack.zip

@@ -1,0 +1,108 @@
+name: Release
+
+on:
+  push:
+    branches: [ "master" ]
+    tags: [ "*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-version:
+    name: Check Version Change
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check if Version Changed
+        id: check
+        run: |
+          set -euo pipefail
+
+          read_version() {
+            tr -d '[:space:]' < "$1"
+          }
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="$(read_version VERSION)"
+            echo "Triggered manually: ${TAG}"
+            echo "should_release=true" >> "${GITHUB_OUTPUT}"
+            echo "version=${TAG}" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${{ github.ref_name }}"
+            TAG="${TAG#v}"
+            echo "Triggered by tag push: ${TAG}"
+            echo "should_release=true" >> "${GITHUB_OUTPUT}"
+            echo "version=${TAG}" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          TAG="$(read_version VERSION)"
+          echo "Current code version: ${TAG}"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists on remote. Skipping release."
+            echo "should_release=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          BEFORE="${{ github.event.before }}"
+          if [ -n "${BEFORE}" ] && [ "${BEFORE}" != "0000000000000000000000000000000000000000" ]; then
+            if ! git diff --name-only "${BEFORE}" "${{ github.sha }}" | grep -q '^VERSION$'; then
+              echo "VERSION was not modified in this push. Skipping release."
+              echo "should_release=false" >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
+
+            PREV="$(git show "${BEFORE}:VERSION" 2>/dev/null | tr -d '[:space:]' || true)"
+            if [ -n "${PREV}" ] && [ "${PREV}" = "${TAG}" ]; then
+              echo "VERSION file touched but version string unchanged (${TAG}). Skipping release."
+              echo "should_release=false" >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
+          fi
+
+          echo "Version changed to ${TAG} and tag does not exist. Triggering automatic release."
+          echo "should_release=true" >> "${GITHUB_OUTPUT}"
+          echo "version=${TAG}" >> "${GITHUB_OUTPUT}"
+
+  release:
+    name: Package and Publish
+    needs: check-version
+    if: needs.check-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Package
+        run: |
+          chmod +x ./pack.sh
+          ./pack.sh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.check-version.outputs.version }}
+          name: fuck-music-player ${{ needs.check-version.outputs.version }}
+          body: |
+            Windows runtime snapshot `${{ needs.check-version.outputs.version }}`.
+
+            Contains the vendored dependency DLLs, configs, and UI assets under `fuck/`.
+            Rebuild the host and plugins from `FuckMPlayer.sln` with Visual Studio (Win32).
+          files: |
+            pack.zip
+            pack/*.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: true
