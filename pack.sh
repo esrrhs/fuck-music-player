@@ -1,9 +1,24 @@
 #!/usr/bin/env bash
 # Package the Windows runtime snapshot under fuck/ plus project docs.
+# In CI (or when FETCH_DEPS=1), fetch third-party trees first.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
+
+if [ "${CI:-}" = "true" ] || [ "${FETCH_DEPS:-}" = "1" ]; then
+  echo "Fetching third-party dependencies..."
+  chmod +x ./scripts/fetch-deps.sh
+  ./scripts/fetch-deps.sh
+  test -d wxWidgets-2.9.1/include
+  test -d protobuf-2.4.1/src
+  test -d boost/boost
+  test -d zeromq-2.1.7/include
+  test -d CEGUI-0.7.5/cegui
+  test -f boost/boost.vcxproj
+  test -d CEGUI-0.7.5/projects
+  echo "Dependency trees OK"
+fi
 
 VERSION="$(tr -d '[:space:]' < VERSION)"
 if [ -z "${VERSION}" ]; then

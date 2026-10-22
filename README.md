@@ -9,7 +9,7 @@
 
 Plugin-based Windows MP3 player built with OpenGL, wxWidgets, CEGUI, FMOD, Boost, ZeroMQ, Lua, and Protocol Buffers.
 
-This repository is a historical Visual Studio (Win32) project from around 2011. Dependencies are vendored in-tree. Treat it as an archive / study sample rather than a modern cross-platform app.
+This repository is a historical Visual Studio (Win32) project from around 2011. Third-party dependency *trees are not committed*; run `scripts/fetch-deps.sh` (also used by CI) to download them. Treat it as an archive / study sample rather than a modern cross-platform app.
 
 ## Features
 
@@ -24,7 +24,13 @@ This repository is a historical Visual Studio (Win32) project from around 2011. 
 - Visual Studio with C++ desktop workload (original projects use VS 2010-era `ToolsVersion="4.0"`)
 - Open `FuckMPlayer.sln` and build **Release | Win32** (or Debug)
 
-Third-party trees are included: `wxWidgets-2.9.1/`, `CEGUI-0.7.5/`, `zeromq-2.1.7/`, `protobuf-2.4.1/`, `boost/`, `fmod/`, `opengl/`.
+Fetch dependencies before opening the solution:
+
+```bash
+./scripts/fetch-deps.sh
+```
+
+Downloads (pinned): wxWidgets **2.9.1**, protobuf **2.4.1**, Boost **1.46.1**, ZeroMQ **2.1.7**, CEGUI **0.7.5**, freeglut **3.0.0** (into `opengl/`), and `protoc.exe` 2.4.1. **FMOD Ex** is proprietary — set `FMOD_SDK` to an unpacked SDK or place files under `fmod/` manually.
 
 ## Build
 
@@ -45,7 +51,7 @@ Debug equivalent:
 fuck_debug.bat
 ```
 
-Runtime directory: `fuck/` (dependency DLLs, `*.cfg`, UI assets). Launch `FuckMPlayer.exe` from that folder after copying build outputs.
+Runtime directory: `fuck/` (`*.cfg`, UI assets). After building, copy plugin DLLs / the exe (`fuck_release.bat`) and third-party runtime DLLs into `fuck/`, then launch `FuckMPlayer.exe` from that folder.
 
 ## Layout
 
@@ -56,7 +62,8 @@ Runtime directory: `fuck/` (dependency DLLs, `*.cfg`, UI assets). Launch `FuckMP
 | `plugin/` | Plugin SDK + modules (thread, process, logo, musicengine, filefinder, …) |
 | `frame/` | wxWidgets main frame |
 | `common/` | Shared headers / logger |
-| `fuck/` | Runtime snapshot (DLLs, configs, UI) |
+| `fuck/` | Runtime configs + UI (DLLs fetched/built locally) |
+| `scripts/fetch-deps.sh` | Download third-party trees into expected paths |
 | `VERSION` | Release version source of truth |
 
 ## Release
@@ -74,4 +81,4 @@ Manual packaging:
 
 MIT. See [LICENSE](LICENSE).
 
-Vendored third-party libraries (wxWidgets, CEGUI, ZeroMQ, protobuf, Boost, FMOD, etc.) keep their own licenses; FMOD in particular is proprietary and not covered by the MIT grant above.
+Third-party libraries fetched by `scripts/fetch-deps.sh` (wxWidgets, CEGUI, ZeroMQ, protobuf, Boost, freeglut, FMOD, etc.) keep their own licenses; FMOD in particular is proprietary and not covered by the MIT grant above.

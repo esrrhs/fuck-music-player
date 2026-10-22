@@ -9,7 +9,7 @@
 
 基于插件架构的 Windows MP3 播放器，技术栈包括 OpenGL、wxWidgets、CEGUI、FMOD、Boost、ZeroMQ、Lua、Protocol Buffers。
 
-本仓库是约 2011 年的 Visual Studio（Win32）历史项目，依赖随仓库内置。更适合作为归档 / 学习样本，而不是现代跨平台应用。
+本仓库是约 2011 年的 Visual Studio（Win32）历史项目。第三方依赖树**不提交进仓库**；请运行 `scripts/fetch-deps.sh`（CI 同样会拉取）。更适合作为归档 / 学习样本，而不是现代跨平台应用。
 
 ## 特性
 
@@ -24,7 +24,13 @@
 - 安装了 C++ 桌面开发工作负载的 Visual Studio（原工程为 VS 2010 时代的 `ToolsVersion="4.0"`）
 - 打开 `FuckMPlayer.sln`，构建 **Release | Win32**（或 Debug）
 
-第三方源码/库已内置：`wxWidgets-2.9.1/`、`CEGUI-0.7.5/`、`zeromq-2.1.7/`、`protobuf-2.4.1/`、`boost/`、`fmod/`、`opengl/`。
+构建前先拉取依赖：
+
+```bash
+./scripts/fetch-deps.sh
+```
+
+固定版本：wxWidgets **2.9.1**、protobuf **2.4.1**、Boost **1.46.1**、ZeroMQ **2.1.7**、CEGUI **0.7.5**、freeglut **3.0.0**（放入 `opengl/`），以及 `protoc.exe` 2.4.1。**FMOD Ex** 为专有软件，需自行设置 `FMOD_SDK` 或手动放入 `fmod/`。
 
 ## 构建
 
@@ -45,7 +51,7 @@ Debug 对应：
 fuck_debug.bat
 ```
 
-运行目录为 `fuck/`（依赖 DLL、`*.cfg`、UI 资源）。拷贝构建产物后，在该目录启动 `FuckMPlayer.exe`。
+运行目录为 `fuck/`（`*.cfg`、UI 资源）。构建后用 `fuck_release.bat` 拷贝插件/exe，并把第三方运行时 DLL 放入 `fuck/`，再启动 `FuckMPlayer.exe`。
 
 ## 目录结构
 
@@ -74,4 +80,4 @@ GitHub Actions 在 `master` 上监视 **`VERSION`**。当版本号字符串变�
 
 MIT，见 [LICENSE](LICENSE)。
 
-随仓库内置的第三方库（wxWidgets、CEGUI、ZeroMQ、protobuf、Boost、FMOD 等）各自保留其原有许可证；其中 FMOD 为专有软件，不在上述 MIT 授权范围内。
+由 `scripts/fetch-deps.sh` 拉取的第三方库（wxWidgets、CEGUI、ZeroMQ、protobuf、Boost、freeglut、FMOD 等）各自保留其原有许可证；其中 FMOD 为专有软件，不在上述 MIT 授权范围内。
