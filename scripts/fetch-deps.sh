@@ -10,7 +10,7 @@ mkdir -p "$CACHE"
 
 download() {
   local url="$1" out="$2"
-  if [ -f "$out" ]; then
+  if [ -f "$out" ] && [ -s "$out" ]; then
     echo "Using cached $(basename "$out")"
     return 0
   fi
@@ -19,27 +19,74 @@ download() {
   mv "$out.partial" "$out"
 }
 
-extract_tar_to() {
-  local archive="$1" dest="$2" strip_components="${3:-1}"
+extract_archive() {
+  # extract_archive <archive> <dest-dir> [strip-components]
+  local archive="$1" dest="$2" strip="${3:-1}"
   rm -rf "$dest"
   mkdir -p "$dest"
-  tar -xf "$archive" -C "$dest" --strip-components="$strip_components"
+  case "$archive" in
+    *.tar.gz|*.tgz)
+      tar -xzf "$archive" -C "$dest" --strip-components="$strip"
+      ;;
+    *.tar.bz2|*.tbz2)
+      if tar -xjf "$archive" -C "$dest" --strip-components="$strip" 2>/dev/null; then
+        return 0
+      fi
+      # Fallback when system tar lacks bzip2 support
+      if command -v bunzip2 >/dev/null 2>&1; then
+        bunzip2 -c "$archive" | tar -xf - -C "$dest" --strip-components="$strip"
+      else
+        python3 - "$archive" "$dest" "$strip" <<'PY'
+import sys, tarfile
+arc, dest, strip = sys.argv[1], sys.argv[2], int(sys.argv[3])
+with tarfile.open(arc, "r:bz2") as tf:
+    for m in tf.getmembers():
+        parts = m.name.split("/", strip)
+        if len(parts) <= strip:
+            continue
+        m.name = "/".join(parts[strip:])
+        tf.extract(m, dest)
+PY
+      fi
+      ;;
+    *.zip)
+      local tmp
+      tmp="$(mktemp -d)"
+      unzip -qo "$archive" -d "$tmp"
+      # Move single top-level directory contents into dest
+      local top
+      top="$(find "$tmp" -mindepth 1 -maxdepth 1 -type d | head -1)"
+      if [ -n "$top" ] && [ "$(find "$tmp" -mindepth 1 -maxdepth 1 | wc -l)" -eq 1 ]; then
+        shopt -s dotglob
+        mv "$top"/* "$dest"/
+        shopt -u dotglob
+      else
+        shopt -s dotglob
+        mv "$tmp"/* "$dest"/
+        shopt -u dotglob
+      fi
+      rm -rf "$tmp"
+      ;;
+    *)
+      echo "error: unsupported archive: $archive" >&2
+      exit 1
+      ;;
+  esac
 }
 
 echo "==> wxWidgets 2.9.1"
-WX_ARC="$CACHE/wxWidgets-2.9.1.tar.bz2"
-download "https://github.com/wxWidgets/wxWidgets/releases/download/v2.9.1/wxWidgets-2.9.1.tar.bz2" "$WX_ARC"
-extract_tar_to "$WX_ARC" "wxWidgets-2.9.1"
+WX_ARC="$CACHE/wxWidgets-2.9.1.tar.gz"
+download "https://github.com/wxWidgets/wxWidgets/archive/refs/tags/v2.9.1.tar.gz" "$WX_ARC"
+extract_archive "$WX_ARC" "wxWidgets-2.9.1"
 
 echo "==> protobuf 2.4.1"
 PB_ARC="$CACHE/protobuf-2.4.1.tar.gz"
 download "https://github.com/protocolbuffers/protobuf/releases/download/v2.4.1/protobuf-2.4.1.tar.gz" "$PB_ARC"
-# Preserve tracked VS project overlay
 PB_OVERLAY="$(mktemp -d)"
 if [ -d protobuf-2.4.1/vsprojects ]; then
   cp -a protobuf-2.4.1/vsprojects "$PB_OVERLAY/"
 fi
-extract_tar_to "$PB_ARC" "protobuf-2.4.1"
+extract_archive "$PB_ARC" "protobuf-2.4.1"
 if [ -d "$PB_OVERLAY/vsprojects" ]; then
   rm -rf protobuf-2.4.1/vsprojects
   cp -a "$PB_OVERLAY/vsprojects" protobuf-2.4.1/
@@ -47,11 +94,10 @@ fi
 rm -rf "$PB_OVERLAY"
 
 echo "==> Boost 1.46.1"
-BOOST_ARC="$CACHE/boost_1_46_1.tar.bz2"
-download "https://archives.boost.io/release/1.46.1/source/boost_1_46_1.tar.bz2" "$BOOST_ARC"
+BOOST_ARC="$CACHE/boost_1_46_1.tar.gz"
+download "https://archives.boost.io/release/1.46.1/source/boost_1_46_1.tar.gz" "$BOOST_ARC"
 BOOST_TMP="$(mktemp -d)"
-tar -xf "$BOOST_ARC" -C "$BOOST_TMP"
-# Keep tracked boost.vcxproj + ex/; replace headers and libs
+tar -xzf "$BOOST_ARC" -C "$BOOST_TMP"
 mkdir -p boost
 rm -rf boost/boost boost/libs
 cp -a "$BOOST_TMP/boost_1_46_1/boost" boost/
@@ -69,7 +115,7 @@ ZMQ_OVERLAY="$(mktemp -d)"
 if [ -d zeromq-2.1.7/builds ]; then
   cp -a zeromq-2.1.7/builds "$ZMQ_OVERLAY/"
 fi
-extract_tar_to "$ZMQ_ARC" "zeromq-2.1.7"
+extract_archive "$ZMQ_ARC" "zeromq-2.1.7"
 if [ -d "$ZMQ_OVERLAY/builds" ]; then
   rm -rf zeromq-2.1.7/builds
   cp -a "$ZMQ_OVERLAY/builds" zeromq-2.1.7/
@@ -83,7 +129,7 @@ CEGUI_OVERLAY="$(mktemp -d)"
 if [ -d CEGUI-0.7.5/projects ]; then
   cp -a CEGUI-0.7.5/projects "$CEGUI_OVERLAY/"
 fi
-extract_tar_to "$CEGUI_ARC" "CEGUI-0.7.5"
+extract_archive "$CEGUI_ARC" "CEGUI-0.7.5"
 if [ -d "$CEGUI_OVERLAY/projects" ]; then
   rm -rf CEGUI-0.7.5/projects
   cp -a "$CEGUI_OVERLAY/projects" CEGUI-0.7.5/
@@ -94,10 +140,9 @@ echo "==> freeglut 3.0.0 -> opengl/ (headers; place Windows libs manually if nee
 FG_ARC="$CACHE/freeglut-3.0.0.tar.gz"
 download "https://github.com/freeglut/freeglut/releases/download/v3.0.0/freeglut-3.0.0.tar.gz" "$FG_ARC"
 FG_TMP="$(mktemp -d)"
-tar -xf "$FG_ARC" -C "$FG_TMP"
+tar -xzf "$FG_ARC" -C "$FG_TMP"
 rm -rf opengl
 mkdir -p opengl/include opengl/lib
-# Map freeglut GL headers into the historical opengl/include layout when present
 if [ -d "$FG_TMP/freeglut-3.0.0/include/GL" ]; then
   cp -a "$FG_TMP/freeglut-3.0.0/include/GL/." opengl/include/
 fi
