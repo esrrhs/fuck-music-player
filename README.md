@@ -18,9 +18,9 @@ GitHub Actions (`ci.yml`) on `master`:
 1. **Structure and pack** (Ubuntu) — validate layout and run `./pack.sh` (fetch deps + package the `fuck/` runtime snapshot).
 2. **MSBuild Release Win32** (Windows) — fetch deps (including freeglut + historical `glaux` via `msvc-overlays/opengl/`), MSBuild `FuckMPlayer.sln` **Release|Win32** including `plugin\logo`, stage a runnable `fuck/` tree, then best-effort launch `FuckMPlayer.exe` and capture a PNG of the player window. Skips proprietary FMOD plugin `musicengine` (runtime treats a missing engine as non-fatal). Uploads `win32-release-binaries` and `player-shell-screenshot`.
 
-Screenshot capture on `windows-latest` can be flaky (black frame / no GUI session); the screenshot step is soft-fail so the MSBuild job stays green when the build itself succeeds.
+Screenshot capture on `windows-latest` is soft-fail so a headless runner cannot fail the MSBuild job. When D3D9 + CEGUI paint, the capture shows the real TaharezLook wheel (coloured track labels, prev/next, random, volume) on an intentional black clear — not an empty grey wx client.
 
-Example green run (logo build + shell screenshot): [#39915123064](https://github.com/esrrhs/fuck-music-player/actions/runs/39915123064).
+Example CI run whose artifact supplied the shell shot below: [#39926464182](https://github.com/esrrhs/fuck-music-player/actions/runs/39926464182).
 
 Player UI (CI capture of CEGUI main window, no audio/FMOD):
 
