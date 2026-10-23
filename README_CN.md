@@ -20,6 +20,8 @@
 
 在 `windows-latest` 上截图可能不稳定（黑屏 / 无 GUI 会话）；截图步骤为软失败，只要编译成功，MSBuild 任务仍保持绿色。
 
+一次成功的示例（含 logo 构建与窗口截图）：[#39915123064](https://github.com/esrrhs/fuck-music-player/actions/runs/39915123064)。
+
 播放器外壳（CI 截图，无音频/FMOD）：
 
 ![Windows CI 截取的 FuckMPlayer 窗口](docs/player-shell.png)

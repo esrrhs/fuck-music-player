@@ -20,6 +20,8 @@ GitHub Actions (`ci.yml`) on `master`:
 
 Screenshot capture on `windows-latest` can be flaky (black frame / no GUI session); the screenshot step is soft-fail so the MSBuild job stays green when the build itself succeeds.
 
+Example green run (logo build + shell screenshot): [#39915123064](https://github.com/esrrhs/fuck-music-player/actions/runs/39915123064).
+
 Player shell (CI capture, no audio/FMOD):
 
 ![FuckMPlayer shell window captured by Windows CI](docs/player-shell.png)
