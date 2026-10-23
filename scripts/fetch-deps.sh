@@ -144,6 +144,20 @@ echo "==> protobuf 2.4.1"
 PB_ARC="$CACHE/protobuf-2.4.1.tar.gz"
 download "https://github.com/protocolbuffers/protobuf/releases/download/v2.4.1/protobuf-2.4.1.tar.gz" "$PB_ARC"
 extract_archive "$PB_ARC" "protobuf-2.4.1"
+# protobuf 2.4 + modern MSVC: message.cc needs complete iostream types (not iosfwd).
+if [ -f protobuf-2.4.1/src/google/protobuf/message.cc ] && \
+   ! grep -q '#include <iostream>' protobuf-2.4.1/src/google/protobuf/message.cc; then
+  python3 - <<'PY'
+from pathlib import Path
+p = Path("protobuf-2.4.1/src/google/protobuf/message.cc")
+t = p.read_text()
+needle = "#include <google/protobuf/message.h>\n"
+if needle not in t:
+    raise SystemExit("error: message.h include not found for iostream patch")
+p.write_text(t.replace(needle, "#include <iostream>\n" + needle, 1))
+print("    Patched protobuf message.cc: #include <iostream> (MSVC)")
+PY
+fi
 
 echo "==> Boost 1.46.1"
 BOOST_ARC="$CACHE/boost_1_46_1.tar.gz"
