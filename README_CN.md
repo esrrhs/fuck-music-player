@@ -11,6 +11,15 @@
 
 本仓库是约 2011 年的 Visual Studio（Win32）历史项目。第三方依赖树**不提交进仓库**；请运行 `scripts/fetch-deps.sh`（CI 同样会拉取）。更适合作为归档 / 学习样本，而不是现代跨平台应用。
 
+### CI 状态
+
+`master` 上的 GitHub Actions（`ci.yml`）：
+
+- **Ubuntu**：校验布局并运行 `./pack.sh`（拉依赖 + 打包 `fuck/` 运行时快照）。
+- **Windows**：拉依赖、应用 `msvc-overlays/`，再用 MSBuild 编译 `FuckMPlayer.sln` 的 **Release|Win32**（跳过需要专有 FMOD / Windows GLUT 导入库的 `musicengine` / `logo`）。
+
+播放器为 GUI 程序，CI **不会**无启动。本地完整构建仍需在 `scripts/fetch-deps.sh` 之后使用 Visual Studio（Win32）、FMOD 与 OpenGL/GLUT 库。
+
 ## 特性
 
 - 宿主程序（`FuckMPlayer.exe`）以 DLL 方式加载插件
@@ -62,6 +71,8 @@ fuck_debug.bat
 | `plugin/` | 插件 SDK 与模块（thread、process、logo、musicengine、filefinder 等） |
 | `frame/` | wxWidgets 主窗口 |
 | `common/` | 公共头文件 / 日志 |
+| `ex/` | 项目自有的 Asio logger 辅助代码（原 `boost/ex/`） |
+| `msvc-overlays/` | `fetch-deps.sh` 会拷贝到已拉取依赖树上的 VS2010 时代 `.vcxproj` 覆盖层 |
 | `fuck/` | 运行时快照（DLL、配置、UI） |
 | `VERSION` | 发版版本号来源 |
 

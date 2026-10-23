@@ -82,59 +82,28 @@ extract_archive "$WX_ARC" "wxWidgets-2.9.1"
 echo "==> protobuf 2.4.1"
 PB_ARC="$CACHE/protobuf-2.4.1.tar.gz"
 download "https://github.com/protocolbuffers/protobuf/releases/download/v2.4.1/protobuf-2.4.1.tar.gz" "$PB_ARC"
-PB_OVERLAY="$(mktemp -d)"
-if [ -d protobuf-2.4.1/vsprojects ]; then
-  cp -a protobuf-2.4.1/vsprojects "$PB_OVERLAY/"
-fi
 extract_archive "$PB_ARC" "protobuf-2.4.1"
-if [ -d "$PB_OVERLAY/vsprojects" ]; then
-  rm -rf protobuf-2.4.1/vsprojects
-  cp -a "$PB_OVERLAY/vsprojects" protobuf-2.4.1/
-fi
-rm -rf "$PB_OVERLAY"
 
 echo "==> Boost 1.46.1"
 BOOST_ARC="$CACHE/boost_1_46_1.tar.gz"
 download "https://archives.boost.io/release/1.46.1/source/boost_1_46_1.tar.gz" "$BOOST_ARC"
 BOOST_TMP="$(mktemp -d)"
 tar -xzf "$BOOST_ARC" -C "$BOOST_TMP"
+rm -rf boost
 mkdir -p boost
-rm -rf boost/boost boost/libs
 cp -a "$BOOST_TMP/boost_1_46_1/boost" boost/
 cp -a "$BOOST_TMP/boost_1_46_1/libs" boost/
 rm -rf "$BOOST_TMP"
-if [ ! -f boost/boost.vcxproj ]; then
-  echo "error: boost/boost.vcxproj missing (project overlay)" >&2
-  exit 1
-fi
 
 echo "==> ZeroMQ 2.1.7"
 ZMQ_ARC="$CACHE/zeromq-2.1.7.tar.gz"
 download "https://github.com/zeromq/zeromq2-x/archive/refs/tags/v2.1.7.tar.gz" "$ZMQ_ARC"
-ZMQ_OVERLAY="$(mktemp -d)"
-if [ -d zeromq-2.1.7/builds ]; then
-  cp -a zeromq-2.1.7/builds "$ZMQ_OVERLAY/"
-fi
 extract_archive "$ZMQ_ARC" "zeromq-2.1.7"
-if [ -d "$ZMQ_OVERLAY/builds" ]; then
-  rm -rf zeromq-2.1.7/builds
-  cp -a "$ZMQ_OVERLAY/builds" zeromq-2.1.7/
-fi
-rm -rf "$ZMQ_OVERLAY"
 
 echo "==> CEGUI 0.7.5"
 CEGUI_ARC="$CACHE/CEGUI-0.7.5.tar.gz"
 download "https://sourceforge.net/projects/crayzedsgui/files/CEGUI%20Mk-2/0.7.5/CEGUI-0.7.5.tar.gz/download" "$CEGUI_ARC"
-CEGUI_OVERLAY="$(mktemp -d)"
-if [ -d CEGUI-0.7.5/projects ]; then
-  cp -a CEGUI-0.7.5/projects "$CEGUI_OVERLAY/"
-fi
 extract_archive "$CEGUI_ARC" "CEGUI-0.7.5"
-if [ -d "$CEGUI_OVERLAY/projects" ]; then
-  rm -rf CEGUI-0.7.5/projects
-  cp -a "$CEGUI_OVERLAY/projects" CEGUI-0.7.5/
-fi
-rm -rf "$CEGUI_OVERLAY"
 
 echo "==> freeglut 3.0.0 -> opengl/ (headers; place Windows libs manually if needed)"
 FG_ARC="$CACHE/freeglut-3.0.0.tar.gz"
@@ -187,6 +156,24 @@ fi
 
 echo "==> CELayoutEditor 0.7.1 (optional tool, not required by FuckMPlayer.sln)"
 echo "    Skipped by default. Install separately if you need the CEGUI layout editor."
+
+echo "==> Apply MSVC project overlays from msvc-overlays/"
+if [ -d msvc-overlays ]; then
+  # Copy overlay files into fetched trees (vcxproj + config headers the sln expects)
+  (cd msvc-overlays && find . -type f | while read -r f; do
+    f="${f#./}"
+    mkdir -p "$(dirname "$ROOT/$f")"
+    cp -a "$ROOT/msvc-overlays/$f" "$ROOT/$f"
+  done)
+  echo "    Overlays applied."
+else
+  echo "    warning: msvc-overlays/ missing; FuckMPlayer.sln may not load vendor .vcxproj paths" >&2
+fi
+
+# ZeroMQ Windows build expects builds/msvc/platform.hpp (shipped in upstream tarball)
+if [ ! -f zeromq-2.1.7/builds/msvc/platform.hpp ] && [ -f zeromq-2.1.7/builds/msvc/platform.hpp.in ]; then
+  cp -a zeromq-2.1.7/builds/msvc/platform.hpp.in zeromq-2.1.7/builds/msvc/platform.hpp
+fi
 
 echo ""
 echo "Done. Dependency trees are in place for a local Visual Studio Win32 build."

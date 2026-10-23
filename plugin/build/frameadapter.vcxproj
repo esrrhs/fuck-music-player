@@ -47,7 +47,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)zeromq-2.1.7\include;$(SolutionDir)zeromq-2.1.7\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir);$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)zeromq-2.1.7\include;$(SolutionDir)zeromq-2.1.7\src;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)lib\Debug\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -55,7 +55,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)lib\Release\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)zeromq-2.1.7\include;$(SolutionDir)zeromq-2.1.7\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir);$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)zeromq-2.1.7\include;$(SolutionDir)zeromq-2.1.7\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
