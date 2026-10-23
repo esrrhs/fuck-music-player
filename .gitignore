@@ -13,7 +13,7 @@ ipch/
 # Intermediate / local build trees
 temp/
 **/temp/
-lib/
+/lib/
 *.ilk
 *.pdb
 *.exp
