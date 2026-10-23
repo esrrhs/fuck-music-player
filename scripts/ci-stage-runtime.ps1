@@ -101,6 +101,68 @@ if (-not $d3dxOk) {
   throw "d3dx9_43.dll missing — run scripts/fetch-deps.sh (copies from microsoft.dxsdk.d3dx nupkg)"
 }
 
+Write-Host "=== Staging VC++ 2010 CRT (MSVCR100 for lua.dll from CEGUI-DEPS) ==="
+# lua.dll (CEGUI-DEPS vc10) imports MSVCR100.dll; windows-latest often lacks VC++ 2010 x86.
+$msvcrDest = Join-Path $fuck "msvcr100.dll"
+if (-not (Test-Path $msvcrDest)) {
+  $candidates = @(
+    (Join-Path $env:SystemRoot "SysWOW64\msvcr100.dll"),
+    (Join-Path $env:SystemRoot "System32\msvcr100.dll"),
+    (Join-Path $root "msvc-overlays\runtime\msvcr100.dll")
+  )
+  $found = $false
+  foreach ($c in $candidates) {
+    if (Test-Path $c) {
+      Copy-Item -Force $c $msvcrDest
+      Write-Host "  + msvcr100.dll (from $c)"
+      $found = $true
+      break
+    }
+  }
+  if (-not $found) {
+    Write-Host "  MSVCR100 not on runner; downloading VC++ 2010 SP1 x86 redistributable..."
+    $vc = Join-Path $env:RUNNER_TEMP "vcredist_x86_2010.exe"
+    if (-not $env:RUNNER_TEMP) { $vc = Join-Path $root "vcredist_x86_2010.exe" }
+    $uri = "https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe"
+    Invoke-WebRequest -Uri $uri -OutFile $vc -UseBasicParsing
+    $extract = Join-Path $env:RUNNER_TEMP "vcredist2010-x86"
+    if (-not $env:RUNNER_TEMP) { $extract = Join-Path $root "vcredist2010-x86" }
+    New-Item -ItemType Directory -Force -Path $extract | Out-Null
+    # Silent install puts MSVCR100 into SysWOW64; also try 7z extract as fallback.
+    $p = Start-Process -FilePath $vc -ArgumentList "/q","/norestart" -Wait -PassThru
+    Write-Host "  vcredist exit=$($p.ExitCode)"
+    foreach ($c in @(
+      (Join-Path $env:SystemRoot "SysWOW64\msvcr100.dll"),
+      (Join-Path $env:SystemRoot "System32\msvcr100.dll")
+    )) {
+      if (Test-Path $c) {
+        Copy-Item -Force $c $msvcrDest
+        Write-Host "  + msvcr100.dll (from $c after vcredist)"
+        $found = $true
+        break
+      }
+    }
+    if (-not $found) {
+      # 7z can unpack the exe; search for the DLL
+      $seven = Get-Command 7z -ErrorAction SilentlyContinue
+      if ($seven) {
+        & 7z x -y "-o$extract" $vc | Out-Null
+        $hit = Get-ChildItem -Path $extract -Recurse -Filter "msvcr100.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($hit) {
+          Copy-Item -Force $hit.FullName $msvcrDest
+          Write-Host "  + msvcr100.dll (extracted from vcredist)"
+          $found = $true
+        }
+      }
+    }
+  }
+  if (-not (Test-Path $msvcrDest)) {
+    throw "msvcr100.dll missing after VC++ 2010 install/extract — lua.dll cannot load"
+  }
+} else {
+  Write-Host "  msvcr100.dll already in fuck/"
+}
+
 # CI overlay: empty musicengine filename so main skips FMOD without waiting on LoadLibrary.
 $ciMainCfg = Join-Path $fuck "main.cfg"
 if (Test-Path $ciMainCfg) {
@@ -181,6 +243,32 @@ if (`$h -eq [IntPtr]::Zero) {
   $out = & $wow -NoProfile -Command $probeScript 2>&1
   Write-Host "  32-bit probe: $out"
   if ($LASTEXITCODE -ne 0) {
+    Write-Host "  Diagnosing missing dependency (32-bit LoadLibrary per DLL)..."
+    $deps = @("d3dx9_43.dll","lua.dll","tolua++.dll","CEGUIBase.dll","CEGUIDirect3D9Renderer.dll","CEGUILuaScriptModule.dll","libzmq.dll","msvcr100.dll","main.dll")
+    $diag = @"
+Add-Type -Namespace CiProbe2 -Name Native -MemberDefinition @'
+  [System.Runtime.InteropServices.DllImport("kernel32", SetLastError=true, CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+  public static extern System.IntPtr LoadLibraryW(string path);
+  [System.Runtime.InteropServices.DllImport("kernel32")]
+  public static extern uint GetLastError();
+  [System.Runtime.InteropServices.DllImport("kernel32", SetLastError=true)]
+  public static extern bool FreeLibrary(System.IntPtr h);
+  [System.Runtime.InteropServices.DllImport("kernel32", CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+  public static extern bool SetDllDirectory(string path);
+'@
+[CiProbe2.Native]::SetDllDirectory('$fuck') | Out-Null
+foreach (`$d in @($(($deps | ForEach-Object { "'$_'" }) -join ','))) {
+  `$path = Join-Path '$fuck' `$d
+  if (-not (Test-Path `$path)) { Write-Output ("MISSING_FILE `$(`$d)"); continue }
+  [System.Runtime.InteropServices.Marshal]::GetLastWin32Error() | Out-Null
+  `$h = [CiProbe2.Native]::LoadLibraryW(`$path)
+  `$err = [CiProbe2.Native]::GetLastError()
+  if (`$h -eq [IntPtr]::Zero) { Write-Output ("FAIL `$(`$d) err=`$(`$err)") }
+  else { Write-Output ("OK `$(`$d)"); [void][CiProbe2.Native]::FreeLibrary(`$h) }
+}
+"@
+    $dout = & $wow -NoProfile -Command $diag 2>&1
+    $dout | ForEach-Object { Write-Host "    $_" }
     throw "32-bit LoadLibrary(main.dll) failed: $out"
   }
 }
