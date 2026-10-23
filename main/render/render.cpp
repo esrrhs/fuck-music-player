@@ -4,6 +4,16 @@
 #include <boost/pool/singleton_pool.hpp>
 #include <d3d9.h>
 #include <stdio.h>
+
+static void D3dLog(const char * msg)
+{
+	FILE * df = fopen("d3d-init.txt", "a");
+	if (df)
+	{
+		fprintf(df, "%s\n", msg);
+		fclose(df);
+	}
+}
 #include "../god/god.h"
 
 Render::Render() : m_pD3DDevice(NULL)
@@ -53,25 +63,35 @@ bool Render::create_device()
 bool Render::create_d3d9_device()
 {
 	LOG_ENTER
+	D3dLog("create_d3d9_device enter");
 
 	// 创建d3d
 	LPDIRECT3D9 d_D3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (!d_D3D)
 	{
 		LOG_ERROR("Direct3DCreate9");
+		D3dLog("Direct3DCreate9 FAILED");
 		return false;
 	}
 	LOG_TRACE("Direct3DCreate9 ok");
+	D3dLog("Direct3DCreate9 ok");
 
 	D3DDISPLAYMODE d3ddm;
 	if (FAILED(d_D3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
 	{
 		LOG_ERROR("GetAdapterDisplayMode");
+		D3dLog("GetAdapterDisplayMode FAILED");
 		d_D3D->Release();
 		return false;
 	}
+	D3dLog("GetAdapterDisplayMode ok");
 
 	void * hwnd = SINGLETON(God).GetHwnd();
+	{
+		char buf[128];
+		sprintf(buf, "hwnd=%p", hwnd);
+		D3dLog(buf);
+	}
 
 	D3DPRESENT_PARAMETERS d3dpp; 
 	ZeroMemory( &d3dpp, sizeof(d3dpp) ); 

@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include <stdio.h>
 
 #include "main.h"
 #include "plugin.h"
@@ -185,15 +186,25 @@ void WaitGetHwnd()
 }
 extern "C" MAIN_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 {
+	FILE * bf = fopen("d3d-init.txt", "a");
+	if (bf) { fprintf(bf, "PLUGIN_RUN enter\n"); fclose(bf); }
 	LOG_ENTER
 	ini_zmq();
+	bf = fopen("d3d-init.txt", "a");
+	if (bf) { fprintf(bf, "ini_zmq done\n"); fclose(bf); }
 	WaitGetHwnd();
+	bf = fopen("d3d-init.txt", "a");
+	if (bf) { fprintf(bf, "WaitGetHwnd done hwnd=%p zmq=%p\n", (void*)g_hwnd, g_zmq_ui_ctx); fclose(bf); }
 	if (!SINGLETON(God).Ini())
 	{
 		LOG_ERROR("God::Ini failed");
+		bf = fopen("d3d-init.txt", "a");
+		if (bf) { fprintf(bf, "God::Ini FAILED\n"); fclose(bf); }
 		LOG_LEAVE
 		return false;
 	}
+	bf = fopen("d3d-init.txt", "a");
+	if (bf) { fprintf(bf, "God::Ini ok, entering Loop\n"); fclose(bf); }
 	SINGLETON(God).Loop();
 	SINGLETON(God).Quit();
 	LOG_LEAVE
