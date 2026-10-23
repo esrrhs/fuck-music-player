@@ -20,7 +20,7 @@ GitHub Actions (`ci.yml`) on `master`:
 
 Screenshot capture on `windows-latest` is soft-fail so a headless runner cannot fail the MSBuild job. When D3D9 + CEGUI paint, the capture shows the real TaharezLook wheel (coloured track labels, prev/next, random, volume) on an intentional black clear — not an empty grey wx client.
 
-Example CI run whose artifact supplied the shell shot below: [#39926464182](https://github.com/esrrhs/fuck-music-player/actions/runs/39926464182).
+Example CI run whose artifact supplied the shell shot below: [#39930034091](https://github.com/esrrhs/fuck-music-player/actions/runs/39930034091).
 
 Player UI (CI capture of CEGUI main window, no audio/FMOD):
 
