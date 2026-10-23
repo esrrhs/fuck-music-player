@@ -46,6 +46,11 @@ extern "C" PROCESS_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 	while (g_pc->size() > 0)
 	{
 		PluginSys::PluginContainer::ConstIter it = g_pc->begin();
+		if (!(*it)->IsOK())
+		{
+			// LoadLibrary failed (missing DLL / deps) — do not pretend Run succeeded.
+			return false;
+		}
 		if(!(*it)->Run())
 		{
 			return false;
