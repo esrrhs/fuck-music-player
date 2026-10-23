@@ -459,6 +459,47 @@ fi
 echo "==> CELayoutEditor 0.7.1 (optional tool, not required by FuckMPlayer.sln)"
 echo "    Skipped by default. Install separately if you need the CEGUI layout editor."
 
+echo "==> CEGUI MSVC dependencies (lua, freeglut, codecs, …)"
+CEGUI_DEPS_ARC="$CACHE/CEGUI-DEPS-0.7.x-r3-vc10.zip"
+download "https://downloads.sourceforge.net/project/crayzedsgui/CEGUI%20Mk-2%20MSVC%2B%2B%20Dependencies/0.7.x/CEGUI-DEPS-0.7.x-r3-vc10.zip" "$CEGUI_DEPS_ARC"
+# Archive root is dependencies/; merge into CEGUI-0.7.5/dependencies/
+DEPS_TMP="$(mktemp -d)"
+unzip -qo "$CEGUI_DEPS_ARC" -d "$DEPS_TMP"
+if [ -d "$DEPS_TMP/dependencies" ]; then
+  mkdir -p CEGUI-0.7.5/dependencies
+  cp -a "$DEPS_TMP/dependencies"/. CEGUI-0.7.5/dependencies/
+  echo "    Merged CEGUI-DEPS into CEGUI-0.7.5/dependencies/"
+else
+  echo "error: CEGUI-DEPS archive missing dependencies/ root" >&2
+  rm -rf "$DEPS_TMP"
+  exit 1
+fi
+rm -rf "$DEPS_TMP"
+test -f CEGUI-0.7.5/dependencies/include/lua.h
+test -f CEGUI-0.7.5/dependencies/lib/dynamic/lua.lib
+test -f CEGUI-0.7.5/dependencies/lib/dynamic/freeglut.lib
+
+echo "==> Legacy DirectX D3DX9 + DxErr (headers/libs for CEGUI Direct3D9)"
+D3DX_NUPKG="$CACHE/microsoft.dxsdk.d3dx.9.29.952.8.nupkg"
+download "https://api.nuget.org/v3-flatcontainer/microsoft.dxsdk.d3dx/9.29.952.8/microsoft.dxsdk.d3dx.9.29.952.8.nupkg" "$D3DX_NUPKG"
+DXERR_NUPKG="$CACHE/dxsdk_missing.1.1.2.nupkg"
+download "https://api.nuget.org/v3-flatcontainer/dxsdk_missing/1.1.2/dxsdk_missing.1.1.2.nupkg" "$DXERR_NUPKG"
+DX_TMP="$(mktemp -d)"
+unzip -qo "$D3DX_NUPKG" -d "$DX_TMP/d3dx"
+unzip -qo "$DXERR_NUPKG" -d "$DX_TMP/dxerr"
+mkdir -p CEGUI-0.7.5/dependencies/include CEGUI-0.7.5/dependencies/lib/dynamic
+# Headers (d3dx9* from official Microsoft package; DxErr.h from DXSDK_Missing)
+cp -a "$DX_TMP/d3dx/build/native/include/." CEGUI-0.7.5/dependencies/include/
+cp -a "$DX_TMP/dxerr/Include/DxErr.h" CEGUI-0.7.5/dependencies/include/
+# Win32 import libs into the path CEGUI vcxproj already searches
+cp -a "$DX_TMP/d3dx/build/native/release/lib/x86/d3dx9.lib" CEGUI-0.7.5/dependencies/lib/dynamic/d3dx9.lib
+cp -a "$DX_TMP/dxerr/Lib/native/x86/DxErr.lib" CEGUI-0.7.5/dependencies/lib/dynamic/dxerr.lib
+rm -rf "$DX_TMP"
+test -f CEGUI-0.7.5/dependencies/include/d3dx9.h
+test -f CEGUI-0.7.5/dependencies/lib/dynamic/d3dx9.lib
+test -f CEGUI-0.7.5/dependencies/lib/dynamic/dxerr.lib
+echo "    Installed d3dx9.h / DxErr.h / d3dx9.lib / dxerr.lib into CEGUI dependencies"
+
 echo "==> Apply MSVC project overlays from msvc-overlays/"
 if [ -d msvc-overlays ]; then
   # Copy overlay files into fetched trees (vcxproj + config headers the sln expects)

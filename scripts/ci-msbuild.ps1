@@ -22,6 +22,9 @@ $targets = @(
   "cegui\CEGUIFalagardWRBase",
   "cegui\CEGUISTBImageCodec",
   "cegui\CEGUITGAImageCodec",
+  "cegui\tolua++",
+  "cegui\CEGUILuaScriptModule",
+  "cegui\CEGUIDirect3D9Renderer",
   # Builtin image/compression libs before base/core (wx_base links wxzlib/wxregexu/wxexpat).
   "wxWidgets\wxzlib",
   "wxWidgets\wxregex",
@@ -38,9 +41,14 @@ $targets = @(
   "plugin\thread",
   "plugin\process",
   "plugin\filefinder",
-  "plugin\frameadapter",
-  "main",
-  "FuckMPlayer"
+  "plugin\frameadapter"
+)
+
+# Built as vcxproj (not solution /t) so we do not pull sln ProjectDependencies:
+# optional CEGUI codecs, musicengine (FMOD), logo (GLUT import libs).
+$directProjects = @(
+  "main\main.vcxproj",
+  "FuckMPlayer.vcxproj"
 )
 
 $common = @(
@@ -53,7 +61,7 @@ $common = @(
 )
 
 Write-Host "MSBuild: $msbuild"
-Write-Host "Targets: $($targets.Count)"
+Write-Host "Targets: $($targets.Count) + $($directProjects.Count) direct"
 
 foreach ($t in $targets) {
   Write-Host ""
@@ -61,6 +69,16 @@ foreach ($t in $targets) {
   & $msbuild "FuckMPlayer.sln" @common "/t:$t"
   if ($LASTEXITCODE -ne 0) {
     Write-Host "MSBuild failed on target $t (exit $LASTEXITCODE)"
+    exit $LASTEXITCODE
+  }
+}
+
+foreach ($proj in $directProjects) {
+  Write-Host ""
+  Write-Host "=== Building $proj (direct, no sln ProjectDependencies) ==="
+  & $msbuild $proj @common
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "MSBuild failed on $proj (exit $LASTEXITCODE)"
     exit $LASTEXITCODE
   }
 }
