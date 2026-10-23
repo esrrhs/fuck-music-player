@@ -134,4 +134,26 @@ Write-Host "=== fuck/ staging summary ==="
 Get-ChildItem $fuck -File | Sort-Object Name | ForEach-Object {
   Write-Host ("  {0,12}  {1}" -f $_.Length, $_.Name)
 }
+Write-Host "=== Probe LoadLibrary(main.dll) from fuck/ ==="
+Add-Type -Namespace CiProbe -Name Native -MemberDefinition @"
+  [System.Runtime.InteropServices.DllImport("kernel32", SetLastError=true, CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+  public static extern System.IntPtr LoadLibraryW(string path);
+  [System.Runtime.InteropServices.DllImport("kernel32")]
+  public static extern uint GetLastError();
+  [System.Runtime.InteropServices.DllImport("kernel32", SetLastError=true)]
+  public static extern bool FreeLibrary(System.IntPtr h);
+  [System.Runtime.InteropServices.DllImport("kernel32", CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
+  public static extern bool SetDllDirectory(string path);
+"@
+[CiProbe.Native]::SetDllDirectory($fuck) | Out-Null
+$h = [CiProbe.Native]::LoadLibraryW((Join-Path $fuck "main.dll"))
+$err = [CiProbe.Native]::GetLastError()
+if ($h -eq [IntPtr]::Zero) {
+  Write-Host "  LoadLibrary(main.dll) FAILED GetLastError=$err"
+} else {
+  Write-Host ("  LoadLibrary(main.dll) OK handle=0x{0:X}" -f $h.ToInt64())
+  [void][CiProbe.Native]::FreeLibrary($h)
+}
+
 Write-Host "Staging done."
+
