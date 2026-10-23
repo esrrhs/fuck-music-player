@@ -189,8 +189,8 @@ PY
 fi
 
 echo "==> ZeroMQ 2.1.7"
-ZMQ_ARC="$CACHE/zeromq-2.1.7.tar.gz"
-download "https://github.com/zeromq/zeromq2-x/archive/refs/tags/v2.1.7.tar.gz" "$ZMQ_ARC"
+ZMQ_ARC="$CACHE/zeromq-2.1.7-release.tar.gz"
+download "https://download.zeromq.org/zeromq-2.1.7.tar.gz" "$ZMQ_ARC"
 extract_archive "$ZMQ_ARC" "zeromq-2.1.7"
 
 echo "==> CEGUI 0.7.5"
