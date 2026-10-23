@@ -5,6 +5,7 @@
 #include "globle.h"
 #include "RendererModules/Direct3D9/CEGUIDirect3D9Renderer.h"
 #include "CEGUI.h"
+#include <stdio.h>
 #include "globle.h"
 #include "../localheader.h"
 #include "../render/render.h"
@@ -62,7 +63,17 @@ void UIMng::create_cegui_system()
 	LOG_TRACE("Create Direct3D9Renderer ok");
 
 	CEGUI::DefaultResourceProvider* rp = new CEGUI::DefaultResourceProvider();
-	CEGUI::System::create(renderer, rp);
+	try
+	{
+		CEGUI::System::create(renderer, rp);
+	}
+	catch (CEGUI::Exception& e)
+	{
+		LOG_ERROR(e.getMessage().c_str());
+		FILE * bf = fopen("d3d-init.txt", "a");
+		if (bf) { fprintf(bf, "CEGUI System::create EXCEPTION: %s\n", e.getMessage().c_str()); fclose(bf); }
+		throw;
+	}
 	LOG_TRACE("Create System ok");
 
 	// …Ë÷√◊ ‘¥

@@ -166,16 +166,13 @@ if (-not (Test-Path $msvcrDest)) {
 # CI overlay: empty musicengine filename so main skips FMOD without waiting on LoadLibrary.
 $ciMainCfg = Join-Path $fuck "main.cfg"
 if (Test-Path $ciMainCfg) {
+  # Omit modules=/musicengine_= lines: common/Config.h tokenizer UB on empty "key=" values.
   @"
-modules=
-module_names=
 fps=30
 filefinder_filename=filefinder.dll
 filefinder_name=filefinder
-musicengine_filename=
-musicengine_name=
 "@ | Set-Content -Path $ciMainCfg -Encoding ascii
-  Write-Host "  Rewrote main.cfg for FMOD-free CI (cleared fuckyou.dll + musicengine)"
+  Write-Host "  Rewrote main.cfg for FMOD-free CI (no modules/musicengine keys)"
 }
 
 # Skip OpenGL logo splash on CI:
