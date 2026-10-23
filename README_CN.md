@@ -20,7 +20,7 @@
 
 在 `windows-latest` 上截图步骤为软失败，避免无桌面会话拖红 MSBuild。当 D3D9 + CEGUI 正常绘制时，截图为真实的 TaharezLook 转盘界面（彩色曲名、上/下、随机、音量），背景为有意的黑色清屏，而非空白灰色 wx 客户区。
 
-提供下方窗口截图的 CI 运行：[#39926464182](https://github.com/esrrhs/fuck-music-player/actions/runs/39926464182)。
+提供下方窗口截图的 CI 运行：[#39930034091](https://github.com/esrrhs/fuck-music-player/actions/runs/39930034091)。
 
 播放器完整界面（CI 截取 CEGUI 主界面，无音频/FMOD）：
 
