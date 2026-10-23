@@ -3,6 +3,7 @@
 #include "../localheader.h"
 #include <boost/pool/singleton_pool.hpp>
 #include <d3d9.h>
+#include <stdio.h>
 #include "../god/god.h"
 
 Render::Render() : m_pD3DDevice(NULL)
@@ -82,21 +83,67 @@ bool Render::create_d3d9_device()
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;	//使用屏幕刷新率
 	d3dpp.hDeviceWindow = (HWND)hwnd;
 
+	// Explicit backbuffer size from the client rect (0x0 params fail on some drivers).
+	RECT crc;
+	if (GetClientRect((HWND)hwnd, &crc))
+	{
+		LONG cw = crc.right - crc.left;
+		LONG ch = crc.bottom - crc.top;
+		if (cw > 0 && ch > 0)
+		{
+			d3dpp.BackBufferWidth = (UINT)cw;
+			d3dpp.BackBufferHeight = (UINT)ch;
+		}
+	}
+
+	// main.dll runs on a boost worker thread (plugin\\thread), not the wx UI thread.
+	// D3DCREATE_MULTITHREADED is required for CreateDevice/Present off the UI thread.
+	const DWORD createFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE;
+
 	LPDIRECT3DDEVICE9 d_3DDevice = NULL;
 	// Prefer HAL; fall back to REF (useful on headless / limited-GPU CI runners).
 	HRESULT hr = d_D3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, (HWND)hwnd,
-		D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d_3DDevice);
+		createFlags, &d3dpp, &d_3DDevice);
+	{
+		FILE * df = fopen("d3d-init.txt", "a");
+		if (df)
+		{
+			fprintf(df, "HAL hr=0x%08lX hwnd=%p bb=%ux%u\n", (unsigned long)hr, hwnd,
+				(unsigned)d3dpp.BackBufferWidth, (unsigned)d3dpp.BackBufferHeight);
+			fclose(df);
+		}
+	}
 	if (FAILED(hr))
 	{
 		LOG_ERROR("CreateDevice HAL failed; trying REF");
 		hr = d_D3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_REF, (HWND)hwnd,
-			D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d_3DDevice);
+			createFlags, &d3dpp, &d_3DDevice);
+		FILE * df = fopen("d3d-init.txt", "a");
+		if (df)
+		{
+			fprintf(df, "REF hr=0x%08lX\n", (unsigned long)hr);
+			fclose(df);
+		}
 	}
 	if (FAILED(hr) || !d_3DDevice)
 	{
 		LOG_ERROR("CreateDevice");
+		FILE * df = fopen("d3d-init.txt", "a");
+		if (df)
+		{
+			fprintf(df, "CreateDevice FAILED\n");
+			fclose(df);
+		}
 		d_D3D->Release();
 		return false;
+	}
+	{
+		FILE * df = fopen("d3d-init.txt", "a");
+		if (df)
+		{
+			fprintf(df, "CreateDevice OK device=%p\n", (void*)d_3DDevice);
+			fclose(df);
+		}
 	}
 	m_pD3DDevice = d_3DDevice;
 	// Keep d_D3D alive for the process lifetime (device holds ref); release our create ref.

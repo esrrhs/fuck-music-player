@@ -20,7 +20,7 @@ function Write-Diag([string]$msg) {
 function Soft-Exit([int]$code, [string]$msg) {
   Write-Diag $msg
   # Always scoop runtime logs for diagnosis
-  foreach ($f in @("CEGUI.log", "trace.txt", "error.txt")) {
+  foreach ($f in @("CEGUI.log", "trace.txt", "error.txt", "d3d-init.txt")) {
     $src = Join-Path (Join-Path $root "fuck") $f
     if (Test-Path $src) {
       Copy-Item -Force $src (Join-Path $outDir $f)
@@ -202,6 +202,8 @@ function Test-UiPainted([string]$path) {
   $samples = 0
   $greyish = 0
   $blackish = 0
+  $whiteish = 0
+  $chroma = 0
   $stepX = [Math]::Max(1, [int](($x1 - $x0) / 24))
   $stepY = [Math]::Max(1, [int](($y1 - $y0) / 24))
   for ($y = $y0; $y -lt $y1; $y += $stepY) {
@@ -211,26 +213,33 @@ function Test-UiPainted([string]$path) {
       if (-not $colors.ContainsKey($key)) { $colors[$key] = 0 }
       $colors[$key]++
       $samples++
-      # wx default client grey ~ (171,171,171) and near-greys
       $maxc = [Math]::Max($c.R, [Math]::Max($c.G, $c.B))
       $minc = [Math]::Min($c.R, [Math]::Min($c.G, $c.B))
+      # wx default client grey ~ (171,171,171) and near-greys
       if (($maxc - $minc) -le 8 -and $c.R -ge 140 -and $c.R -le 200) { $greyish++ }
       if ($c.R -lt 12 -and $c.G -lt 12 -and $c.B -lt 12) { $blackish++ }
+      # Empty wx client / BitBlt of unpainted window is mostly white
+      if ($c.R -ge 245 -and $c.G -ge 245 -and $c.B -ge 245) { $whiteish++ }
+      # TaharezLook music labels use green/red/blue text; chrome is tinted
+      if (($maxc - $minc) -ge 40) { $chroma++ }
     }
   }
   $bmp.Dispose()
   $unique = $colors.Count
   $greyPct = if ($samples -gt 0) { [int](100 * $greyish / $samples) } else { 100 }
   $blackPct = if ($samples -gt 0) { [int](100 * $blackish / $samples) } else { 100 }
-  Write-Diag ("Paint probe: unique~{0} greyish~{1}% blackish~{2}% samples={3} size={4}x{5}" -f $unique, $greyPct, $blackPct, $samples, $w, $h)
-  # Real CEGUI Taharez UI has many colors (buttons, text greens/reds/blues, frames).
-  $ok = ($unique -ge 8) -and ($greyPct -lt 85) -and ($blackPct -lt 95)
-  return @{ Ok = $ok; Unique = $unique; GreyPct = $greyPct; BlackPct = $blackPct }
+  $whitePct = if ($samples -gt 0) { [int](100 * $whiteish / $samples) } else { 100 }
+  $chromaPct = if ($samples -gt 0) { [int](100 * $chroma / $samples) } else { 0 }
+  Write-Diag ("Paint probe: unique~{0} greyish~{1}% blackish~{2}% whiteish~{3}% chroma~{4}% samples={5} size={6}x{7}" -f $unique, $greyPct, $blackPct, $whitePct, $chromaPct, $samples, $w, $h)
+  # Require chromatic UI content — reject blank grey/white GDI backdrops.
+  $ok = ($unique -ge 12) -and ($greyPct -lt 70) -and ($blackPct -lt 90) -and ($whitePct -lt 70) -and ($chromaPct -ge 3)
+  return @{ Ok = $ok; Unique = $unique; GreyPct = $greyPct; BlackPct = $blackPct; WhitePct = $whitePct; ChromaPct = $chromaPct }
 }
 
 # Give main.dll time to create D3D + load CEGUI schemes/layouts after splash skip.
 Write-Diag "Waiting for CEGUI/D3D first paint (multi-attempt)..."
-$captureDeadline = (Get-Date).AddSeconds(45)
+Start-Sleep -Seconds 5
+$captureDeadline = (Get-Date).AddSeconds(60)
 $attempt = 0
 $bestPath = $null
 $bestScore = -1
@@ -300,7 +309,7 @@ $fi = Get-Item $pngPath
 Write-Diag ("Wrote {0} ({1} bytes)" -f $pngPath, $fi.Length)
 
 # Copy runtime logs
-foreach ($f in @("CEGUI.log", "trace.txt", "error.txt")) {
+foreach ($f in @("CEGUI.log", "trace.txt", "error.txt", "d3d-init.txt")) {
   $src = Join-Path $fuck $f
   if (Test-Path $src) {
     Copy-Item -Force $src (Join-Path $outDir $f)
