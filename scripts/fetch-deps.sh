@@ -139,6 +139,18 @@ echo "==> wxWidgets 2.9.1"
 WX_ARC="$CACHE/wxWidgets-2.9.1.tar.gz"
 download "https://github.com/wxWidgets/wxWidgets/archive/refs/tags/v2.9.1.tar.gz" "$WX_ARC"
 extract_archive "$WX_ARC" "wxWidgets-2.9.1"
+# MSVC CustomBuild copies setup.h into lib/vc_{lib,dll}/mswu*/wx/ but does not mkdir;
+# solution maps Release -> DLL Release, so seed vc_dll/mswu (and common variants).
+if [ -f wxWidgets-2.9.1/include/wx/msw/setup.h ]; then
+  for cfg in vc_dll/mswu vc_dll/mswud vc_lib/mswu vc_lib/mswud; do
+    mkdir -p "wxWidgets-2.9.1/lib/$cfg/wx/msw"
+    cp -a wxWidgets-2.9.1/include/wx/msw/setup.h "wxWidgets-2.9.1/lib/$cfg/wx/setup.h"
+    if [ -f wxWidgets-2.9.1/include/wx/msw/rcdefs.h ]; then
+      cp -a wxWidgets-2.9.1/include/wx/msw/rcdefs.h "wxWidgets-2.9.1/lib/$cfg/wx/msw/rcdefs.h"
+    fi
+  done
+  echo "    Seeded wx/setup.h under lib/vc_{lib,dll}/mswu{,d}/ for MSVC"
+fi
 
 echo "==> protobuf 2.4.1"
 PB_ARC="$CACHE/protobuf-2.4.1.tar.gz"
