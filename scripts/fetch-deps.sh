@@ -501,11 +501,16 @@ cp -a "$DX_TMP/dxerr/Include/DxErr.h" CEGUI-0.7.5/dependencies/include/
 # Win32 import libs into the path CEGUI vcxproj already searches
 cp -a "$DX_TMP/d3dx/build/native/release/lib/x86/d3dx9.lib" CEGUI-0.7.5/dependencies/lib/dynamic/d3dx9.lib
 cp -a "$DX_TMP/dxerr/Lib/native/x86/DxErr.lib" CEGUI-0.7.5/dependencies/lib/dynamic/dxerr.lib
+# Runtime DLLs required by CEGUIDirect3D9Renderer.dll (LoadLibrary(main.dll) fails without these)
+mkdir -p CEGUI-0.7.5/dependencies/bin
+cp -a "$DX_TMP/d3dx/build/native/release/bin/x86/D3DX9_43.dll" CEGUI-0.7.5/dependencies/bin/d3dx9_43.dll
+cp -a "$DX_TMP/d3dx/build/native/release/bin/x86/D3DCompiler_43.dll" CEGUI-0.7.5/dependencies/bin/D3DCompiler_43.dll
 rm -rf "$DX_TMP"
 test -f CEGUI-0.7.5/dependencies/include/d3dx9.h
 test -f CEGUI-0.7.5/dependencies/lib/dynamic/d3dx9.lib
 test -f CEGUI-0.7.5/dependencies/lib/dynamic/dxerr.lib
-echo "    Installed d3dx9.h / DxErr.h / d3dx9.lib / dxerr.lib into CEGUI dependencies"
+test -f CEGUI-0.7.5/dependencies/bin/d3dx9_43.dll
+echo "    Installed d3dx9.h / DxErr.h / d3dx9.lib / dxerr.lib / d3dx9_43.dll into CEGUI dependencies"
 
 echo "==> Apply MSVC project overlays from msvc-overlays/"
 if [ -d msvc-overlays ]; then

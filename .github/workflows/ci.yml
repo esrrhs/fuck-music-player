@@ -66,6 +66,7 @@ jobs:
           test -f opengl/include/glaux.h
           test -f opengl/lib/glaux.lib
           test -f opengl/lib/freeglut.lib
+          test -f CEGUI-0.7.5/dependencies/bin/d3dx9_43.dll
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2

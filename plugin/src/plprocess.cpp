@@ -2,6 +2,7 @@
 #include "plugin.h"
 #include "plugincontainer.h"
 #include "config.h"
+#include <stdio.h>
 
 PluginSys::PluginContainer * g_pc = NULL;
 
@@ -49,6 +50,8 @@ extern "C" PROCESS_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 		if (!(*it)->IsOK())
 		{
 			// LoadLibrary failed (missing DLL / deps) — do not pretend Run succeeded.
+			FILE * bf = fopen("d3d-init.txt", "a");
+			if (bf) { fprintf(bf, "process: plugin LoadLibrary FAILED (IsOK=false)\n"); fclose(bf); }
 			return false;
 		}
 		if(!(*it)->Run())
