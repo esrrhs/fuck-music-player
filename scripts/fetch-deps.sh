@@ -155,6 +155,24 @@ mkdir -p boost
 cp -a "$BOOST_TMP/boost_1_46_1/boost" boost/
 cp -a "$BOOST_TMP/boost_1_46_1/libs" boost/
 rm -rf "$BOOST_TMP"
+# Boost 1.46 enum TIME_UTC conflicts with the C11 macro on modern MSVC/UCRT.
+if [ -f boost/boost/thread/xtime.hpp ]; then
+  python3 - <<'PY'
+from pathlib import Path
+p = Path("boost/boost/thread/xtime.hpp")
+t = p.read_text()
+if "TIME_UTC_=1" in t:
+    print("    xtime.hpp already uses TIME_UTC_")
+else:
+    t2 = t.replace("TIME_UTC=1", "TIME_UTC_=1").replace(
+        "clock_type == TIME_UTC", "clock_type == TIME_UTC_"
+    )
+    if t2 == t:
+        raise SystemExit("error: failed to patch TIME_UTC in xtime.hpp")
+    p.write_text(t2)
+    print("    Patched boost/thread/xtime.hpp: TIME_UTC -> TIME_UTC_ (MSVC C11)")
+PY
+fi
 
 echo "==> ZeroMQ 2.1.7"
 ZMQ_ARC="$CACHE/zeromq-2.1.7.tar.gz"
