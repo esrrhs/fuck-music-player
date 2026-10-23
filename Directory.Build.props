@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Applied automatically by MSBuild to every .vcxproj under this tree.
+     Boost 1.46 / wx 2.9 / protobuf 2.4 / ZeroMQ 2.1 need a permissive C++14
+     mode on VS2022+: declaring move ctors without copy ctors deletes the
+     copy under C++11 rules (error C2280 on boost::shared_ptr, etc.). -->
+<Project>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
+      <PreprocessorDefinitions>_HAS_AUTO_PTR_ETC=1;BOOST_NO_RVALUE_REFERENCES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>
