@@ -19,6 +19,85 @@ download() {
   mv "$out.partial" "$out"
 }
 
+# Portable tar extract: Windows Git Bash tar exits non-zero when it cannot
+# create symlinks (e.g. ZeroMQ 2.1.7 doc/zmq_epgm.txt -> zmq_pgm.txt). Those
+# doc links are not needed for MSBuild. Accept the extract if only link errors
+# were reported and the destination is non-empty. Ubuntu/Linux tar succeeds.
+extract_tar() {
+  # extract_tar <archive> <dest-dir> [strip-components] [gz|bz2|none]
+  local archive="$1" dest="$2" strip="${3:-0}" compression="${4:-gz}"
+  local err rc=0 had_errexit=0
+  case $- in *e*) had_errexit=1 ;; esac
+  err="$(mktemp)"
+  mkdir -p "$dest"
+
+  set +e
+  case "$compression" in
+    gz)
+      tar -xzf "$archive" -C "$dest" --strip-components="$strip" 2>"$err"
+      rc=$?
+      ;;
+    bz2)
+      tar -xjf "$archive" -C "$dest" --strip-components="$strip" 2>"$err"
+      rc=$?
+      if [ "$rc" -ne 0 ] && ! grep -Eqi 'Cannot create symlink|Cannot hard link|Cannot create hard link' "$err"; then
+        # Fallback when system tar lacks bzip2 support
+        if command -v bunzip2 >/dev/null 2>&1; then
+          bunzip2 -c "$archive" | tar -xf - -C "$dest" --strip-components="$strip" 2>"$err"
+          rc=$?
+        else
+          python3 - "$archive" "$dest" "$strip" <<'PY'
+import sys, tarfile
+arc, dest, strip = sys.argv[1], sys.argv[2], int(sys.argv[3])
+with tarfile.open(arc, "r:bz2") as tf:
+    for m in tf.getmembers():
+        parts = m.name.split("/")
+        if len(parts) <= strip:
+            continue
+        m.name = "/".join(parts[strip:])
+        if not m.name or m.name.startswith("/") or ".." in m.name.split("/"):
+            continue
+        try:
+            tf.extract(m, dest)
+        except (OSError, tarfile.ExtractError):
+            if m.issym() or m.islnk():
+                continue
+            raise
+PY
+          rc=$?
+        fi
+      fi
+      ;;
+    none)
+      tar -xf "$archive" -C "$dest" --strip-components="$strip" 2>"$err"
+      rc=$?
+      ;;
+    *)
+      echo "error: unknown compression: $compression" >&2
+      rm -f "$err"
+      [ "$had_errexit" -eq 1 ] && set -e
+      return 1
+      ;;
+  esac
+
+  if [ "$rc" -ne 0 ]; then
+    if grep -Eqi 'Cannot create symlink|Cannot hard link|Cannot create hard link' "$err" \
+      && [ -n "$(find "$dest" -mindepth 1 -print -quit 2>/dev/null)" ]; then
+      echo "warning: tar reported link creation failures (common on Windows); keeping extract of $(basename "$archive")" >&2
+      grep -Ei 'Cannot create symlink|Cannot hard link|Cannot create hard link|Exiting with failure' "$err" >&2 || true
+      rc=0
+    else
+      cat "$err" >&2
+      rm -f "$err"
+      [ "$had_errexit" -eq 1 ] && set -e
+      return "$rc"
+    fi
+  fi
+  rm -f "$err"
+  [ "$had_errexit" -eq 1 ] && set -e
+  return 0
+}
+
 extract_archive() {
   # extract_archive <archive> <dest-dir> [strip-components]
   local archive="$1" dest="$2" strip="${3:-1}"
@@ -26,28 +105,10 @@ extract_archive() {
   mkdir -p "$dest"
   case "$archive" in
     *.tar.gz|*.tgz)
-      tar -xzf "$archive" -C "$dest" --strip-components="$strip"
+      extract_tar "$archive" "$dest" "$strip" gz
       ;;
     *.tar.bz2|*.tbz2)
-      if tar -xjf "$archive" -C "$dest" --strip-components="$strip" 2>/dev/null; then
-        return 0
-      fi
-      # Fallback when system tar lacks bzip2 support
-      if command -v bunzip2 >/dev/null 2>&1; then
-        bunzip2 -c "$archive" | tar -xf - -C "$dest" --strip-components="$strip"
-      else
-        python3 - "$archive" "$dest" "$strip" <<'PY'
-import sys, tarfile
-arc, dest, strip = sys.argv[1], sys.argv[2], int(sys.argv[3])
-with tarfile.open(arc, "r:bz2") as tf:
-    for m in tf.getmembers():
-        parts = m.name.split("/", strip)
-        if len(parts) <= strip:
-            continue
-        m.name = "/".join(parts[strip:])
-        tf.extract(m, dest)
-PY
-      fi
+      extract_tar "$archive" "$dest" "$strip" bz2
       ;;
     *.zip)
       local tmp
@@ -88,7 +149,7 @@ echo "==> Boost 1.46.1"
 BOOST_ARC="$CACHE/boost_1_46_1.tar.gz"
 download "https://archives.boost.io/release/1.46.1/source/boost_1_46_1.tar.gz" "$BOOST_ARC"
 BOOST_TMP="$(mktemp -d)"
-tar -xzf "$BOOST_ARC" -C "$BOOST_TMP"
+extract_tar "$BOOST_ARC" "$BOOST_TMP" 0 gz
 rm -rf boost
 mkdir -p boost
 cp -a "$BOOST_TMP/boost_1_46_1/boost" boost/
@@ -109,7 +170,7 @@ echo "==> freeglut 3.0.0 -> opengl/ (headers; place Windows libs manually if nee
 FG_ARC="$CACHE/freeglut-3.0.0.tar.gz"
 download "https://github.com/freeglut/freeglut/releases/download/v3.0.0/freeglut-3.0.0.tar.gz" "$FG_ARC"
 FG_TMP="$(mktemp -d)"
-tar -xzf "$FG_ARC" -C "$FG_TMP"
+extract_tar "$FG_ARC" "$FG_TMP" 0 gz
 rm -rf opengl
 mkdir -p opengl/include opengl/lib
 if [ -d "$FG_TMP/freeglut-3.0.0/include/GL" ]; then
@@ -148,7 +209,7 @@ This project historically used FMOD Ex (`fmodex.dll` / `fmodex_vc.lib`, headers 
 
 FMOD is proprietary. Obtain an SDK from Firelight Technologies, then either:
 
-- Set `FMOD_SDK` to the unpacked SDK path and re-run `scripts/fetch-deps.sh`, or
+- Set `FMOD_SDK` to an unpacked SDK path and re-run `scripts/fetch-deps.sh`, or
 - Copy headers into `fmod/inc/`, the import lib into `fmod/lib/`, and `fmodex.dll` next to the runtime.
 FMOD
   echo "    Skipped: set FMOD_SDK to an unpacked FMOD Ex SDK directory to install into fmod/"
