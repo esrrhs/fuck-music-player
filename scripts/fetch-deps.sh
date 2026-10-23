@@ -160,6 +160,95 @@ if [ -f wxWidgets-2.9.1/include/wx/msw/setup.h ]; then
   echo "    Seeded wx/setup.h under lib/vc_{lib,dll}/mswu{,d}/ for MSVC"
 fi
 
+# wx 2.9.1 datetime.cpp falls through to POSIX `timezone` on desktop MSVC;
+# UCRT no longer provides that name. Use _get_timezone for all __VISUALC__.
+if [ -f wxWidgets-2.9.1/src/common/datetime.cpp ]; then
+  python3 - <<'PY'
+from pathlib import Path
+p = Path("wxWidgets-2.9.1/src/common/datetime.cpp")
+t = p.read_text()
+old = """    #elif defined(__WXWINCE__) && defined(__VISUALC8__)
+        // _timezone is not present in dynamic run-time library
+        #if 0
+        // Solution (1): use the function equivalent of _timezone
+        static long wxGetTimeZone()
+        {
+            long t;
+            _get_timezone(& t);
+            return t;
+        }
+        #define WX_TIMEZONE wxGetTimeZone()
+        #elif 1
+        // Solution (2): using GetTimeZoneInformation
+        static long wxGetTimeZone()
+        {
+            TIME_ZONE_INFORMATION tzi;
+            ::GetTimeZoneInformation(&tzi);
+            return tzi.Bias; // x 60
+        }
+        #define WX_TIMEZONE wxGetTimeZone()
+        #else
+        // Old method using _timezone: this symbol doesn't exist in the dynamic run-time library (i.e. using /MD)
+        #define WX_TIMEZONE _timezone
+        #endif
+    #else // unknown platform - try timezone
+        #define WX_TIMEZONE timezone
+    #endif"""
+new = """    #elif defined(__VISUALC__)
+        // Prefer CRT _get_timezone (seconds). POSIX `timezone` is gone from UCRT;
+        // _timezone is awkward with /MD. Works for WinCE and desktop MSVC.
+        static long wxGetTimeZone()
+        {
+            long t = 0;
+            _get_timezone(&t);
+            return t;
+        }
+        #define WX_TIMEZONE wxGetTimeZone()
+    #else // unknown platform - try timezone
+        #define WX_TIMEZONE timezone
+    #endif"""
+if "elif defined(__VISUALC__)" in t and "_get_timezone(&t)" in t:
+    print("    datetime.cpp already patched for MSVC timezone")
+elif old not in t:
+    raise SystemExit("error: unexpected wxWidgets datetime.cpp timezone block")
+else:
+    p.write_text(t.replace(old, new, 1))
+    print("    Patched wxWidgets datetime.cpp: MSVC uses _get_timezone")
+PY
+fi
+
+# Silence "Please update wx/platform.h" for VS2012+; map to a late-known token.
+if [ -f wxWidgets-2.9.1/include/wx/platform.h ]; then
+  python3 - <<'PY'
+from pathlib import Path
+p = Path("wxWidgets-2.9.1/include/wx/platform.h")
+t = p.read_text()
+old = """#   elif __VISUALC__ < 1700
+#       define __VISUALC10__
+#   else
+#       pragma message("Please update wx/platform.h to recognize this VC++ version")
+#   endif"""
+new = """#   elif __VISUALC__ < 1700
+#       define __VISUALC10__
+#   elif __VISUALC__ < 1800
+#       define __VISUALC11__
+#   elif __VISUALC__ < 1900
+#       define __VISUALC12__
+#   else
+        /* VS2015+ (1900+) and later; enough for wx 2.9.1 feature tests */
+#       define __VISUALC14__
+#   endif"""
+if "__VISUALC14__" in t:
+    print("    platform.h already recognizes VS2015+")
+elif old not in t:
+    raise SystemExit("error: unexpected wx/platform.h VC version block")
+else:
+    p.write_text(t.replace(old, new, 1))
+    print("    Patched wx/platform.h: recognize VS2012+ without pragma noise")
+PY
+fi
+
+
 echo "==> protobuf 2.4.1"
 PB_ARC="$CACHE/protobuf-2.4.1.tar.gz"
 download "https://github.com/protocolbuffers/protobuf/releases/download/v2.4.1/protobuf-2.4.1.tar.gz" "$PB_ARC"
