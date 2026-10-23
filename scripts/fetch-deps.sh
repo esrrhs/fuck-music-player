@@ -139,7 +139,12 @@ echo "==> wxWidgets 2.9.1"
 WX_ARC="$CACHE/wxWidgets-2.9.1.tar.gz"
 download "https://github.com/wxWidgets/wxWidgets/archive/refs/tags/v2.9.1.tar.gz" "$WX_ARC"
 extract_archive "$WX_ARC" "wxWidgets-2.9.1"
-# MSVC CustomBuild copies setup.h into lib/vc_{lib,dll}/mswu*/wx/ but does not mkdir;
+# GitHub source tags ship setup0.h only; MSVC expects include/wx/msw/setup.h.
+if [ ! -f wxWidgets-2.9.1/include/wx/msw/setup.h ] && [ -f wxWidgets-2.9.1/include/wx/msw/setup0.h ]; then
+  cp -a wxWidgets-2.9.1/include/wx/msw/setup0.h wxWidgets-2.9.1/include/wx/msw/setup.h
+  echo "    Copied setup0.h -> include/wx/msw/setup.h"
+fi
+# CustomBuild copies setup.h into lib/vc_{lib,dll}/mswu*/wx/ but does not mkdir;
 # solution maps Release -> DLL Release, so seed vc_dll/mswu (and common variants).
 if [ -f wxWidgets-2.9.1/include/wx/msw/setup.h ]; then
   for cfg in vc_dll/mswu vc_dll/mswud vc_lib/mswu vc_lib/mswud; do
@@ -147,6 +152,9 @@ if [ -f wxWidgets-2.9.1/include/wx/msw/setup.h ]; then
     cp -a wxWidgets-2.9.1/include/wx/msw/setup.h "wxWidgets-2.9.1/lib/$cfg/wx/setup.h"
     if [ -f wxWidgets-2.9.1/include/wx/msw/rcdefs.h ]; then
       cp -a wxWidgets-2.9.1/include/wx/msw/rcdefs.h "wxWidgets-2.9.1/lib/$cfg/wx/msw/rcdefs.h"
+    elif [ -f wxWidgets-2.9.1/include/wx/msw/genrcdefs.h ]; then
+      # Minimal stub; genrcdefs is normally preprocessed by cl.exe during CustomBuild.
+      printf '%s\n' '/* generated stub for CI */' > "wxWidgets-2.9.1/lib/$cfg/wx/msw/rcdefs.h"
     fi
   done
   echo "    Seeded wx/setup.h under lib/vc_{lib,dll}/mswu{,d}/ for MSVC"
