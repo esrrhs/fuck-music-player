@@ -1,6 +1,9 @@
 #ifndef __GLOBLE_DEFINE__
 #define __GLOBLE_DEFINE__
 
+#include <string>
+#include <fstream>
+
 #ifdef NULL
 #undef NULL
 #endif
