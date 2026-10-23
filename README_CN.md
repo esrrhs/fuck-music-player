@@ -20,9 +20,7 @@
 
 播放器为 GUI 程序，CI 不会无启动。本地完整构建仍需在 `scripts/fetch-deps.sh` 之后使用 Visual Studio（Win32）、FMOD 与 OpenGL/GLUT 库。
 
-一次成功的示例（[#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817)）：
-
-![CI 成功：Structure and pack + MSBuild Release Win32](docs/ci-msbuild-success.png)
+一次成功的示例：[#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817)。
 
 ## 特性
 

@@ -20,9 +20,7 @@ GitHub Actions (`ci.yml`) on `master`:
 
 The player is GUI-only; CI does not launch it headlessly. Local full builds still need Visual Studio (Win32), FMOD, and OpenGL/GLUT libs after `scripts/fetch-deps.sh`.
 
-Example green run ([#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817)):
-
-![CI success: Structure and pack + MSBuild Release Win32](docs/ci-msbuild-success.png)
+Example green run: [#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817).
 
 ## Features
 
