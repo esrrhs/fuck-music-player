@@ -13,11 +13,16 @@ This repository is a historical Visual Studio (Win32) project from around 2011. 
 
 ### CI status
 
-GitHub Actions (`ci.yml`) on `master` currently validates layout and runs `./pack.sh` on **Ubuntu** (fetch deps + package the `fuck/` runtime snapshot). It does **not** compile or launch the app yet.
+GitHub Actions (`ci.yml`) on `master`:
 
-A ready-to-apply Windows MSBuild job (fetch deps → apply `msvc-overlays/` → `msbuild` `FuckMPlayer.sln` **Release|Win32**, skipping FMOD/GLUT plugins `musicengine` / `logo`) lives in [`docs/ci.yml.pending`](docs/ci.yml.pending) (diff: [`docs/ci.yml.diff`](docs/ci.yml.diff)). Applying it requires a GitHub token/app with the **`workflow`** scope (OAuth apps without that scope cannot update `.github/workflows/*.yml`).
+1. **Structure and pack** (Ubuntu) — validate layout and run `./pack.sh` (fetch deps + package the `fuck/` runtime snapshot).
+2. **MSBuild Release Win32** (Windows) — fetch deps, apply `msvc-overlays/`, then MSBuild `FuckMPlayer.sln` **Release|Win32**. Skips FMOD/GLUT plugins `musicengine` / `logo`. Produces `FuckMPlayer.exe` / `main.dll` and uploads `win32-release-binaries`.
 
-The player is GUI-only; even with the Windows job, CI will not launch it headlessly. Local full builds still need Visual Studio (Win32), FMOD, and OpenGL/GLUT libs after `scripts/fetch-deps.sh`.
+The player is GUI-only; CI does not launch it headlessly. Local full builds still need Visual Studio (Win32), FMOD, and OpenGL/GLUT libs after `scripts/fetch-deps.sh`.
+
+Example green run ([#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817)):
+
+![CI success: Structure and pack + MSBuild Release Win32](docs/ci-msbuild-success.png)
 
 ## Features
 
