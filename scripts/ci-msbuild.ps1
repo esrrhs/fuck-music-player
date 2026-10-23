@@ -10,7 +10,8 @@ if (-not $msbuild) {
 }
 
 # Targets that do not require FMOD / GLUT import libs.
-# Plugins musicengine + logo remain in the sln for local builds with those SDKs installed.
+# Build one solution project at a time: MSBuild /m + /t:A;B;C incorrectly
+# forwards every target name into each .vcxproj (MSB4057).
 $targets = @(
   "boost",
   "libprotobuf",
@@ -39,21 +40,29 @@ $targets = @(
   "frameadapter",
   "main",
   "FuckMPlayer"
-) -join ";"
+)
+
+$common = @(
+  "/m",
+  "/p:Configuration=Release",
+  "/p:Platform=Win32",
+  "/p:PlatformToolset=v143",
+  "/p:WindowsTargetPlatformVersion=10.0",
+  "/v:minimal"
+)
 
 Write-Host "MSBuild: $msbuild"
-Write-Host "Targets: $targets"
+Write-Host "Targets: $($targets -join ', ')"
 
-& $msbuild "FuckMPlayer.sln" `
-  /m `
-  /p:Configuration=Release `
-  /p:Platform=Win32 `
-  /p:PlatformToolset=v143 `
-  /p:WindowsTargetPlatformVersion=10.0 `
-  /t:$targets `
-  /v:minimal
-
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+foreach ($t in $targets) {
+  Write-Host ""
+  Write-Host "=== Building $t ==="
+  & $msbuild "FuckMPlayer.sln" @common "/t:$t"
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "MSBuild failed on target $t (exit $LASTEXITCODE)"
+    exit $LASTEXITCODE
+  }
+}
 
 $exe = Get-ChildItem -Recurse -Filter "FuckMPlayer.exe" -ErrorAction SilentlyContinue |
   Where-Object { $_.FullName -match "Release|fuck|bin" } |
