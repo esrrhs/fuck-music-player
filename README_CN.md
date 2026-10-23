@@ -13,12 +13,11 @@
 
 ### CI 状态
 
-`master` 上的 GitHub Actions（`ci.yml`）：
+`master` 上的 GitHub Actions（`ci.yml`）目前只在 **Ubuntu** 上校验布局并运行 `./pack.sh`（拉依赖 + 打包 `fuck/` 运行时快照），**尚不编译、不启动**程序。
 
-- **Ubuntu**：校验布局并运行 `./pack.sh`（拉依赖 + 打包 `fuck/` 运行时快照）。
-- **Windows**：拉依赖、应用 `msvc-overlays/`，再用 MSBuild 编译 `FuckMPlayer.sln` 的 **Release|Win32**（跳过需要专有 FMOD / Windows GLUT 导入库的 `musicengine` / `logo`）。
+已准备好的 Windows MSBuild 任务（拉依赖 → 应用 `msvc-overlays/` → `msbuild` `FuckMPlayer.sln` **Release|Win32**，跳过需 FMOD/GLUT 的 `musicengine` / `logo`）见 [`docs/ci.yml.pending`](docs/ci.yml.pending)（diff：[`docs/ci.yml.diff`](docs/ci.yml.diff)）。写入 `.github/workflows/*.yml` 需要带 **`workflow`** scope 的 GitHub token/应用。
 
-播放器为 GUI 程序，CI **不会**无启动。本地完整构建仍需在 `scripts/fetch-deps.sh` 之后使用 Visual Studio（Win32）、FMOD 与 OpenGL/GLUT 库。
+播放器为 GUI 程序；即便启用 Windows 任务，CI 也不会无启动。本地完整构建仍需在 `scripts/fetch-deps.sh` 之后使用 Visual Studio（Win32）、FMOD 与 OpenGL/GLUT 库。
 
 ## 特性
 
