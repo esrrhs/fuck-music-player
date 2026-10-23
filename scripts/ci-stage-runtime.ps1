@@ -193,6 +193,7 @@ New-Item -ItemType Directory -Force -Path $ciMusic | Out-Null
 # Wipe prior stubs so the list is exactly what we stage (avoid stale single-file dirs).
 Get-ChildItem $ciMusic -File -ErrorAction SilentlyContinue | Remove-Item -Force
 $stubId3 = [byte[]](0x49,0x44,0x33)  # "ID3" - filefinder only matches extension
+# Enough stubs to fill the 5-slot wheel (2 above + current + 2 below) after scrolling.
 $ciTracks = @(
   "aurora-dreams.mp3",
   "blue-horizon.mp3",
@@ -200,7 +201,15 @@ $ciTracks = @(
   "dusk-waltz.mp3",
   "echo-station.mp3",
   "forest-path.wav",
-  "golden-hour.mp3"
+  "golden-hour.mp3",
+  "harbor-lights.mp3",
+  "ivory-keys.wav",
+  "jade-garden.mp3",
+  "kinetic-pulse.mp3",
+  "lunar-tide.wav",
+  "midnight-express.mp3",
+  "neon-alley.mp3",
+  "orbit-waltz.wav"
 )
 foreach ($name in $ciTracks) {
   [System.IO.File]::WriteAllBytes((Join-Path $ciMusic $name), $stubId3)

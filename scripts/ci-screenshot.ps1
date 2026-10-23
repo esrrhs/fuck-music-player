@@ -69,6 +69,10 @@ public static class NativeWin {
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
   [DllImport("user32.dll")] public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
   [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
+  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+  [DllImport("user32.dll")] public static extern bool SetCursorPos(int X, int Y);
+  [DllImport("user32.dll")] public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+  [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
   [DllImport("user32.dll")] public static extern IntPtr GetDC(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
   [DllImport("gdi32.dll")] public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
@@ -84,6 +88,10 @@ public static class NativeWin {
   public const uint SRCCOPY = 0x00CC0020;
   public const uint PW_RENDERFULLCONTENT = 0x00000002;
   public const uint PW_CLIENTONLY = 0x00000001;
+  public const uint WM_MOUSEMOVE = 0x0200;
+  public const uint WM_LBUTTONDOWN = 0x0201;
+  public const uint WM_LBUTTONUP = 0x0202;
+  public const int MK_LBUTTON = 0x0001;
 }
 "@
 
@@ -183,6 +191,38 @@ function Capture-PrintWindow([IntPtr]$h, [string]$path) {
   }
   $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
   $bmp.Dispose()
+}
+
+# Click CEGUI 「下」(uiwheel/next). Layout UnifiedAreaRect {{0.82,0},{0.46,0},{0.92,0},{0.52,0}}
+# relative to the client area. wx routes WM_MOUSEMOVE then LBUTTON into CEGUI inject*.
+function Click-UiWheelNext([IntPtr]$h, [int]$times) {
+  $cr = New-Object NativeWin+RECT
+  if (-not [NativeWin]::GetClientRect($h, [ref]$cr)) {
+    Write-Diag "GetClientRect failed; cannot click 下"
+    return
+  }
+  $cw = [Math]::Max(1, $cr.Right - $cr.Left)
+  $ch = [Math]::Max(1, $cr.Bottom - $cr.Top)
+  # Button center in client coords (matches fuck/ui/layouts/uiwheel.layout uiwheel/next)
+  $cx = [int](($cw * 0.82) + ($cw * 0.10) / 2)
+  $cy = [int](($ch * 0.46) + ($ch * 0.06) / 2)
+  Write-Diag ("Click 下 at client ({0},{1}) in {2}x{3} x{4}" -f $cx, $cy, $cw, $ch, $times)
+  [void][NativeWin]::SetForegroundWindow($h)
+  Start-Sleep -Milliseconds 200
+  # MAKELPARAM(x,y) — SendMessage so wx processes move before button (CEGUI uses last injectMousePosition)
+  $lpVal = ($cy -shl 16) -bor ($cx -band 0xFFFF)
+  $lp = [IntPtr]$lpVal
+  for ($i = 0; $i -lt $times; $i++) {
+    [void][NativeWin]::SendMessage($h, [NativeWin]::WM_MOUSEMOVE, [IntPtr]::Zero, $lp)
+    Start-Sleep -Milliseconds 100
+    [void][NativeWin]::SendMessage($h, [NativeWin]::WM_LBUTTONDOWN, [IntPtr]([int][NativeWin]::MK_LBUTTON), $lp)
+    Start-Sleep -Milliseconds 80
+    [void][NativeWin]::SendMessage($h, [NativeWin]::WM_LBUTTONUP, [IntPtr]::Zero, $lp)
+    Write-Diag ("Sent 下 click {0}/{1}" -f ($i + 1), $times)
+    Start-Sleep -Milliseconds 400
+  }
+  # Let CEGUI / lua SetNowListPos refresh the 5-slot wheel (items above current).
+  Start-Sleep -Milliseconds 800
 }
 
 # Analyze client-area diversity. Reject solid grey/black GDI backdrops from failed GL/D3D capture.
@@ -304,6 +344,26 @@ if (-not $accepted) {
     Write-Diag ("No painted UI accepted; keeping best effort {0}" -f $bestPath)
   }
   Soft-Exit 1 "Timed out waiting for non-grey CEGUI/D3D client content"
+}
+
+# Scroll the wheel so titles appear above the playing row (pos>=1 hides nothing above until pos>=1;
+# pos>=2 fills both upper slots). Layout starts at pos=0 with only current+below visible.
+if ($accepted -and -not $proc.HasExited) {
+  Write-Diag "Clicking 下 so wheel shows tracks above the current/playing row..."
+  Click-UiWheelNext $hwnd 2
+  $scrolled = Join-Path $outDir "scrolled-bitblt.png"
+  try {
+    Capture-BitBlt $hwnd $scrolled
+    $probe2 = Test-UiPainted $scrolled
+    if ($probe2.Ok -or ((Test-Path $scrolled) -and ((Get-Item $scrolled).Length -gt 2048))) {
+      Copy-Item -Force $scrolled $pngPath
+      Write-Diag ("Post-scroll capture saved ({0} bytes, ok={1})" -f (Get-Item $scrolled).Length, $probe2.Ok)
+    } else {
+      Write-Diag "Post-scroll capture weak; keeping pre-scroll accepted PNG"
+    }
+  } catch {
+    Write-Diag ("Post-scroll capture failed: {0}" -f $_.Exception.Message)
+  }
 }
 
 if (-not (Test-Path $pngPath)) {
