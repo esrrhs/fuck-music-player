@@ -204,8 +204,9 @@ function Test-UiPainted([string]$path) {
   $blackish = 0
   $whiteish = 0
   $chroma = 0
-  $stepX = [Math]::Max(1, [int](($x1 - $x0) / 24))
-  $stepY = [Math]::Max(1, [int](($y1 - $y0) / 24))
+  # Dense grid: CEGUI text glyphs are thin; a 24x24 grid often misses them on a black clear.
+  $stepX = [Math]::Max(1, [int](($x1 - $x0) / 48))
+  $stepY = [Math]::Max(1, [int](($y1 - $y0) / 48))
   for ($y = $y0; $y -lt $y1; $y += $stepY) {
     for ($x = $x0; $x -lt $x1; $x += $stepX) {
       $c = $bmp.GetPixel($x, $y)
@@ -220,8 +221,8 @@ function Test-UiPainted([string]$path) {
       if ($c.R -lt 12 -and $c.G -lt 12 -and $c.B -lt 12) { $blackish++ }
       # Empty wx client / BitBlt of unpainted window is mostly white
       if ($c.R -ge 245 -and $c.G -ge 245 -and $c.B -ge 245) { $whiteish++ }
-      # TaharezLook music labels use green/red/blue text; chrome is tinted
-      if (($maxc - $minc) -ge 40) { $chroma++ }
+      # TaharezLook music labels use green/red/blue text; chrome is tinted beige
+      if (($maxc - $minc) -ge 30) { $chroma++ }
     }
   }
   $bmp.Dispose()
@@ -230,10 +231,12 @@ function Test-UiPainted([string]$path) {
   $blackPct = if ($samples -gt 0) { [int](100 * $blackish / $samples) } else { 100 }
   $whitePct = if ($samples -gt 0) { [int](100 * $whiteish / $samples) } else { 100 }
   $chromaPct = if ($samples -gt 0) { [int](100 * $chroma / $samples) } else { 0 }
-  Write-Diag ("Paint probe: unique~{0} greyish~{1}% blackish~{2}% whiteish~{3}% chroma~{4}% samples={5} size={6}x{7}" -f $unique, $greyPct, $blackPct, $whitePct, $chromaPct, $samples, $w, $h)
-  # Require chromatic UI content — reject blank grey/white GDI backdrops.
-  $ok = ($unique -ge 12) -and ($greyPct -lt 70) -and ($blackPct -lt 90) -and ($whitePct -lt 70) -and ($chromaPct -ge 3)
-  return @{ Ok = $ok; Unique = $unique; GreyPct = $greyPct; BlackPct = $blackPct; WhitePct = $whitePct; ChromaPct = $chromaPct }
+  Write-Diag ("Paint probe: unique~{0} greyish~{1}% blackish~{2}% whiteish~{3}% chroma~{4}% chromaN={5} samples={6} size={7}x{8}" -f $unique, $greyPct, $blackPct, $whitePct, $chromaPct, $chroma, $samples, $w, $h)
+  # Player clears to black; real CEGUI chrome is sparse (red/green/blue labels + Taharez beige).
+  # Reject empty grey/white GDI clients and pure-black clears with zero chroma.
+  $hasChrome = ($chroma -ge 3) -or ($chromaPct -ge 1 -and $unique -ge 10)
+  $ok = $hasChrome -and ($greyPct -lt 60) -and ($whitePct -lt 60) -and ($unique -ge 8)
+  return @{ Ok = $ok; Unique = $unique; GreyPct = $greyPct; BlackPct = $blackPct; WhitePct = $whitePct; ChromaPct = $chromaPct; Chroma = $chroma }
 }
 
 # Give main.dll time to create D3D + load CEGUI schemes/layouts after splash skip.
@@ -275,7 +278,7 @@ while ((Get-Date) -lt $captureDeadline) {
       continue
     }
     $probe = Test-UiPainted $cand
-    $score = [int]$probe.Unique - [int]$probe.GreyPct
+    $score = [int]$probe.Unique + (10 * [int]$probe.ChromaPct) + [int]$probe.Chroma - [int]$probe.GreyPct
     if ($score -gt $bestScore) {
       $bestScore = $score
       $bestPath = $cand

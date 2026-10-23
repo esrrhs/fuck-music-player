@@ -18,9 +18,9 @@
 1. **Structure and pack**（Ubuntu）— 校验布局并运行 `./pack.sh`（拉依赖 + 打包 `fuck/` 运行时快照）。
 2. **MSBuild Release Win32**（Windows）— 拉依赖（含 freeglut 与 `msvc-overlays/opengl/` 中的历史 `glaux`），MSBuild `FuckMPlayer.sln` **Release|Win32**（含 `plugin\logo`），暂存可运行的 `fuck/`，再尽力启动 `FuckMPlayer.exe` 并截取播放器窗口 PNG。跳过专有 FMOD 插件 `musicengine`（运行时缺引擎不致命）。上传 `win32-release-binaries` 与 `player-shell-screenshot`。
 
-在 `windows-latest` 上截图可能不稳定（黑屏 / 无 GUI 会话）；截图步骤为软失败，只要编译成功，MSBuild 任务仍保持绿色。
+在 `windows-latest` 上截图步骤为软失败，避免无桌面会话拖红 MSBuild。当 D3D9 + CEGUI 正常绘制时，截图为真实的 TaharezLook 转盘界面（彩色曲名、上/下、随机、音量），背景为有意的黑色清屏，而非空白灰色 wx 客户区。
 
-一次成功的示例（含 logo 构建与窗口截图）：[#39915123064](https://github.com/esrrhs/fuck-music-player/actions/runs/39915123064)。
+提供下方窗口截图的 CI 运行：[#39926464182](https://github.com/esrrhs/fuck-music-player/actions/runs/39926464182)。
 
 播放器完整界面（CI 截取 CEGUI 主界面，无音频/FMOD）：
 
