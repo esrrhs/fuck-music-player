@@ -40,35 +40,14 @@ pack.zip
 .deps-cache/
 
 # Fetched third-party trees (see scripts/fetch-deps.sh)
-# Entire trees replaced by fetch; project overlays are restored by the script
-# and also kept under these paths when present in git:
-#   boost/boost.vcxproj, boost/ex/
-#   CEGUI-0.7.5/projects/
-#   protobuf-2.4.1/vsprojects/
-#   zeromq-2.1.7/builds/
 /wxWidgets-2.9.1/
 /fmod/
 /opengl/
 /CELayoutEditor 0.7.1/
-
-# Boost: ignore fetched headers/libs only
-/boost/boost/
-/boost/libs/
-
-# protobuf: ignore fetched sources; keep vsprojects/
-/protobuf-2.4.1/*
-!/protobuf-2.4.1/vsprojects/
-!/protobuf-2.4.1/vsprojects/**
-
-# ZeroMQ: ignore fetched sources; keep builds/
-/zeromq-2.1.7/*
-!/zeromq-2.1.7/builds/
-!/zeromq-2.1.7/builds/**
-
-# CEGUI: ignore fetched sources/deps; keep projects/
-/CEGUI-0.7.5/*
-!/CEGUI-0.7.5/projects/
-!/CEGUI-0.7.5/projects/**
+/boost/
+/protobuf-2.4.1/
+/zeromq-2.1.7/
+/CEGUI-0.7.5/
 
 # Tool binary fetched by scripts/fetch-deps.sh
 /protobufmessage/protoc.exe

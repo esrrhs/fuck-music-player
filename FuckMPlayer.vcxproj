@@ -39,12 +39,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>temp\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>bin\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)wxWidgets-2.9.1\include;$(SolutionDir)wxWidgets-2.9.1\lib\vc_dll\mswud;$(SolutionDir)common;$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)boost;$(SolutionDir)plugin\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)wxWidgets-2.9.1\include;$(SolutionDir)wxWidgets-2.9.1\lib\vc_dll\mswud;$(SolutionDir)common;$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)boost;$(SolutionDir);$(SolutionDir)plugin\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>bin\$(Configuration)\</OutDir>
     <IntDir>temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)wxWidgets-2.9.1\include;$(SolutionDir)wxWidgets-2.9.1\lib\vc_dll\mswud;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)plugin\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)wxWidgets-2.9.1\include;$(SolutionDir)wxWidgets-2.9.1\lib\vc_dll\mswud;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir);$(SolutionDir)protobufmessage;$(SolutionDir)protobuf-2.4.1\src;$(SolutionDir)plugin\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

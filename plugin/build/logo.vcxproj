@@ -45,7 +45,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir)opengl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir);$(SolutionDir)opengl\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)lib\Debug\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -53,7 +53,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)lib\Release\</OutDir>
     <IntDir>$(SolutionDir)temp\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir)opengl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)plugin\include;$(SolutionDir)common;$(SolutionDir)boost;$(SolutionDir);$(SolutionDir)opengl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

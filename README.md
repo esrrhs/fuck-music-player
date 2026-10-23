@@ -11,6 +11,15 @@ Plugin-based Windows MP3 player built with OpenGL, wxWidgets, CEGUI, FMOD, Boost
 
 This repository is a historical Visual Studio (Win32) project from around 2011. Third-party dependency *trees are not committed*; run `scripts/fetch-deps.sh` (also used by CI) to download them. Treat it as an archive / study sample rather than a modern cross-platform app.
 
+### CI status
+
+GitHub Actions (`ci.yml`) on `master`:
+
+- **Ubuntu**: validate layout and run `./pack.sh` (fetch deps + package the `fuck/` runtime snapshot).
+- **Windows**: fetch deps, apply `msvc-overlays/`, then MSBuild `FuckMPlayer.sln` **Release|Win32** (skips `musicengine` / `logo`, which need proprietary FMOD and Windows GLUT import libs).
+
+The player is a GUI app; CI does **not** launch it headlessly. Local full builds still need Visual Studio (Win32), FMOD, and OpenGL/GLUT libs after `scripts/fetch-deps.sh`.
+
 ## Features
 
 - Host shell (`FuckMPlayer.exe`) loads plugins as DLLs
@@ -62,7 +71,9 @@ Runtime directory: `fuck/` (`*.cfg`, UI assets). After building, copy plugin DLL
 | `plugin/` | Plugin SDK + modules (thread, process, logo, musicengine, filefinder, …) |
 | `frame/` | wxWidgets main frame |
 | `common/` | Shared headers / logger |
+| `ex/` | Project-owned Asio logger helpers (formerly under `boost/ex/`) |
 | `fuck/` | Runtime configs + UI (DLLs fetched/built locally) |
+| `msvc-overlays/` | VS2010-era `.vcxproj` overlays copied onto fetched trees by `fetch-deps.sh` |
 | `scripts/fetch-deps.sh` | Download third-party trees into expected paths |
 | `VERSION` | Release version source of truth |
 

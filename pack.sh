@@ -15,8 +15,6 @@ if [ "${CI:-}" = "true" ] || [ "${FETCH_DEPS:-}" = "1" ]; then
   test -d boost/boost
   test -d zeromq-2.1.7/include
   test -d CEGUI-0.7.5/cegui
-  test -f boost/boost.vcxproj
-  test -d CEGUI-0.7.5/projects
   echo "Dependency trees OK"
 fi
 
