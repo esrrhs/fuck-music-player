@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -12,30 +12,30 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ex\logger\logger_service.cpp" />
-    <ClCompile Include="libs\date_time\gregorian\date_generators.cpp" />
-    <ClCompile Include="libs\date_time\gregorian\gregorian_types.cpp" />
-    <ClCompile Include="libs\date_time\gregorian\greg_month.cpp" />
-    <ClCompile Include="libs\date_time\gregorian\greg_weekday.cpp" />
-    <ClCompile Include="libs\date_time\posix_time\posix_time_types.cpp" />
-    <ClCompile Include="libs\filesystem\codecvt_error_category.cpp" />
-    <ClCompile Include="libs\filesystem\operations.cpp" />
-    <ClCompile Include="libs\filesystem\path.cpp" />
-    <ClCompile Include="libs\filesystem\path_traits.cpp" />
-    <ClCompile Include="libs\filesystem\portability.cpp" />
-    <ClCompile Include="libs\filesystem\unique_path.cpp" />
-    <ClCompile Include="libs\filesystem\utf8_codecvt_facet.cpp" />
-    <ClCompile Include="libs\filesystem\windows_file_codecvt.cpp" />
-    <ClCompile Include="libs\system\error_code.cpp" />
-    <ClCompile Include="libs\thread\win32\thread.cpp" />
-    <ClCompile Include="libs\thread\win32\tss_pe.cpp" />
+    <ClCompile Include="libs\date_time\src\gregorian\date_generators.cpp" />
+    <ClCompile Include="libs\date_time\src\gregorian\gregorian_types.cpp" />
+    <ClCompile Include="libs\date_time\src\gregorian\greg_month.cpp" />
+    <ClCompile Include="libs\date_time\src\gregorian\greg_weekday.cpp" />
+    <ClCompile Include="libs\date_time\src\posix_time\posix_time_types.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\codecvt_error_category.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\operations.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\path.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\path_traits.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\portability.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\unique_path.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\utf8_codecvt_facet.cpp" />
+    <ClCompile Include="libs\filesystem\v3\src\windows_file_codecvt.cpp" />
+    <ClCompile Include="libs\system\src\error_code.cpp" />
+    <ClCompile Include="libs\thread\src\win32\thread.cpp" />
+    <ClCompile Include="libs\thread\src\win32\tss_pe.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="libs\thread\win32\timeconv.inl" />
+    <None Include="libs\thread\src\win32\timeconv.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libs\date_time\gregorian\greg_names.hpp" />
-    <ClInclude Include="libs\filesystem\windows_file_codecvt.hpp" />
-    <ClInclude Include="libs\system\local_free_on_destruction.hpp" />
+    <ClInclude Include="libs\date_time\src\gregorian\greg_names.hpp" />
+    <ClInclude Include="libs\filesystem\v3\src\windows_file_codecvt.hpp" />
+    <ClInclude Include="libs\system\src\local_free_on_destruction.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D1B8287E-227C-4879-AC82-AEE9A6FEEE6C}</ProjectGuid>
