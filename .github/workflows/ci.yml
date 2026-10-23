@@ -28,6 +28,11 @@ jobs:
           test -d fuck
           test -d msvc-overlays
           test -d ex/logger
+          test -f scripts/ci-msbuild.ps1
+          test -f scripts/ci-stage-runtime.ps1
+          test -f scripts/ci-screenshot.ps1
+          test -f msvc-overlays/opengl/lib/glaux.lib
+          test -f msvc-overlays/opengl/include/glaux.h
           VERSION="$(tr -d '[:space:]' < VERSION)"
           test -n "${VERSION}"
           echo "VERSION=${VERSION}"
@@ -58,6 +63,9 @@ jobs:
           test -f zeromq-2.1.7/builds/msvc/libzmq/libzmq.vcxproj
           test -f CEGUI-0.7.5/projects/premake/BaseSystem/CEGUIBase.vcxproj
           test -f wxWidgets-2.9.1/build/msw/wx_base.vcxproj
+          test -f opengl/include/glaux.h
+          test -f opengl/lib/glaux.lib
+          test -f opengl/lib/freeglut.lib
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -74,6 +82,17 @@ jobs:
         run: |
           ./scripts/ci-msbuild.ps1
 
+      - name: Stage runnable fuck/ tree
+        shell: pwsh
+        run: |
+          ./scripts/ci-stage-runtime.ps1
+
+      - name: Screenshot player shell (best-effort)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          ./scripts/ci-screenshot.ps1
+
       - name: Upload build outputs
         if: success()
         uses: actions/upload-artifact@v4
@@ -85,4 +104,14 @@ jobs:
             **/Release/*.dll
             fuck/*.exe
             fuck/*.dll
+          if-no-files-found: warn
+
+      - name: Upload player screenshot + diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: player-shell-screenshot
+          path: |
+            ci-artifacts/**
+            docs/player-shell.png
           if-no-files-found: warn

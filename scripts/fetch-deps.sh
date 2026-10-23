@@ -407,7 +407,7 @@ CEGUI_ARC="$CACHE/CEGUI-0.7.5.tar.gz"
 download "https://sourceforge.net/projects/crayzedsgui/files/CEGUI%20Mk-2/0.7.5/CEGUI-0.7.5.tar.gz/download" "$CEGUI_ARC"
 extract_archive "$CEGUI_ARC" "CEGUI-0.7.5"
 
-echo "==> freeglut 3.0.0 -> opengl/ (headers; place Windows libs manually if needed)"
+echo "==> freeglut 3.0.0 -> opengl/ (headers; Win32 libs from CEGUI-DEPS + msvc-overlays)"
 FG_ARC="$CACHE/freeglut-3.0.0.tar.gz"
 download "https://github.com/freeglut/freeglut/releases/download/v3.0.0/freeglut-3.0.0.tar.gz" "$FG_ARC"
 FG_TMP="$(mktemp -d)"
@@ -418,8 +418,8 @@ if [ -d "$FG_TMP/freeglut-3.0.0/include/GL" ]; then
   cp -a "$FG_TMP/freeglut-3.0.0/include/GL/." opengl/include/
 fi
 rm -rf "$FG_TMP"
-echo "    Note: historical tree also shipped Windows GLUT/OpenGL import libs under opengl/lib."
-echo "    Build freeglut for Win32 or copy libs into opengl/lib/ as needed."
+echo "    Headers installed. Import libs: freeglut from CEGUI-DEPS (below);"
+echo "    historical glaux/glut32 for logo.dll come from msvc-overlays/opengl/."
 
 echo "==> protoc 2.4.1 (Windows) -> protobufmessage/protoc.exe"
 PROTOC_ARC="$CACHE/protoc-2.4.1-win32.zip"
@@ -478,6 +478,13 @@ rm -rf "$DEPS_TMP"
 test -f CEGUI-0.7.5/dependencies/include/lua.h
 test -f CEGUI-0.7.5/dependencies/lib/dynamic/lua.lib
 test -f CEGUI-0.7.5/dependencies/lib/dynamic/freeglut.lib
+# Stage freeglut import lib + runtime DLL where logo/main expect OpenGL deps
+mkdir -p opengl/lib
+cp -a CEGUI-0.7.5/dependencies/lib/dynamic/freeglut.lib opengl/lib/freeglut.lib
+if [ -f CEGUI-0.7.5/dependencies/bin/freeglut.dll ]; then
+  cp -a CEGUI-0.7.5/dependencies/bin/freeglut.dll opengl/lib/freeglut.dll
+fi
+echo "    Copied freeglut.lib (+ dll if present) into opengl/lib/"
 
 echo "==> Legacy DirectX D3DX9 + DxErr (headers/libs for CEGUI Direct3D9)"
 D3DX_NUPKG="$CACHE/microsoft.dxsdk.d3dx.9.29.952.8.nupkg"
@@ -520,6 +527,13 @@ fi
 # Sources #include "platform.hpp"; ensure it exists under src/ (PreBuild also copies it).
 if [ -f zeromq-2.1.7/builds/msvc/platform.hpp ]; then
   cp -a zeromq-2.1.7/builds/msvc/platform.hpp zeromq-2.1.7/src/platform.hpp
+fi
+
+# logo.dll links glaux.lib (BMP via auxDIBImageLoad); overlays should have placed it.
+if [ -f opengl/lib/glaux.lib ] && [ -f opengl/include/glaux.h ]; then
+  echo "    opengl glaux.h + glaux.lib present (logo plugin)"
+else
+  echo "warning: opengl/lib/glaux.lib or include/glaux.h missing; plugin\\logo will not link" >&2
 fi
 
 echo ""

@@ -1,5 +1,6 @@
 # Build FuckMPlayer.sln (Release|Win32) on windows-latest.
-# Skips musicengine (needs proprietary FMOD) and logo (needs Windows OpenGL/GLUT import libs).
+# Builds logo (needs glaux/freeglut via fetch-deps + msvc-overlays).
+# Skips musicengine (proprietary FMOD).
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $root
@@ -41,11 +42,12 @@ $targets = @(
   "plugin\thread",
   "plugin\process",
   "plugin\filefinder",
-  "plugin\frameadapter"
+  "plugin\frameadapter",
+  "plugin\logo"
 )
 
 # Built as vcxproj (not solution /t) so we do not pull sln ProjectDependencies:
-# optional CEGUI codecs, musicengine (FMOD), logo (GLUT import libs).
+# optional CEGUI codecs, musicengine (FMOD).
 $directProjects = @(
   "main\main.vcxproj",
   "FuckMPlayer.vcxproj"
@@ -96,5 +98,4 @@ $exe = Get-ChildItem -Recurse -Filter "FuckMPlayer.exe" -ErrorAction SilentlyCon
 Write-Host "Built executables:"
 $exe | ForEach-Object { Write-Host " - $($_.FullName)" }
 
-# GUI Win32 app: no meaningful headless smoke run in Actions.
-Write-Host "Compile finished. Skipping app launch (GUI-only; no headless smoke)."
+Write-Host "Compile finished (logo included; musicengine skipped — no FMOD)."
