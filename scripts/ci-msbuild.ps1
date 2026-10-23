@@ -9,37 +9,37 @@ if (-not $msbuild) {
   $msbuild = "msbuild"
 }
 
-# Targets that do not require FMOD / GLUT import libs.
-# Build one solution project at a time: MSBuild /m + /t:A;B;C incorrectly
-# forwards every target name into each .vcxproj (MSB4057).
-$targets = @(
-  "boost",
-  "libprotobuf",
-  "libzmq",
-  "CEGUIBase",
-  "CEGUIOpenGLRenderer",
-  "CEGUIExpatParser",
-  "CEGUIFalagardWRBase",
-  "CEGUISTBImageCodec",
-  "CEGUITGAImageCodec",
-  "base",
-  "core",
-  "adv",
-  "net",
-  "xml",
-  "wxexpat",
-  "wxjpeg",
-  "wxpng",
-  "wxregex",
-  "wxtiff",
-  "wxzlib",
-  "protobufmessage",
-  "thread",
-  "process",
-  "filefinder",
-  "frameadapter",
-  "main",
-  "FuckMPlayer"
+# Build .vcxproj files directly. Solution /t:Name fails for projects nested in
+# solution folders on modern MSBuild (MSB4057), and /t:A;B with /m forwards
+# every target into each project. Order matters for dependents.
+$projects = @(
+  "boost\boost.vcxproj",
+  "protobuf-2.4.1\vsprojects\libprotobuf.vcxproj",
+  "zeromq-2.1.7\builds\msvc\libzmq\libzmq.vcxproj",
+  "CEGUI-0.7.5\projects\premake\BaseSystem\CEGUIBase.vcxproj",
+  "CEGUI-0.7.5\projects\premake\RendererModules\OpenGL\CEGUIOpenGLRenderer.vcxproj",
+  "CEGUI-0.7.5\projects\premake\XMLParserModules\expatParser\CEGUIExpatParser.vcxproj",
+  "CEGUI-0.7.5\projects\premake\WindowRendererSets\Falagard\CEGUIFalagardWRBase.vcxproj",
+  "CEGUI-0.7.5\projects\premake\ImageCodecModules\STBImageCodec\CEGUISTBImageCodec.vcxproj",
+  "CEGUI-0.7.5\projects\premake\ImageCodecModules\TGAImageCodec\CEGUITGAImageCodec.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_base.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_core.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_adv.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_net.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_xml.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_wxexpat.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_wxjpeg.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_wxpng.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_wxregex.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_wxtiff.vcxproj",
+  "wxWidgets-2.9.1\build\msw\wx_wxzlib.vcxproj",
+  "protobufmessage\protobufmessage.vcxproj",
+  "plugin\build\thread.vcxproj",
+  "plugin\build\process.vcxproj",
+  "plugin\build\filefinder.vcxproj",
+  "plugin\build\frameadapter.vcxproj",
+  "main\main.vcxproj",
+  "FuckMPlayer.vcxproj"
 )
 
 $common = @(
@@ -52,14 +52,18 @@ $common = @(
 )
 
 Write-Host "MSBuild: $msbuild"
-Write-Host "Targets: $($targets -join ', ')"
+Write-Host "Projects: $($projects.Count)"
 
-foreach ($t in $targets) {
+foreach ($proj in $projects) {
+  if (-not (Test-Path $proj)) {
+    Write-Host "Missing project file: $proj"
+    exit 1
+  }
   Write-Host ""
-  Write-Host "=== Building $t ==="
-  & $msbuild "FuckMPlayer.sln" @common "/t:$t"
+  Write-Host "=== Building $proj ==="
+  & $msbuild $proj @common
   if ($LASTEXITCODE -ne 0) {
-    Write-Host "MSBuild failed on target $t (exit $LASTEXITCODE)"
+    Write-Host "MSBuild failed on $proj (exit $LASTEXITCODE)"
     exit $LASTEXITCODE
   }
 }
