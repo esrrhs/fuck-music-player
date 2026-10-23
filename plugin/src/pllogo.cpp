@@ -18,7 +18,9 @@ HGLRC		g_hRC = NULL;			// Permanent Rendering Context
 #include <stdio.h>			// Header File For Standard Input/Output
 #include <gl\gl.h>			// Header File For The OpenGL32 Library
 #include <gl\glu.h>			// Header File For The GLu32 Library
-#include "glaux.h"			// Header File For The Glaux Library
+// Minimal BMP loader replaces deprecated glaux (auxDIBImageLoad) for modern MSVC CI.
+#include <stdlib.h>
+#include <string.h>
 
 GLuint	g_texture = 0;			// Storage For One Texture ( NEW )
 STRING g_logo;
@@ -29,29 +31,100 @@ f32 g_alphaspeed = 0.1f;
 
 namespace OpenGl
 {
+	// Load a 24-bit Windows BMP into top-down RGB bytes.
+	unsigned char * LoadBmpRgb(const char * path, int * outW, int * outH)
+	{
+		FILE * f = fopen(path, "rb");
+		if (!f)
+		{
+			return 0;
+		}
+		unsigned char header[54];
+		if (fread(header, 1, 54, f) != 54 || header[0] != 'B' || header[1] != 'M')
+		{
+			fclose(f);
+			return 0;
+		}
+		int dataPos = header[10] + (header[11] << 8) + (header[12] << 16) + (header[13] << 24);
+		int width = header[18] + (header[19] << 8) + (header[20] << 16) + (header[21] << 24);
+		int height = header[22] + (header[23] << 8) + (header[24] << 16) + (header[25] << 24);
+		int bpp = header[28] + (header[29] << 8);
+		if (width <= 0 || height == 0 || bpp != 24)
+		{
+			fclose(f);
+			return 0;
+		}
+		int absH = height < 0 ? -height : height;
+		bool topDown = height < 0;
+		int rowRaw = width * 3;
+		int rowStride = (rowRaw + 3) & ~3;
+		size_t imgSize = (size_t)rowStride * (size_t)absH;
+		unsigned char * bgr = (unsigned char *)malloc(imgSize);
+		if (!bgr)
+		{
+			fclose(f);
+			return 0;
+		}
+		fseek(f, dataPos, SEEK_SET);
+		if (fread(bgr, 1, imgSize, f) != imgSize)
+		{
+			free(bgr);
+			fclose(f);
+			return 0;
+		}
+		fclose(f);
+		unsigned char * rgb = (unsigned char *)malloc((size_t)width * (size_t)absH * 3);
+		if (!rgb)
+		{
+			free(bgr);
+			return 0;
+		}
+		for (int y = 0; y < absH; y++)
+		{
+			int srcY = topDown ? y : (absH - 1 - y);
+			unsigned char * src = bgr + (size_t)srcY * rowStride;
+			unsigned char * dst = rgb + (size_t)y * (size_t)width * 3;
+			for (int x = 0; x < width; x++)
+			{
+				dst[x * 3 + 0] = src[x * 3 + 2];
+				dst[x * 3 + 1] = src[x * 3 + 1];
+				dst[x * 3 + 2] = src[x * 3 + 0];
+			}
+		}
+		free(bgr);
+		*outW = width;
+		*outH = absH;
+		return rgb;
+	}
 	bool LoadGLTextures()		// Load Bitmaps And Convert To Textures
 	{
 		bool ret = false;
-		AUX_RGBImageRec * TextureImage = 0;					// Create Storage Space For The Texture
-
-		// Load The Bitmap, Check For Errors, If Bitmap's Not Found Quit
-		if (TextureImage = auxDIBImageLoad(g_logo.c_str()))
+		int w = 0, h = 0;
+#ifdef UNICODE
+		std::string path;
 		{
-			glGenTextures(1, &g_texture);					// Create The Texture
-
-			// Typical Texture Generation Using Data From The Bitmap
+			int n = WideCharToMultiByte(CP_ACP, 0, g_logo.c_str(), -1, NULL, 0, NULL, NULL);
+			if (n > 0)
+			{
+				path.resize((size_t)(n - 1));
+				WideCharToMultiByte(CP_ACP, 0, g_logo.c_str(), -1, &path[0], n, NULL, NULL);
+			}
+		}
+		const char * cpath = path.c_str();
+#else
+		const char * cpath = g_logo.c_str();
+#endif
+		unsigned char * data = LoadBmpRgb(cpath, &w, &h);
+		if (data)
+		{
+			glGenTextures(1, &g_texture);
 			glBindTexture(GL_TEXTURE_2D, g_texture);
-			glTexImage2D(GL_TEXTURE_2D, 0, 3, TextureImage->sizeX, TextureImage->sizeY, 
-				0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage->data);
+			glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 			ret = true;
+			free(data);
 		}
-
-		SAFE_DELETE(TextureImage->data);				// Free The Texture Image Memory
-		SAFE_DELETE(TextureImage);						// Free The Image Structure
-
 		return ret;
 	}
 	bool CreateOpenGLWindow()
