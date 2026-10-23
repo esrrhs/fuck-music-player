@@ -90,15 +90,45 @@ foreach ($g in @("glut32.dll", "glut.dll", "freeglut.dll")) {
 # CI overlay: empty musicengine filename so main skips FMOD without waiting on LoadLibrary.
 $ciMainCfg = Join-Path $fuck "main.cfg"
 if (Test-Path $ciMainCfg) {
-  $cfg = Get-Content -Raw $ciMainCfg
-  if ($cfg -match "musicengine_filename=") {
-    $cfg = $cfg -replace "musicengine_filename=.*", "musicengine_filename="
-    $cfg = $cfg -replace "musicengine_name=.*", "musicengine_name="
-    Set-Content -Path $ciMainCfg -Value $cfg.TrimEnd() -NoNewline
-    Add-Content -Path $ciMainCfg -Value ""
-    Write-Host "  Cleared musicengine_* in main.cfg for FMOD-free CI run"
-  }
+  @"
+modules=
+module_names=
+fps=30
+filefinder_filename=filefinder.dll
+filefinder_name=filefinder
+musicengine_filename=
+musicengine_name=
+"@ | Set-Content -Path $ciMainCfg -Encoding ascii
+  Write-Host "  Rewrote main.cfg for FMOD-free CI (cleared fuckyou.dll + musicengine)"
 }
+
+# Skip OpenGL logo splash on CI:
+# 1) Logo SetPixelFormat(OpenGL) on the wx HWND poisons later D3D9 CreateDevice.
+# 2) Screenshot PrintWindow cannot see GL pixels (solid grey client area).
+# Jump straight to main.dll so CEGUI/D3D UI can paint on a clean window.
+$ciProcessCfg = Join-Path $fuck "process.cfg"
+@"
+modules=main.dll
+module_names=main
+"@ | Set-Content -Path $ciProcessCfg -Encoding ascii
+Write-Host "  Rewrote process.cfg to skip logo.dll (main only) for CI UI capture"
+
+# Local music scan dir so filefinder finishes quickly and loading/wheel UI has a path.
+$ciMusic = Join-Path $fuck "ci-music"
+New-Item -ItemType Directory -Force -Path $ciMusic | Out-Null
+$dummyMp3 = Join-Path $ciMusic "ci-sample.mp3"
+if (-not (Test-Path $dummyMp3)) {
+  # Minimal valid-enough stub (not a real MP3); filefinder only matches extension.
+  [System.IO.File]::WriteAllBytes($dummyMp3, [byte[]](0x49,0x44,0x33))
+}
+$ciFinderCfg = Join-Path $fuck "filefinder.cfg"
+@"
+dir=$ciMusic
+filter=.mp3;.wav
+sleep_time=0
+thread_num=2
+"@ | Set-Content -Path $ciFinderCfg -Encoding ascii
+Write-Host "  Pointed filefinder.cfg at fuck/ci-music for fast CI scan"
 
 Write-Host "=== fuck/ staging summary ==="
 Get-ChildItem $fuck -File | Sort-Object Name | ForEach-Object {

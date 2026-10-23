@@ -4,6 +4,7 @@
 class Render
 {
 public:
+	Render();
 	bool Ini();
 	bool Begin();
 	bool End();
@@ -18,4 +19,4 @@ private:
 	void * m_pD3DDevice;
 };
 
-#endif	
+#endif

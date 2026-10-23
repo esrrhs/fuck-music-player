@@ -22,9 +22,9 @@ Screenshot capture on `windows-latest` can be flaky (black frame / no GUI sessio
 
 Example green run (logo build + shell screenshot): [#39915123064](https://github.com/esrrhs/fuck-music-player/actions/runs/39915123064).
 
-Player shell (CI capture, no audio/FMOD):
+Player UI (CI capture of CEGUI main window, no audio/FMOD):
 
-![FuckMPlayer shell window captured by Windows CI](docs/player-shell.png)
+![FuckMPlayer CEGUI UI captured by Windows CI](docs/player-shell.png)
 
 ## Features
 

@@ -1,5 +1,5 @@
-# Best-effort: launch FuckMPlayer.exe from fuck/, wait for a visible window, capture PNG.
-# Soft-fail by default (exit 0 with warning) so flaky GUI/OpenGL on windows-latest
+# Best-effort: launch FuckMPlayer.exe from fuck/, wait for painted CEGUI/D3D UI, capture PNG.
+# Soft-fail by default (exit 0 with warning) so flaky GUI on windows-latest
 # does not turn the required MSBuild job red. Set SCREENSHOT_STRICT=1 to hard-fail.
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
@@ -19,6 +19,14 @@ function Write-Diag([string]$msg) {
 
 function Soft-Exit([int]$code, [string]$msg) {
   Write-Diag $msg
+  # Always scoop runtime logs for diagnosis
+  foreach ($f in @("CEGUI.log", "trace.txt", "error.txt")) {
+    $src = Join-Path (Join-Path $root "fuck") $f
+    if (Test-Path $src) {
+      Copy-Item -Force $src (Join-Path $outDir $f)
+      Write-Diag ("Copied {0} ({1} bytes)" -f $f, (Get-Item $src).Length)
+    }
+  }
   if ($strict) {
     exit $code
   }
@@ -35,10 +43,17 @@ if (-not (Test-Path $exe)) {
   Soft-Exit 1 "FuckMPlayer.exe not found at $exe — run ci-stage-runtime.ps1 first"
 }
 
-# Prefer interactive session for GUI; Actions runners are often session 0.
 Write-Diag "Working directory: $fuck"
 Write-Diag "Listing fuck/ DLLs:"
 Get-ChildItem $fuck -Filter "*.dll" | ForEach-Object { Write-Diag ("  DLL {0}" -f $_.Name) }
+Write-Diag "Configs:"
+foreach ($c in @("fuck.cfg","process.cfg","main.cfg","filefinder.cfg","logo.cfg")) {
+  $p = Join-Path $fuck $c
+  if (Test-Path $p) {
+    Write-Diag ("  --- {0} ---" -f $c)
+    Get-Content $p | ForEach-Object { Write-Diag ("    {0}" -f $_) }
+  }
+}
 
 Add-Type @"
 using System;
@@ -53,6 +68,7 @@ public static class NativeWin {
   [DllImport("user32.dll")] public static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
   [DllImport("user32.dll")] public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
+  [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
   [DllImport("user32.dll")] public static extern IntPtr GetDC(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
   [DllImport("gdi32.dll")] public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
@@ -63,10 +79,15 @@ public static class NativeWin {
   [DllImport("gdi32.dll")] public static extern bool DeleteDC(IntPtr hdc);
   [StructLayout(LayoutKind.Sequential)]
   public struct RECT { public int Left, Top, Right, Bottom; }
+  [StructLayout(LayoutKind.Sequential)]
+  public struct POINT { public int X, Y; }
   public const uint SRCCOPY = 0x00CC0020;
   public const uint PW_RENDERFULLCONTENT = 0x00000002;
+  public const uint PW_CLIENTONLY = 0x00000001;
 }
 "@
+
+Add-Type -AssemblyName System.Drawing
 
 $proc = $null
 try {
@@ -82,7 +103,7 @@ try {
   Soft-Exit 1 ("Failed to start exe: {0}" -f $_.Exception.Message)
 }
 
-$deadline = (Get-Date).AddSeconds(45)
+$deadline = (Get-Date).AddSeconds(60)
 $hwnd = [IntPtr]::Zero
 $title = ""
 while ((Get-Date) -lt $deadline) {
@@ -102,7 +123,6 @@ while ((Get-Date) -lt $deadline) {
     [void][NativeWin]::GetWindowText($h, $sb, $sb.Capacity)
     $t = $sb.ToString()
     if ([string]::IsNullOrWhiteSpace($t)) { return $true }
-    # Prefer the main player frame title
     $script:foundHwnd = $h
     $script:foundTitle = $t
     if ($t -match "FuckMPlayer|Fuck") { return $false }
@@ -122,20 +142,31 @@ if ($hwnd -eq [IntPtr]::Zero) {
   Soft-Exit 1 "Timed out waiting for a visible top-level window from FuckMPlayer.exe"
 }
 
-# Give splash / first paint a moment
-Start-Sleep -Seconds 3
-
-Add-Type -AssemblyName System.Drawing
-
-function Capture-Window([IntPtr]$h, [string]$path) {
+function Capture-BitBlt([IntPtr]$h, [string]$path) {
   $wr = New-Object NativeWin+RECT
-  if (-not [NativeWin]::GetWindowRect($h, [ref]$wr)) {
-    throw "GetWindowRect failed"
-  }
+  if (-not [NativeWin]::GetWindowRect($h, [ref]$wr)) { throw "GetWindowRect failed" }
   $w = [Math]::Max(1, $wr.Right - $wr.Left)
   $hgt = [Math]::Max(1, $wr.Bottom - $wr.Top)
-  Write-Diag ("Window rect {0}x{1} at ({2},{3})" -f $w, $hgt, $wr.Left, $wr.Top)
+  Write-Diag ("BitBlt window rect {0}x{1} at ({2},{3})" -f $w, $hgt, $wr.Left, $wr.Top)
+  $screen = [NativeWin]::GetDC([IntPtr]::Zero)
+  $mem = [NativeWin]::CreateCompatibleDC($screen)
+  $hbmp = [NativeWin]::CreateCompatibleBitmap($screen, $w, $hgt)
+  $old = [NativeWin]::SelectObject($mem, $hbmp)
+  [void][NativeWin]::BitBlt($mem, 0, 0, $w, $hgt, $screen, $wr.Left, $wr.Top, [NativeWin]::SRCCOPY)
+  [void][NativeWin]::SelectObject($mem, $old)
+  $bmp = [System.Drawing.Image]::FromHbitmap($hbmp)
+  [void][NativeWin]::DeleteObject($hbmp)
+  [void][NativeWin]::DeleteDC($mem)
+  [void][NativeWin]::ReleaseDC([IntPtr]::Zero, $screen)
+  $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
+  $bmp.Dispose()
+}
 
+function Capture-PrintWindow([IntPtr]$h, [string]$path) {
+  $wr = New-Object NativeWin+RECT
+  if (-not [NativeWin]::GetWindowRect($h, [ref]$wr)) { throw "GetWindowRect failed" }
+  $w = [Math]::Max(1, $wr.Right - $wr.Left)
+  $hgt = [Math]::Max(1, $wr.Bottom - $wr.Top)
   $bmp = New-Object System.Drawing.Bitmap $w, $hgt
   $g = [System.Drawing.Graphics]::FromImage($bmp)
   $hdc = $g.GetHdc()
@@ -145,33 +176,120 @@ function Capture-Window([IntPtr]$h, [string]$path) {
     $ok = [NativeWin]::PrintWindow($h, $hdc, 0)
   }
   $g.ReleaseHdc($hdc)
+  $g.Dispose()
   if (-not $ok) {
-    Write-Diag "PrintWindow failed; trying BitBlt from screen DC"
-    $screen = [NativeWin]::GetDC([IntPtr]::Zero)
-    $mem = [NativeWin]::CreateCompatibleDC($screen)
-    $hbmp = [NativeWin]::CreateCompatibleBitmap($screen, $w, $hgt)
-    $old = [NativeWin]::SelectObject($mem, $hbmp)
-    [void][NativeWin]::BitBlt($mem, 0, 0, $w, $hgt, $screen, $wr.Left, $wr.Top, [NativeWin]::SRCCOPY)
-    [void][NativeWin]::SelectObject($mem, $old)
-    $bmp2 = [System.Drawing.Image]::FromHbitmap($hbmp)
-    [void][NativeWin]::DeleteObject($hbmp)
-    [void][NativeWin]::DeleteDC($mem)
-    [void][NativeWin]::ReleaseDC([IntPtr]::Zero, $screen)
-    $g.Dispose()
     $bmp.Dispose()
-    $bmp2.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
-    $bmp2.Dispose()
-    return
+    throw "PrintWindow failed"
   }
   $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
-  $g.Dispose()
   $bmp.Dispose()
 }
 
-try {
-  Capture-Window $hwnd $pngPath
-} catch {
-  Soft-Exit 1 ("Capture failed: {0}" -f $_.Exception.Message)
+# Analyze client-area diversity. Reject solid grey/black GDI backdrops from failed GL/D3D capture.
+function Test-UiPainted([string]$path) {
+  $img = [System.Drawing.Image]::FromFile($path)
+  $bmp = New-Object System.Drawing.Bitmap $img
+  $img.Dispose()
+  $w = $bmp.Width
+  $h = $bmp.Height
+  # Skip ~title-bar band (~30px) and thin chrome border
+  $y0 = [Math]::Min([int](30), $h - 1)
+  $x0 = 4
+  $x1 = [Math]::Max($x0 + 1, $w - 4)
+  $y1 = [Math]::Max($y0 + 1, $h - 4)
+
+  $colors = @{}
+  $samples = 0
+  $greyish = 0
+  $blackish = 0
+  $stepX = [Math]::Max(1, [int](($x1 - $x0) / 24))
+  $stepY = [Math]::Max(1, [int](($y1 - $y0) / 24))
+  for ($y = $y0; $y -lt $y1; $y += $stepY) {
+    for ($x = $x0; $x -lt $x1; $x += $stepX) {
+      $c = $bmp.GetPixel($x, $y)
+      $key = "{0},{1},{2}" -f $c.R, $c.G, $c.B
+      if (-not $colors.ContainsKey($key)) { $colors[$key] = 0 }
+      $colors[$key]++
+      $samples++
+      # wx default client grey ~ (171,171,171) and near-greys
+      $maxc = [Math]::Max($c.R, [Math]::Max($c.G, $c.B))
+      $minc = [Math]::Min($c.R, [Math]::Min($c.G, $c.B))
+      if (($maxc - $minc) -le 8 -and $c.R -ge 140 -and $c.R -le 200) { $greyish++ }
+      if ($c.R -lt 12 -and $c.G -lt 12 -and $c.B -lt 12) { $blackish++ }
+    }
+  }
+  $bmp.Dispose()
+  $unique = $colors.Count
+  $greyPct = if ($samples -gt 0) { [int](100 * $greyish / $samples) } else { 100 }
+  $blackPct = if ($samples -gt 0) { [int](100 * $blackish / $samples) } else { 100 }
+  Write-Diag ("Paint probe: unique~{0} greyish~{1}% blackish~{2}% samples={3} size={4}x{5}" -f $unique, $greyPct, $blackPct, $samples, $w, $h)
+  # Real CEGUI Taharez UI has many colors (buttons, text greens/reds/blues, frames).
+  $ok = ($unique -ge 8) -and ($greyPct -lt 85) -and ($blackPct -lt 95)
+  return @{ Ok = $ok; Unique = $unique; GreyPct = $greyPct; BlackPct = $blackPct }
+}
+
+# Give main.dll time to create D3D + load CEGUI schemes/layouts after splash skip.
+Write-Diag "Waiting for CEGUI/D3D first paint (multi-attempt)..."
+$captureDeadline = (Get-Date).AddSeconds(45)
+$attempt = 0
+$bestPath = $null
+$bestScore = -1
+$accepted = $false
+
+while ((Get-Date) -lt $captureDeadline) {
+  if ($proc.HasExited) {
+    Soft-Exit 1 ("Process exited during paint wait code={0}" -f $proc.ExitCode)
+  }
+  $attempt++
+  $tmpBit = Join-Path $outDir ("attempt-{0}-bitblt.png" -f $attempt)
+  $tmpPw = Join-Path $outDir ("attempt-{0}-printwindow.png" -f $attempt)
+
+  $candidates = @()
+  try {
+    Capture-BitBlt $hwnd $tmpBit
+    $candidates += $tmpBit
+  } catch {
+    Write-Diag ("BitBlt attempt {0} failed: {1}" -f $attempt, $_.Exception.Message)
+  }
+  try {
+    Capture-PrintWindow $hwnd $tmpPw
+    $candidates += $tmpPw
+  } catch {
+    Write-Diag ("PrintWindow attempt {0} failed: {1}" -f $attempt, $_.Exception.Message)
+  }
+
+  foreach ($cand in $candidates) {
+    if (-not (Test-Path $cand)) { continue }
+    $fi = Get-Item $cand
+    if ($fi.Length -lt 2048) {
+      Write-Diag ("Skipping tiny {0} ({1} bytes)" -f $cand, $fi.Length)
+      continue
+    }
+    $probe = Test-UiPainted $cand
+    $score = [int]$probe.Unique - [int]$probe.GreyPct
+    if ($score -gt $bestScore) {
+      $bestScore = $score
+      $bestPath = $cand
+    }
+    if ($probe.Ok) {
+      Copy-Item -Force $cand $pngPath
+      Write-Diag ("Accepted painted UI from {0}" -f $cand)
+      $accepted = $true
+      break
+    }
+  }
+  if ($accepted) { break }
+
+  Write-Diag ("Attempt {0}: UI not painted yet (bestScore={1}); sleeping..." -f $attempt, $bestScore)
+  Start-Sleep -Seconds 2
+}
+
+if (-not $accepted) {
+  if ($bestPath -and (Test-Path $bestPath)) {
+    Copy-Item -Force $bestPath $pngPath
+    Write-Diag ("No painted UI accepted; keeping best effort {0}" -f $bestPath)
+  }
+  Soft-Exit 1 "Timed out waiting for non-grey CEGUI/D3D client content"
 }
 
 if (-not (Test-Path $pngPath)) {
@@ -181,33 +299,15 @@ if (-not (Test-Path $pngPath)) {
 $fi = Get-Item $pngPath
 Write-Diag ("Wrote {0} ({1} bytes)" -f $pngPath, $fi.Length)
 
-# Reject trivially empty / tiny captures
-if ($fi.Length -lt 2048) {
-  Soft-Exit 1 "PNG too small; likely a blank/failed capture"
-}
-
-# Heuristic: mostly-black frames are common on headless OpenGL — still upload but warn
-try {
-  $img = [System.Drawing.Image]::FromFile($pngPath)
-  $bmp = New-Object System.Drawing.Bitmap $img
-  $img.Dispose()
-  $sampleBlack = 0
-  $samples = 0
-  for ($y = 0; $y -lt $bmp.Height; $y += [Math]::Max(1, [int]($bmp.Height / 16))) {
-    for ($x = 0; $x -lt $bmp.Width; $x += [Math]::Max(1, [int]($bmp.Width / 16))) {
-      $c = $bmp.GetPixel($x, $y)
-      $samples++
-      if ($c.R -lt 8 -and $c.G -lt 8 -and $c.B -lt 8) { $sampleBlack++ }
-    }
+# Copy runtime logs
+foreach ($f in @("CEGUI.log", "trace.txt", "error.txt")) {
+  $src = Join-Path $fuck $f
+  if (Test-Path $src) {
+    Copy-Item -Force $src (Join-Path $outDir $f)
+    Write-Diag ("Copied {0} ({1} bytes)" -f $f, (Get-Item $src).Length)
+  } else {
+    Write-Diag ("Missing runtime log: {0}" -f $f)
   }
-  $bmp.Dispose()
-  $pct = if ($samples -gt 0) { [int](100 * $sampleBlack / $samples) } else { 100 }
-  Write-Diag ("Blackish sample ratio ~{0}% ({1}/{2})" -f $pct, $sampleBlack, $samples)
-  if ($pct -ge 98) {
-    Write-Diag "WARNING: capture looks almost entirely black (common on Actions OpenGL)."
-  }
-} catch {
-  Write-Diag ("Pixel probe skipped: {0}" -f $_.Exception.Message)
 }
 
 # Also copy into docs/ for optional commit-back by a follow-up step

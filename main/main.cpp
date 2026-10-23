@@ -188,7 +188,12 @@ extern "C" MAIN_API bool PLUGIN_RUN_FUNC_DEFAAULT_NAME()
 	LOG_ENTER
 	ini_zmq();
 	WaitGetHwnd();
-	SINGLETON(God).Ini();
+	if (!SINGLETON(God).Ini())
+	{
+		LOG_ERROR("God::Ini failed");
+		LOG_LEAVE
+		return false;
+	}
 	SINGLETON(God).Loop();
 	SINGLETON(God).Quit();
 	LOG_LEAVE
