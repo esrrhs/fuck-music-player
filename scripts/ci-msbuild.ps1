@@ -73,10 +73,17 @@ foreach ($t in $targets) {
   }
 }
 
+# vcxproj-direct builds do not inherit SolutionDir from the .sln; projects
+# use $(SolutionDir)... for IncludePath / AdditionalLibraryDirectories.
+$solutionDir = $root
+if (-not $solutionDir.EndsWith('\') -and -not $solutionDir.EndsWith('/')) {
+  $solutionDir = $solutionDir + '\'
+}
+
 foreach ($proj in $directProjects) {
   Write-Host ""
   Write-Host "=== Building $proj (direct, no sln ProjectDependencies) ==="
-  & $msbuild $proj @common
+  & $msbuild $proj @common "/p:SolutionDir=$solutionDir"
   if ($LASTEXITCODE -ne 0) {
     Write-Host "MSBuild failed on $proj (exit $LASTEXITCODE)"
     exit $LASTEXITCODE
