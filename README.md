@@ -16,11 +16,13 @@ This repository is a historical Visual Studio (Win32) project from around 2011. 
 GitHub Actions (`ci.yml`) on `master`:
 
 1. **Structure and pack** (Ubuntu) — validate layout and run `./pack.sh` (fetch deps + package the `fuck/` runtime snapshot).
-2. **MSBuild Release Win32** (Windows) — fetch deps, apply `msvc-overlays/`, then MSBuild `FuckMPlayer.sln` **Release|Win32**. Skips FMOD/GLUT plugins `musicengine` / `logo`. Produces `FuckMPlayer.exe` / `main.dll` and uploads `win32-release-binaries`.
+2. **MSBuild Release Win32** (Windows) — fetch deps (including freeglut + historical `glaux` via `msvc-overlays/opengl/`), MSBuild `FuckMPlayer.sln` **Release|Win32** including `plugin\logo`, stage a runnable `fuck/` tree, then best-effort launch `FuckMPlayer.exe` and capture a PNG of the player window. Skips proprietary FMOD plugin `musicengine` (runtime treats a missing engine as non-fatal). Uploads `win32-release-binaries` and `player-shell-screenshot`.
 
-The player is GUI-only; CI does not launch it headlessly. Local full builds still need Visual Studio (Win32), FMOD, and OpenGL/GLUT libs after `scripts/fetch-deps.sh`.
+Screenshot capture on `windows-latest` can be flaky (black frame / no GUI session); the screenshot step is soft-fail so the MSBuild job stays green when the build itself succeeds.
 
-Example green run: [#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817).
+Player shell (CI capture, no audio/FMOD):
+
+![FuckMPlayer shell window captured by Windows CI](docs/player-shell.png)
 
 ## Features
 

@@ -16,11 +16,13 @@
 `master` 上的 GitHub Actions（`ci.yml`）：
 
 1. **Structure and pack**（Ubuntu）— 校验布局并运行 `./pack.sh`（拉依赖 + 打包 `fuck/` 运行时快照）。
-2. **MSBuild Release Win32**（Windows）— 拉依赖、应用 `msvc-overlays/`，再 MSBuild `FuckMPlayer.sln` **Release|Win32**。跳过需 FMOD/GLUT 的 `musicengine` / `logo`。产出 `FuckMPlayer.exe` / `main.dll`，并上传 `win32-release-binaries`。
+2. **MSBuild Release Win32**（Windows）— 拉依赖（含 freeglut 与 `msvc-overlays/opengl/` 中的历史 `glaux`），MSBuild `FuckMPlayer.sln` **Release|Win32**（含 `plugin\logo`），暂存可运行的 `fuck/`，再尽力启动 `FuckMPlayer.exe` 并截取播放器窗口 PNG。跳过专有 FMOD 插件 `musicengine`（运行时缺引擎不致命）。上传 `win32-release-binaries` 与 `player-shell-screenshot`。
 
-播放器为 GUI 程序，CI 不会无启动。本地完整构建仍需在 `scripts/fetch-deps.sh` 之后使用 Visual Studio（Win32）、FMOD 与 OpenGL/GLUT 库。
+在 `windows-latest` 上截图可能不稳定（黑屏 / 无 GUI 会话）；截图步骤为软失败，只要编译成功，MSBuild 任务仍保持绿色。
 
-一次成功的示例：[#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817)。
+播放器外壳（CI 截图，无音频/FMOD）：
+
+![Windows CI 截取的 FuckMPlayer 窗口](docs/player-shell.png)
 
 ## 特性
 

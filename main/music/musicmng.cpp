@@ -39,12 +39,24 @@ void MusicMng::ini_music_engine()
 	STRING filename, name;
 	SINGLETON(God).GetPluginName(MUSIC_ENGINE_PLUGIN_TYPE, filename, name);
 
+	// Optional: CI / builds without proprietary FMOD skip musicengine.dll.
+	if (filename.empty())
+	{
+		LOG_TRACE("musicengine filename empty; continuing without audio");
+		m_musicengine = NULL;
+		LOG_LEAVE;
+		return;
+	}
+
 	PluginSys::Plugin * musicengine = new PluginSys::Plugin(filename, name);
 
 	if (!musicengine->IsOK())
 	{
-		LOG_ERROR("m_musicengine Is not OK");
+		LOG_ERROR("m_musicengine Is not OK (missing DLL or FMOD); continuing without audio");
 		SAFE_DELETE(musicengine);
+		m_musicengine = NULL;
+		LOG_LEAVE;
+		return;
 	}
 
 	musicengine->Ini();
@@ -60,12 +72,23 @@ void MusicMng::load_file_finder()
 	STRING filename, name;
 	SINGLETON(God).GetPluginName(FILE_FINDER_PLUGIN_TYPE, filename, name);
 
+	if (filename.empty())
+	{
+		LOG_TRACE("filefinder filename empty; continuing without scanner");
+		m_filefinder = NULL;
+		LOG_LEAVE;
+		return;
+	}
+
 	PluginSys::Plugin * filefinder = new PluginSys::Plugin(filename, name);
 
 	if (!filefinder->IsOK())
 	{
-		LOG_ERROR("m_filefinder Is not OK");
+		LOG_ERROR("m_filefinder Is not OK; continuing without scanner");
 		SAFE_DELETE(filefinder);
+		m_filefinder = NULL;
+		LOG_LEAVE;
+		return;
 	}
 
 	filefinder->Ini();
@@ -76,7 +99,11 @@ void MusicMng::load_file_finder()
 }
 void MusicMng::heartbeat(double elapsed)
 {
-	((PluginSys::Plugin*)m_musicengine)->Run();
+	(void)elapsed;
+	if (m_musicengine)
+	{
+		((PluginSys::Plugin*)m_musicengine)->Run();
+	}
 }
 void MusicMng::play_music(s32 pos)
 {
@@ -93,6 +120,10 @@ void MusicMng::play_music(s32 pos)
 }
 void MusicMng::play_music(const c8 * name)
 {
+	if (!m_musicengine)
+	{
+		return;
+	}
 	((PluginSys::Plugin*)m_musicengine)->Input((void*)PI_I_MUSIC_ENGINE_PLAY_MUSIC, (void*)name);
 }
 void RunFileFinder()
@@ -106,11 +137,19 @@ void MusicMng::start_load_music_list()
 {
 	LOG_ENTER;
 
+	if (!m_filefinder)
+	{
+		LOG_TRACE("no filefinder; skip music list scan");
+		end_load_music_list();
+		LOG_LEAVE;
+		return;
+	}
+
 	LOG_TRACE("start find thread");
 
 	SINGLETON(God).SetStauts(God::GS_FIND);
 
-	// Æô¶¯thread
+	// start find thread
 	boost::thread fd(boost::bind(RunFileFinder));
 
 	LOG_LEAVE;
@@ -118,6 +157,12 @@ void MusicMng::start_load_music_list()
 void MusicMng::parse_from_find_list()
 {
 	LOG_ENTER;
+
+	if (!m_filefinder)
+	{
+		LOG_LEAVE;
+		return;
+	}
 
 	std::vector<STRING> * pvec;
 	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_RESULT_LIST, (void*)&pvec);
@@ -166,6 +211,10 @@ const c8 * MusicMng::get_list_item_name(s32 pos)
 
 const c8 * MusicMng::get_find_dir_name()
 {
+	if (!m_filefinder)
+	{
+		return "";
+	}
 	const c8 * p = NULL;
 	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_FINDING_DIR, (void*)&p);
 #ifdef UNICODE
@@ -178,6 +227,10 @@ const c8 * MusicMng::get_find_dir_name()
 }
 const c8 * MusicMng::get_find_name()
 {
+	if (!m_filefinder)
+	{
+		return "";
+	}
 	const c8 * p = NULL;
 	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_FINDING_NAME, (void*)&p);
 #ifdef UNICODE
@@ -190,6 +243,10 @@ const c8 * MusicMng::get_find_name()
 }
 const c8 * MusicMng::get_find_num()
 {
+	if (!m_filefinder)
+	{
+		return "0";
+	}
 	s32 num = 0;
 	((PluginSys::Plugin*)m_filefinder)->Get((void*)PI_GS_FILE_FINDER_FIND_NUM, (void*)&num);
 
@@ -207,11 +264,19 @@ void MusicMng::random_shuffle()
 }
 void MusicMng::set_music_volume(f32 volume)
 {
+	if (!m_musicengine)
+	{
+		return;
+	}
 	((PluginSys::Plugin*)m_musicengine)->Input((void*)PI_I_MUSIC_ENGINE_SET_VOLUME, (void*)&volume);
 }
 bool MusicMng::is_playing()
 {
-	u8 ret;
+	if (!m_musicengine)
+	{
+		return false;
+	}
+	u8 ret = 0;
 	((PluginSys::Plugin*)m_musicengine)->Get((void*)PI_GS_MUSIC_ENGINE_IS_PLAYING, (void*)&ret);
 	return ret != 0;
 }
