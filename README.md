@@ -13,12 +13,11 @@ This repository is a historical Visual Studio (Win32) project from around 2011. 
 
 ### CI status
 
-GitHub Actions (`ci.yml`) on `master`:
+GitHub Actions (`ci.yml`) on `master` currently validates layout and runs `./pack.sh` on **Ubuntu** (fetch deps + package the `fuck/` runtime snapshot). It does **not** compile or launch the app yet.
 
-- **Ubuntu**: validate layout and run `./pack.sh` (fetch deps + package the `fuck/` runtime snapshot).
-- **Windows**: fetch deps, apply `msvc-overlays/`, then MSBuild `FuckMPlayer.sln` **Release|Win32** (skips `musicengine` / `logo`, which need proprietary FMOD and Windows GLUT import libs).
+A ready-to-apply Windows MSBuild job (fetch deps → apply `msvc-overlays/` → `msbuild` `FuckMPlayer.sln` **Release|Win32**, skipping FMOD/GLUT plugins `musicengine` / `logo`) lives in [`docs/ci.yml.pending`](docs/ci.yml.pending) (diff: [`docs/ci.yml.diff`](docs/ci.yml.diff)). Applying it requires a GitHub token/app with the **`workflow`** scope (OAuth apps without that scope cannot update `.github/workflows/*.yml`).
 
-The player is a GUI app; CI does **not** launch it headlessly. Local full builds still need Visual Studio (Win32), FMOD, and OpenGL/GLUT libs after `scripts/fetch-deps.sh`.
+The player is GUI-only; even with the Windows job, CI will not launch it headlessly. Local full builds still need Visual Studio (Win32), FMOD, and OpenGL/GLUT libs after `scripts/fetch-deps.sh`.
 
 ## Features
 
