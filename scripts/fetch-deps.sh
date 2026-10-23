@@ -248,6 +248,31 @@ else:
 PY
 fi
 
+# pbt.h was dropped from Windows SDK 8+; PBT_* macros live in winuser.h.
+# Upstream removed this include after 2.9.1 (r69863).
+if [ -f wxWidgets-2.9.1/src/msw/window.cpp ]; then
+  python3 - <<'PY'
+from pathlib import Path
+p = Path("wxWidgets-2.9.1/src/msw/window.cpp")
+t = p.read_text()
+old = """#if !defined __WXWINCE__ && !defined NEED_PBT_H
+    #include <pbt.h>
+#endif"""
+new = """/* pbt.h removed from modern Windows SDKs; PBT_* are in winuser.h (r69863). */
+#if 0 && !defined __WXWINCE__ && !defined NEED_PBT_H
+    #include <pbt.h>
+#endif"""
+if "pbt.h removed from modern Windows SDKs" in t:
+    print("    window.cpp already skips pbt.h")
+elif old not in t:
+    raise SystemExit("error: unexpected window.cpp pbt.h include block")
+else:
+    p.write_text(t.replace(old, new, 1))
+    print("    Patched wxWidgets window.cpp: skip missing pbt.h")
+PY
+fi
+
+
 
 echo "==> protobuf 2.4.1"
 PB_ARC="$CACHE/protobuf-2.4.1.tar.gz"
