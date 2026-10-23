@@ -267,6 +267,10 @@ fi
 if [ ! -f zeromq-2.1.7/builds/msvc/platform.hpp ] && [ -f zeromq-2.1.7/builds/msvc/platform.hpp.in ]; then
   cp -a zeromq-2.1.7/builds/msvc/platform.hpp.in zeromq-2.1.7/builds/msvc/platform.hpp
 fi
+# Sources #include "platform.hpp"; ensure it exists under src/ (PreBuild also copies it).
+if [ -f zeromq-2.1.7/builds/msvc/platform.hpp ]; then
+  cp -a zeromq-2.1.7/builds/msvc/platform.hpp zeromq-2.1.7/src/platform.hpp
+fi
 
 echo ""
 echo "Done. Dependency trees are in place for a local Visual Studio Win32 build."
