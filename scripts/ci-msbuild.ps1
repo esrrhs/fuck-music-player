@@ -23,6 +23,7 @@ $targets = @(
   "cegui\CEGUIFalagardWRBase",
   "cegui\CEGUISTBImageCodec",
   "cegui\CEGUITGAImageCodec",
+  "cegui\CEGUISILLYImageCodec",
   "cegui\tolua++",
   "cegui\CEGUILuaScriptModule",
   "cegui\CEGUIDirect3D9Renderer",
