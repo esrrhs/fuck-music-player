@@ -13,11 +13,16 @@
 
 ### CI 状态
 
-`master` 上的 GitHub Actions（`ci.yml`）目前只在 **Ubuntu** 上校验布局并运行 `./pack.sh`（拉依赖 + 打包 `fuck/` 运行时快照），**尚不编译、不启动**程序。
+`master` 上的 GitHub Actions（`ci.yml`）：
 
-已准备好的 Windows MSBuild 任务（拉依赖 → 应用 `msvc-overlays/` → `msbuild` `FuckMPlayer.sln` **Release|Win32**，跳过需 FMOD/GLUT 的 `musicengine` / `logo`）见 [`docs/ci.yml.pending`](docs/ci.yml.pending)（diff：[`docs/ci.yml.diff`](docs/ci.yml.diff)）。写入 `.github/workflows/*.yml` 需要带 **`workflow`** scope 的 GitHub token/应用。
+1. **Structure and pack**（Ubuntu）— 校验布局并运行 `./pack.sh`（拉依赖 + 打包 `fuck/` 运行时快照）。
+2. **MSBuild Release Win32**（Windows）— 拉依赖、应用 `msvc-overlays/`，再 MSBuild `FuckMPlayer.sln` **Release|Win32**。跳过需 FMOD/GLUT 的 `musicengine` / `logo`。产出 `FuckMPlayer.exe` / `main.dll`，并上传 `win32-release-binaries`。
 
-播放器为 GUI 程序；即便启用 Windows 任务，CI 也不会无启动。本地完整构建仍需在 `scripts/fetch-deps.sh` 之后使用 Visual Studio（Win32）、FMOD 与 OpenGL/GLUT 库。
+播放器为 GUI 程序，CI 不会无启动。本地完整构建仍需在 `scripts/fetch-deps.sh` 之后使用 Visual Studio（Win32）、FMOD 与 OpenGL/GLUT 库。
+
+一次成功的示例（[#39904694817](https://github.com/esrrhs/fuck-music-player/actions/runs/39904694817)）：
+
+![CI 成功：Structure and pack + MSBuild Release Win32](docs/ci-msbuild-success.png)
 
 ## 特性
 
