@@ -87,6 +87,20 @@ foreach ($g in @("glut32.dll", "glut.dll", "freeglut.dll")) {
   Copy-IfExists (Join-Path $root "opengl\lib\$g") $fuck | Out-Null
 }
 
+Write-Host "=== Staging D3DX9 runtime (required by CEGUIDirect3D9Renderer) ==="
+# Without d3dx9_43.dll, LoadLibrary(main.dll) fails and the player shell stays blank grey.
+$d3dxOk = $false
+foreach ($src in @(
+  (Join-Path $root "CEGUI-0.7.5\dependencies\bin\d3dx9_43.dll"),
+  (Join-Path $root "CEGUI-0.7.5\dependencies\bin\D3DX9_43.dll")
+)) {
+  if (Copy-IfExists $src $fuck) { $d3dxOk = $true; break }
+}
+Copy-IfExists (Join-Path $root "CEGUI-0.7.5\dependencies\bin\D3DCompiler_43.dll") $fuck | Out-Null
+if (-not $d3dxOk) {
+  throw "d3dx9_43.dll missing — run scripts/fetch-deps.sh (copies from microsoft.dxsdk.d3dx nupkg)"
+}
+
 # CI overlay: empty musicengine filename so main skips FMOD without waiting on LoadLibrary.
 $ciMainCfg = Join-Path $fuck "main.cfg"
 if (Test-Path $ciMainCfg) {
@@ -134,8 +148,15 @@ Write-Host "=== fuck/ staging summary ==="
 Get-ChildItem $fuck -File | Sort-Object Name | ForEach-Object {
   Write-Host ("  {0,12}  {1}" -f $_.Length, $_.Name)
 }
-Write-Host "=== Probe LoadLibrary(main.dll) from fuck/ ==="
-Add-Type -Namespace CiProbe -Name Native -MemberDefinition @"
+Write-Host "=== Probe LoadLibrary(main.dll) via 32-bit PowerShell ==="
+# Host pwsh on windows-latest is 64-bit; loading Win32 main.dll yields ERROR_BAD_EXE_FORMAT (193).
+$wow = "$env:SystemRoot\SysWOW64\WindowsPowerShell\v1.0\powershell.exe"
+if (-not (Test-Path $wow)) {
+  Write-Host "  warning: SysWOW64 powershell missing; skip 32-bit LoadLibrary probe"
+} else {
+  $probeScript = @"
+`$ErrorActionPreference = 'Continue'
+Add-Type -Namespace CiProbe -Name Native -MemberDefinition @'
   [System.Runtime.InteropServices.DllImport("kernel32", SetLastError=true, CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
   public static extern System.IntPtr LoadLibraryW(string path);
   [System.Runtime.InteropServices.DllImport("kernel32")]
@@ -144,15 +165,24 @@ Add-Type -Namespace CiProbe -Name Native -MemberDefinition @"
   public static extern bool FreeLibrary(System.IntPtr h);
   [System.Runtime.InteropServices.DllImport("kernel32", CharSet=System.Runtime.InteropServices.CharSet.Unicode)]
   public static extern bool SetDllDirectory(string path);
-"@
-[CiProbe.Native]::SetDllDirectory($fuck) | Out-Null
-$h = [CiProbe.Native]::LoadLibraryW((Join-Path $fuck "main.dll"))
-$err = [CiProbe.Native]::GetLastError()
-if ($h -eq [IntPtr]::Zero) {
-  Write-Host "  LoadLibrary(main.dll) FAILED GetLastError=$err"
+'@
+[CiProbe.Native]::SetDllDirectory('$fuck') | Out-Null
+`$h = [CiProbe.Native]::LoadLibraryW('$(Join-Path $fuck "main.dll")')
+`$err = [CiProbe.Native]::GetLastError()
+if (`$h -eq [IntPtr]::Zero) {
+  Write-Output "FAIL `$(`$err)"
+  exit 1
 } else {
-  Write-Host ("  LoadLibrary(main.dll) OK handle=0x{0:X}" -f $h.ToInt64())
-  [void][CiProbe.Native]::FreeLibrary($h)
+  Write-Output ("OK 0x{0:X}" -f `$h.ToInt64())
+  [void][CiProbe.Native]::FreeLibrary(`$h)
+  exit 0
+}
+"@
+  $out = & $wow -NoProfile -Command $probeScript 2>&1
+  Write-Host "  32-bit probe: $out"
+  if ($LASTEXITCODE -ne 0) {
+    throw "32-bit LoadLibrary(main.dll) failed: $out"
+  }
 }
 
 Write-Host "Staging done."
