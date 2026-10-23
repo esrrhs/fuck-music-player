@@ -19,7 +19,12 @@ bool God::Ini()
 	LOG_ENTER
 	srand((u32)time(0));
 	SetStauts(God::GS_START);
-	SINGLETON(Render).Ini();
+	if (!SINGLETON(Render).Ini())
+	{
+		LOG_ERROR("Render::Ini failed — no D3D device; UI will not paint");
+		LOG_LEAVE
+		return false;
+	}
 	SINGLETON(MusicMng).ini();
 	SINGLETON(UIMng).ini();
 	LOG_LEAVE
@@ -48,6 +53,10 @@ bool God::Loop()
 }
 bool God::Hearbeat(double elapsed)
 {
+	if (!SINGLETON(Render).GetDevice())
+	{
+		return false;
+	}
 	SINGLETON(Render).Begin();
 
 	SINGLETON(MusicMng).heartbeat(elapsed);

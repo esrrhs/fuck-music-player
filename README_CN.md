@@ -22,9 +22,9 @@
 
 一次成功的示例（含 logo 构建与窗口截图）：[#39915123064](https://github.com/esrrhs/fuck-music-player/actions/runs/39915123064)。
 
-播放器外壳（CI 截图，无音频/FMOD）：
+播放器完整界面（CI 截取 CEGUI 主界面，无音频/FMOD）：
 
-![Windows CI 截取的 FuckMPlayer 窗口](docs/player-shell.png)
+![Windows CI 截取的 FuckMPlayer CEGUI 完整界面](docs/player-shell.png)
 
 ## 特性
 

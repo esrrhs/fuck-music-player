@@ -50,6 +50,12 @@ void UIMng::create_cegui_system()
 	LOG_ENTER;
 
 	void * pD3DDevice = SINGLETON(Render).GetDevice();
+	if (!pD3DDevice)
+	{
+		LOG_ERROR("no D3D device for CEGUI");
+		LOG_LEAVE;
+		return;
+	}
 
 	// ´´½¨cegui
 	CEGUI::Direct3D9Renderer& renderer(CEGUI::Direct3D9Renderer::create((LPDIRECT3DDEVICE9)pD3DDevice));
