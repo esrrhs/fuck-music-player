@@ -232,17 +232,19 @@ function Test-UiPainted([string]$path) {
   $whitePct = if ($samples -gt 0) { [int](100 * $whiteish / $samples) } else { 100 }
   $chromaPct = if ($samples -gt 0) { [int](100 * $chroma / $samples) } else { 0 }
   Write-Diag ("Paint probe: unique~{0} greyish~{1}% blackish~{2}% whiteish~{3}% chroma~{4}% chromaN={5} samples={6} size={7}x{8}" -f $unique, $greyPct, $blackPct, $whitePct, $chromaPct, $chroma, $samples, $w, $h)
-  # Player clears to black; real CEGUI chrome is sparse (red/green/blue labels + Taharez beige).
-  # Reject empty grey/white GDI clients and pure-black clears with zero chroma.
+  # Designed UI: NASA GPN wallpaper + Taharez chrome (not flat D3D black / empty GDI).
+  # Reject grey/white clients and near-pure black clears (missing BackgroundImage).
   $hasChrome = ($chroma -ge 3) -or ($chromaPct -ge 1 -and $unique -ge 10)
-  $ok = $hasChrome -and ($greyPct -lt 60) -and ($whitePct -lt 60) -and ($unique -ge 8)
+  $hasBackground = ($blackPct -lt 75) -and ($unique -ge 20)
+  $ok = $hasChrome -and $hasBackground -and ($greyPct -lt 60) -and ($whitePct -lt 60)
   return @{ Ok = $ok; Unique = $unique; GreyPct = $greyPct; BlackPct = $blackPct; WhitePct = $whitePct; ChromaPct = $chromaPct; Chroma = $chroma }
 }
 
-# Give main.dll time to create D3D + load CEGUI schemes/layouts after splash skip.
-Write-Diag "Waiting for CEGUI/D3D first paint (multi-attempt)..."
-Start-Sleep -Seconds 5
-$captureDeadline = (Get-Date).AddSeconds(60)
+# Give main.dll time to create D3D + load CEGUI, finish filefinder, and leave the
+# 3s post-scan loading screen so uiwheel (multi-track list) is visible.
+Write-Diag "Waiting for CEGUI/D3D + wheel list (filefinder + find_end_stay)..."
+Start-Sleep -Seconds 12
+$captureDeadline = (Get-Date).AddSeconds(50)
 $attempt = 0
 $bestPath = $null
 $bestScore = -1

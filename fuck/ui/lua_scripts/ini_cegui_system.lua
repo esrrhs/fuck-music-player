@@ -98,7 +98,15 @@ logger:logEvent( "ini_cegui_system begin..." )
 
 schemeMgr:create("TaharezLook.scheme");
 
-local root = winMgr:createWindow("DefaultWindow", "Root")
+-- Designed wallpaper: CEGUI sample NASA GPN-2000-001437.tga (was deleted in 2011;
+-- without it the D3D clear stays flat black behind transparent DefaultWindow).
+CEGUI.ImagesetManager:getSingleton():createFromImageFile("BackgroundImage", "GPN-2000-001437.tga");
+
+local root = winMgr:createWindow("TaharezLook/StaticImage", "Root")
+root:setProperty("UnifiedAreaRect", "{{0,0},{0,0},{1,0},{1,0}}")
+root:setProperty("FrameEnabled", "False")
+root:setProperty("BackgroundEnabled", "False")
+root:setProperty("Image", "set:BackgroundImage image:full_image")
 
 guiSystem:setGUISheet(root)
 guiSystem:setDefaultMouseCursor("TaharezLook", "MouseArrow")

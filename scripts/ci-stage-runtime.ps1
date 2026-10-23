@@ -187,12 +187,24 @@ module_names=main
 Write-Host "  Rewrote process.cfg to skip logo.dll (main only) for CI UI capture"
 
 # Local music scan dir so filefinder finishes quickly and loading/wheel UI has a path.
+# Several distinctly named stubs so the wheel list shows multiple rows (not one title).
 $ciMusic = Join-Path $fuck "ci-music"
 New-Item -ItemType Directory -Force -Path $ciMusic | Out-Null
-$dummyMp3 = Join-Path $ciMusic "ci-sample.mp3"
-if (-not (Test-Path $dummyMp3)) {
-  # Minimal valid-enough stub (not a real MP3); filefinder only matches extension.
-  [System.IO.File]::WriteAllBytes($dummyMp3, [byte[]](0x49,0x44,0x33))
+# Wipe prior stubs so the list is exactly what we stage (avoid stale single-file dirs).
+Get-ChildItem $ciMusic -File -ErrorAction SilentlyContinue | Remove-Item -Force
+$stubId3 = [byte[]](0x49,0x44,0x33)  # "ID3" - filefinder only matches extension
+$ciTracks = @(
+  "aurora-dreams.mp3",
+  "blue-horizon.mp3",
+  "crystal-lake.wav",
+  "dusk-waltz.mp3",
+  "echo-station.mp3",
+  "forest-path.wav",
+  "golden-hour.mp3"
+)
+foreach ($name in $ciTracks) {
+  [System.IO.File]::WriteAllBytes((Join-Path $ciMusic $name), $stubId3)
+  Write-Host "  + ci-music/$name"
 }
 $ciFinderCfg = Join-Path $fuck "filefinder.cfg"
 @"
@@ -201,7 +213,7 @@ filter=.mp3;.wav
 sleep_time=0
 thread_num=2
 "@ | Set-Content -Path $ciFinderCfg -Encoding ascii
-Write-Host "  Pointed filefinder.cfg at fuck/ci-music for fast CI scan"
+Write-Host "  Pointed filefinder.cfg at fuck/ci-music ($($ciTracks.Count) stub tracks)"
 
 Write-Host "=== fuck/ staging summary ==="
 Get-ChildItem $fuck -File | Sort-Object Name | ForEach-Object {
